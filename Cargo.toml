@@ -1,0 +1,6 @@
+[package]
+name = "druzhba"
+version = "0.1.0"
+authors = ["Aatish Varma", "Jiayang Wang", "Anirudh Sivaraman"]
+
+[dependencies]
