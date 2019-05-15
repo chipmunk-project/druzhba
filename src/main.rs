@@ -1,9 +1,11 @@
 fn main() {
+  // List of all stages
+  let pipeline_stages = Vec::<PipelineStage>();
   // Outer simulation loop
   for tick in 0..10000 {
     println!("Tick number {}", tick);
-    // TODO: Create random test PHV container.
-
-    // TODO: Move container in the pipeline forward to the next stage.
+    for stage in stages {
+      stage.tick(tick);
+    }
   }
 }
