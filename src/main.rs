@@ -1,5 +1,7 @@
-mod pipeline_stage;
+extern crate druzhba;
 
+use druzhba::pipeline_stage;
+use druzhba::pipeline;
 fn main() {
   // List of all stages
   let pipeline_stages = vec![pipeline_stage::PipelineStage{};10];
