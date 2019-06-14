@@ -1,15 +1,23 @@
 extern crate druzhba;
 
-use druzhba::pipeline_stage;
-use druzhba::pipeline;
+use druzhba::pipeline_stage::PipelineStage;
+use druzhba::pipeline::Pipeline;
+use druzhba::phv::Phv;
+use druzhba::phv_container::PhvContainer;
+
 fn main() {
   // List of all stages
-  let pipeline_stages = vec![pipeline_stage::PipelineStage{};10];
-  // Outer simulation loop
-  for tick in 0..100 {
-    println!("Tick number {}", tick);
-    for stage in &pipeline_stages {
-      stage.tick(tick);
-    }
+  let pipeline_stages = vec![PipelineStage{};5];
+  
+  let pipeline : Pipeline = Pipeline::new(&pipeline_stages); 
+
+  for i in 0..10{
+    let mut map : PhvContainer = PhvContainer::new();
+    map["field0"]= 0;
+    map["field1"]= 1;
+    let packet : Phv = Phv::with_container(map);
+    let new_packet : Phv = pipeline.tick(packet);
+    println!("Packet {} : {}", i , new_packet);
   }
 }
+

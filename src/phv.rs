@@ -23,6 +23,7 @@ impl Phv{
   // initialized
   pub fn new () -> Self {
     let m : HashMap <FieldName, FieldType> = HashMap::new();
+<<<<<<< HEAD
     let c : PhvContainer <i32> = PhvContainer{ map : m };
 
     Phv { bubble : true, packet : c }
@@ -31,6 +32,15 @@ impl Phv{
   // Alternate constructor that takes in a PhvContainer
   pub fn with_container (c : PhvContainer <i32>) -> Self{
     Phv { bubble : false, packet : c}
+=======
+    let c : PhvContainer = PhvContainer{ map : m };
+
+    Phv {bubble : true, packet : c }
+  } 
+  // Alternate constructor that takes in a PhvContainer
+  pub fn with_container (c : PhvContainer) -> Self{
+    Phv {bubble : false, packet : c}
+>>>>>>> e446e82... First commit
   }
   pub fn is_bubble (&self) -> bool {
     self.bubble
@@ -64,7 +74,6 @@ impl IndexMut<&str> for Phv {
 // so ensure to clone it when using += if the ownership
 // is intended to be retained.
 impl AddAssign for Phv {
-
   fn add_assign (&mut self, t_packet : Self){
 
     assert! (!t_packet.is_bubble());
