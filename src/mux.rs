@@ -18,7 +18,7 @@ impl Mux{
         return self.n_values[self.index_to_return];
     }
 }
-
+/*
 fn main(){
     let ten_val_arr : Vec<i32> = vec![0,1,2,3,4,5,6,7,8,9];
     let index: usize = 3;
@@ -26,4 +26,4 @@ fn main(){
     println!("The value returned from this mux is {}", m.return_value().to_string());
 }
 
-
+*/
