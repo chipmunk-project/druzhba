@@ -24,11 +24,12 @@ impl PhvContainer{
     PhvContainer { map : h.clone() }
   }
 
-   pub fn field_list(&self) -> Vec<String> {
+   pub fn field_list (&self) -> Vec<String> {
+
      let mut field_names : Vec <String> = Vec::new();
-     for (name, _) in self.map.iter() {
-       field_names.push (name.clone());
-     }
+     self.map.iter().for_each( |(name, _)| 
+       field_names.push (name.clone()));
+
      field_names
    }
 }
@@ -36,8 +37,8 @@ impl PhvContainer{
 // Overloads the index operator: [ ]. Enables packet 
 // fields to be attained by using pc [fn], where fn
 // is the field name and pc is the PhvContainer.
-impl Index<&str> for PhvContainer{
-  type Output=i32;
+impl Index <&str> for PhvContainer{
+  type Output = i32;
   fn index (&self, idx : &str) -> &i32{
 
     assert!(self.map.contains_key(idx));
@@ -78,26 +79,28 @@ impl AddAssign for PhvContainer {
      // from the key/value pairs in t_container. If the same key
      // is in both containers, verify that the values corresponding
      // to that key are the same. If not, then exit.
-     for (name, _) in t_container.map.iter() {
-       if self.map.contains_key (name){
+     t_container.map.iter().for_each (|(name, _)| {
+       if self.map.contains_key(name){
          if self[name] != t_container[name] {
+
            panic!("Values of containers for key {} do not match", name)
          }
        }
-     }
-     // Repeat for other container
-     for (name, _) in self.map.iter() {
-       if t_container.map.contains_key (name){
+     });
+     self.map.iter().for_each (|(name, _)| {
+       if t_container.map.contains_key(name){
          if self[name] != t_container[name] {
+
            panic!("Values of containers for key {} do not match", name)
          }
        }
-     }
+     });
+
     // Add all values to field_names which will replace current
     // HashMap
-    for (name, &value) in t_container.map.iter() {
-      field_names.insert(name.clone(), value.clone());
-    }
+    t_container.map.iter().for_each ( |(name, &value)|{
+      field_names.insert (name.clone(), value.clone());
+    });
     *self = PhvContainer { map : field_names };
   }
 }

@@ -64,18 +64,7 @@ fn main() {
     let new_packet : Phv = pipeline.tick (packet);
 
     if new_packet.is_bubble() {
-
       println! ("Output packet: {} ", new_packet);
-      // After packet has completed run through pipeline,
-      // print out new values corresponding to output fields
-      /*
-      println! ("Output packet");
-      output_list
-          .iter()
-          .for_each ( |s| {
-              println! ("{} : {}", s, new_packet [s] ) 
-          });
-          */
     }
   }
 
