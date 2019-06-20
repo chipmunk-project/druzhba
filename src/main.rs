@@ -38,8 +38,8 @@ fn main() {
   let ticks : i32 = 
     match args[3].parse::<i32>() {
 
-      Ok  (_)   => args[3].parse::<i32>().unwrap(),
-      Err (_)   => panic!("Failure: Unable to unwrap ticks"),
+      Ok  (ticks_arg) => ticks_arg,
+      Err (_)         => panic!("Failure: Unable to unwrap ticks"),
     };
   assert! (ticks >= 1);
   let pipeline : Pipeline = prog_to_run::init_pipeline();
