@@ -113,6 +113,7 @@ pub fn init_pipeline (input_fields : &Vec <String>) -> Pipeline
   stages.push (pipeline_stage2);
 
   let pipeline : Pipeline = Pipeline::with_pipeline_stages(stages);
+
   pipeline 
 }
 
