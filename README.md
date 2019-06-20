@@ -3,7 +3,7 @@ Programmable switch pipeline simulator.
 To execute, run the following:
 
     cargo build
-    cargo run <comma-separated list of input fields> <comma-separated list of output fields> <tickss>
+    cargo run <comma-separated list of input fields> <comma-separated list of output fields> <ticks>
 
 Example:
 
