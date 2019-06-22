@@ -12,6 +12,7 @@ use rand::Rng;
 use std::env;
 use std::process;
 
+#[warn(unused_imports)]
 // Takes in a comma-separated &String and returns
 // a vector of String 
 fn string_from_csv (csv : &String) -> Vec <String>
@@ -48,7 +49,7 @@ fn main() {
   // specified input fields set to random values from
   // 0 to 100. Send packet through pipeline and 
   // retrieve resulting packet.
-  for t in 0..ticks {
+  for _t in 0..ticks {
     let mut map : PhvContainer = PhvContainer::new();
     let mut packet : Phv = Phv::with_container (map);
 
@@ -67,6 +68,5 @@ fn main() {
       println! ("Output packet: {} ", new_packet);
     }
   }
-
 }
 
