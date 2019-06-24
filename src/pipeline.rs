@@ -9,9 +9,10 @@ pub struct Pipeline {
 
 impl Pipeline {
     
-  pub fn new (t_pipeline_stages : &Vec <PipelineStage>) -> Self {
-    Pipeline {pipeline_stages : t_pipeline_stages.clone() }
+  pub fn new (t_pipeline_stages : Vec <PipelineStage>) -> Self {
+    Pipeline {pipeline_stages : t_pipeline_stages }
   }
+  
 
   // Calls tick on current packet with all of the
   // stages in the pipeline

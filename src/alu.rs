@@ -1,4 +1,3 @@
-// TODO: File representing stateful and stateless ALUs.
 
 use crate::phv_container::PhvContainer;
 use crate::phv::Phv;

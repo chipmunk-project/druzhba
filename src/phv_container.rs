@@ -20,8 +20,8 @@ impl PhvContainer{
 
   // Alternate constructor that takes in a HashMap for use
   // in initializing PhvContainer.
-  pub fn with_map (h : &HashMap <String, i32>) -> Self{
-    PhvContainer { map : h.clone() }
+  pub fn with_map (h : HashMap <String, i32>) -> Self{
+    PhvContainer { map : h }
   }
 
    pub fn field_list (&self) -> Vec<String> {
