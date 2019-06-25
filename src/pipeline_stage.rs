@@ -22,7 +22,9 @@ impl PipelineStage {
   pub fn with_atoms (vec_of_atoms : Vec <ALU> ) -> Self{
     PipelineStage { atoms : vec_of_atoms }
   }
-
+  pub fn add_atom (&mut self, alu : ALU) {
+    self.atoms.push (alu)
+  }
   pub fn tick(&self, packet : Phv) -> Phv { 
 
     if packet.is_bubble(){
@@ -43,7 +45,6 @@ impl PipelineStage {
       // Goes through atoms in random order and calls 
       // each atom on incoming packet. Accumulate them
       // all together in ret
-      let mut i : i32 = 0;
       for atom in tmp_atoms.iter_mut() {
 
         let mut current_phv = packet.clone();

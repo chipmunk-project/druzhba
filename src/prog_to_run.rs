@@ -102,7 +102,6 @@ pub fn init_pipeline (input_fields : &Vec <String>) -> Pipeline
   // Create pipeline stages, initializing them with atom vectors
   let pipeline_stage0 : PipelineStage = PipelineStage::with_atoms(atoms0);
   let pipeline_stage1 : PipelineStage = PipelineStage::with_atoms(atoms1);
-
   let mut pipeline_stage2 : PipelineStage = PipelineStage::with_atoms(atoms2);
   // Append alu3 directly to pipeline_stage instead of adding to 
   // ALU vector
