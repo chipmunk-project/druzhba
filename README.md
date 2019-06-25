@@ -8,4 +8,4 @@ To execute, run the following:
 Example:
 
     cargo build
-    cargo run arrival_time,dport,new_hop,next_hop,sport  arrival_time,dport,new_hop,next_hop,sport  100
+    cargo run arrival_time,dport,new_hop,next_hop,sport,last_time  arrival_time,dport,new_hop,next_hop,sport,last_time  100

@@ -27,9 +27,7 @@ fn atom0 (packet : &mut Phv,
 
 fn atom1 (packet : &mut Phv, 
           state_scalar : &mut StateScalar, 
-          state_array : &mut StateArray) 
-{
-
+          state_array : &mut StateArray) {
   state_scalar ["new_hop"] = packet ["new_hop"];
   packet["new_hop"] = 0;
   state_scalar ["sport"] = packet ["sport"] * 5;
@@ -60,6 +58,7 @@ fn atom3 ( packet : &mut Phv,
   v.push (10);
   state_array ["test_field"] = v;
 }
+
 
 // Initializes a new pipeline by creating ALUs based on the
 // above atom functions, placing them each into a pipeline_stage,
@@ -103,6 +102,7 @@ pub fn init_pipeline (input_fields : &Vec <String>) -> Pipeline
   // Create pipeline stages, initializing them with atom vectors
   let pipeline_stage0 : PipelineStage = PipelineStage::with_atoms(atoms0);
   let pipeline_stage1 : PipelineStage = PipelineStage::with_atoms(atoms1);
+
   let mut pipeline_stage2 : PipelineStage = PipelineStage::with_atoms(atoms2);
   // Append alu3 directly to pipeline_stage instead of adding to 
   // ALU vector

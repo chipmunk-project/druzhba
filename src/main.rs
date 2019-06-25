@@ -3,14 +3,12 @@ extern crate rand;
 
 mod prog_to_run;
 
-use druzhba::pipeline_stage::PipelineStage;
 use druzhba::pipeline::Pipeline;
 use druzhba::phv::Phv;
 use druzhba::phv_container::PhvContainer;
 
 use rand::Rng;
 use std::env;
-use std::process;
 
 #[warn(unused_imports)]
 // Takes in a comma-separated &String and returns
@@ -43,7 +41,7 @@ fn main() {
       Err (_)         => panic!("Failure: Unable to unwrap ticks"),
     };
   assert! (ticks >= 1);
-  let pipeline : Pipeline = prog_to_run::init_pipeline();
+  let pipeline : Pipeline = prog_to_run::init_pipeline(&input_list);
 
   // For every tick create a new packet with the 
   // specified input fields set to random values from
@@ -63,8 +61,9 @@ fn main() {
 
     println!("Input packet: {} ", packet);
     let new_packet : Phv = pipeline.tick (packet);
+    println!("Is bubble: {}", new_packet.is_bubble());
 
-    if new_packet.is_bubble() {
+    if !new_packet.is_bubble() {
       println! ("Output packet: {} ", new_packet);
     }
   }

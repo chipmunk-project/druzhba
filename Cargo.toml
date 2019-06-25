@@ -5,4 +5,5 @@ authors = ["Aatish Varma", "Jiayang Wang", "Anirudh Sivaraman"]
 
 [dependencies]
 
-rand = "0.3.0"
+rand = "*"
+num = "*"

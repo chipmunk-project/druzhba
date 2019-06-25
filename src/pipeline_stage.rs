@@ -4,6 +4,7 @@ extern crate rand;
 
 use crate::phv::Phv;
 use crate::alu::ALU;
+use crate::phv_container::PhvContainer;
 
 use self::rand::{thread_rng, Rng};
 #[derive(Clone)]
@@ -30,7 +31,8 @@ impl PipelineStage {
     
     else{
 
-      let mut ret = Phv::new();
+      let container : PhvContainer = PhvContainer::new();
+      let mut ret = Phv::with_container(container);
       let mut tmp_atoms : Vec <ALU> = self.atoms.clone();
       // TODO: Currently shuffling tmp_atoms. Consider
       // adding self.atoms. To do so, we would also need
@@ -41,11 +43,13 @@ impl PipelineStage {
       // Goes through atoms in random order and calls 
       // each atom on incoming packet. Accumulate them
       // all together in ret
-      for atom in tmp_atoms {
+      let mut i : i32 = 0;
+      for atom in tmp_atoms.iter_mut() {
+
         let mut current_phv = packet.clone();
-        // TODO: Ensure atom is called
-    //    current_phv = atom.run (current_phv);
+        current_phv = atom.run (current_phv);
         ret += current_phv;
+
       }
       ret
     }
