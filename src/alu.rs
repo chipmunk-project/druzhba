@@ -2,7 +2,6 @@
 use crate::phv_container::PhvContainer;
 use crate::phv::Phv;
 
-
 #[derive(Clone)]
 pub struct ALU{
 
@@ -46,7 +45,6 @@ impl ALU {
            &mut self.state_scalar, 
            &mut self.state_array );
     }
-   
 }
 
 

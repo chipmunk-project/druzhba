@@ -1,12 +1,13 @@
 extern crate druzhba;
 extern crate rand;
-
+//extern crate num;
 mod prog_to_run;
 
 use druzhba::pipeline::Pipeline;
 use druzhba::phv::Phv;
 use druzhba::phv_container::PhvContainer;
 
+use std::collections::HashMap;
 use rand::Rng;
 use std::env;
 
@@ -48,8 +49,10 @@ fn main() {
   // 0 to 100. Send packet through pipeline and 
   // retrieve resulting packet.
   for _t in 0..ticks {
-    let mut map : PhvContainer = PhvContainer::new();
-    let mut packet : Phv = Phv::with_container (map);
+    
+    let map : HashMap <String, i32> = HashMap::new();
+    let mut container : PhvContainer <i32> = PhvContainer::with_map(map);
+    let mut packet : Phv = Phv::with_container (container);
 
     // Initializes packet with all of the input fields
     // along with a random value

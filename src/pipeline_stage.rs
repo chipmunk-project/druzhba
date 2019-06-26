@@ -6,6 +6,7 @@ use crate::phv::Phv;
 use crate::alu::ALU;
 use crate::phv_container::PhvContainer;
 
+use std::collections::HashMap;
 use self::rand::{thread_rng, Rng};
 #[derive(Clone)]
 
@@ -32,8 +33,8 @@ impl PipelineStage {
     }
     
     else{
-
-      let container : PhvContainer = PhvContainer::new();
+      let map : HashMap <String, i32> = HashMap::new();
+      let container : PhvContainer <i32> = PhvContainer::with_map(map);
       let mut ret = Phv::with_container(container);
       let mut tmp_atoms : Vec <ALU> = self.atoms.clone();
       // TODO: Currently shuffling tmp_atoms. Consider

@@ -28,6 +28,7 @@ fn atom0 (packet : &mut Phv,
 fn atom1 (packet : &mut Phv, 
           state_scalar : &mut StateScalar, 
           state_array : &mut StateArray) {
+
   state_scalar ["new_hop"] = packet ["new_hop"];
   packet["new_hop"] = 0;
   state_scalar ["sport"] = packet ["sport"] * 5;
@@ -49,8 +50,7 @@ fn atom2 (packet : &mut Phv,
 }
 fn atom3 ( packet : &mut Phv, 
            state_scalar : &mut StateScalar, 
-           state_array : &mut StateArray) 
-{
+           state_array : &mut StateArray) {
 
   state_scalar ["last_time"] += 1;
   let mut v : Vec <i32> = Vec::new();
