@@ -1,6 +1,6 @@
 extern crate druzhba;
 extern crate rand;
-//extern crate num;
+
 mod prog_to_run;
 
 use druzhba::pipeline::Pipeline;

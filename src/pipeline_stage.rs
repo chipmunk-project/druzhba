@@ -23,16 +23,22 @@ impl PipelineStage {
   pub fn with_atoms (vec_of_atoms : Vec <ALU> ) -> Self{
     PipelineStage { atoms : vec_of_atoms }
   }
-  pub fn add_atom (&mut self, alu : ALU) {
-    self.atoms.push (alu)
+  pub fn add_atom (&mut self, t_alu : ALU) {
+    self.atoms.push (t_alu)
   }
-  pub fn tick(&self, packet : Phv) -> Phv { 
 
-    if packet.is_bubble(){
-      packet
+  // Iterates through all atoms stored and calls their 
+  // underlying function on the incoming Phv in 
+  // random order. Returns the Phv of the summation
+  // of all atom runs on the Phv.
+  pub fn tick(&self, t_packet : Phv) -> Phv { 
+
+    if t_packet.is_bubble(){
+      t_packet
     }
     
-    else{
+    else {
+
       let map : HashMap <String, i32> = HashMap::new();
       let container : PhvContainer <i32> = PhvContainer::with_map(map);
       let mut ret = Phv::with_container(container);
@@ -48,8 +54,8 @@ impl PipelineStage {
       // all together in ret
       for atom in tmp_atoms.iter_mut() {
 
-        let mut current_phv = packet.clone();
-        current_phv = atom.run (current_phv);
+        let mut current_phv = t_packet.clone();
+        atom.run (&mut current_phv);
         ret += current_phv;
 
       }

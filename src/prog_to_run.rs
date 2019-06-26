@@ -22,7 +22,6 @@ fn atom0 (packet : &mut Phv,
   }
   state_scalar["last_time"]= packet["arrival_time"];
   packet["next_hop"] = state_scalar ["next_hop"];
-  packet
 }
 
 fn atom1 (packet : &mut Phv, 
@@ -113,7 +112,6 @@ pub fn init_pipeline (input_fields : &Vec <String>) -> Pipeline
   stages.push (pipeline_stage2);
 
   let pipeline : Pipeline = Pipeline::with_pipeline_stages(stages);
-
   pipeline 
 }
 

@@ -7,32 +7,37 @@ use std::collections::HashMap;
 
 #[derive(Clone)]
 pub struct PhvContainer <T> {
+
   pub map: HashMap<String,T>,
 }
 
-impl<T> PhvContainer<T> 
-  where T : Clone {
-
+impl<T> PhvContainer<T> {
+ 
+  pub fn new () -> Self{
+    let hash : HashMap <String, T> = HashMap::new();
+    PhvContainer { map : hash }
+  }
   // Alternate constructor that takes in a HashMap for use
   // in initializing PhvContainer.
   pub fn with_map (h : HashMap <String, T>) -> Self{
     PhvContainer { map : h }
   }
 
-   pub fn field_list (&self) -> Vec<String> {
+  // Returns vector containing all of the field names
+  // in the phv_container
+  pub fn field_list (&self) -> Vec<String> {
 
-     let mut field_names : Vec <String> = Vec::new();
-     self.map.iter().for_each( |(name, _)| 
-       field_names.push (name.clone()));
+    let mut field_names : Vec <String> = Vec::new();
+    self.map.iter().for_each( |(name, _)| 
+      field_names.push (name.clone()));
 
-     field_names
-   }
+    field_names
+  }
 }
 // Overloads the index operator: [ ]. Enables packet 
 // fields to be attained by using pc [fn], where fn
 // is the field name and pc is the PhvContainer.
-impl <T> Index <&str> for PhvContainer <T> 
-  where T : Default + Clone + PartialEq {
+impl <T> Index <&str> for PhvContainer <T>  {
 
   type Output = T;
   fn index (&self, idx : &str) -> &T{
@@ -44,9 +49,13 @@ impl <T> Index <&str> for PhvContainer <T>
 // Overloads the index operator: [ ]. Enables packet
 // field values to be mutated by returning a mutable
 // reference. pc [fn] = value where fn is the fieldname,
-// value is the new value, and is the PhvContainer
+// value is the new value, and is the PhvContainer.
+//
+// Default trait used in case user accesses element that
+// is not present in map. In this case, it will initialize
+// that value with the default value for that type.
 impl <T> IndexMut<&str> for PhvContainer <T> 
-  where T : Default + Clone + PartialEq{
+  where T : Default {
   fn index_mut (&mut self, idx : &str) -> &mut T {
  
     // Matches against an option
@@ -55,10 +64,8 @@ impl <T> IndexMut<&str> for PhvContainer <T>
       Some (_) => self.map.get_mut(idx).unwrap(),
       None     =>  {
         // Will get an error if return None, so insert
-        // 0 as a "placeholder" before returning mutable
-        // reference
-//        self.map.insert(idx.to_string(), 0);
-//        self.map.insert (idx.to_string(), T::zero());
+        // default value as a "placeholder" before 
+        // returning mutable reference
         self.map.insert (idx.to_string(), T::default());
         self.map.get_mut(idx).unwrap()
       },
@@ -69,9 +76,12 @@ impl <T> IndexMut<&str> for PhvContainer <T>
 // Overloads the += operator. It adds the fields from the
 // given PhvContainer into the current PhvContainer assuming
 // that there are no conflicting values.
+//
+// PartialEq trait needed for != operator. Clone needed for
+// copying names/values into new PhvContainer. Default needed
+// for IndexMut
 impl <T> AddAssign for PhvContainer <T>
-
-  where T : Default + Clone + PartialEq{
+  where T : Default + Clone + PartialEq {
   fn add_assign (&mut self, t_container : Self){
 
      let mut field_names : HashMap <String,T> = self.map.clone();
@@ -110,6 +120,10 @@ impl <T> AddAssign for PhvContainer <T>
 // PhvContainer. Using Display trait also enables the to_string 
 // method to be implemented automatically. Prints the HashMap
 // keys along with its corresponding values
+//
+// fmt::Display needed for allowing values to be converted
+// to strings. Will not be able to print if T does not implement
+// this trait
 impl <T> fmt::Display for PhvContainer <T> 
   where T : fmt::Display {
   fn fmt (&self, f: &mut fmt::Formatter) -> fmt::Result {
