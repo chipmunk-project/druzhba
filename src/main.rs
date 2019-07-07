@@ -1,11 +1,15 @@
-extern crate druzhba;
+// extern crate druzhba;
 extern crate rand;
 
-mod prog_to_run;
+mod program_to_run_akv;
+
+extern crate druzhba;
 
 use druzhba::pipeline::Pipeline;
 use druzhba::phv::Phv;
 use druzhba::phv_container::PhvContainer;
+use druzhba::pipeline_stage::PipelineStage;
+// use druzhba::program_to_run_akv;
 
 use std::collections::HashMap;
 use rand::Rng;
@@ -42,7 +46,7 @@ fn main() {
       Err (_)         => panic!("Failure: Unable to unwrap ticks"),
     };
   assert! (ticks >= 1);
-  let pipeline : Pipeline = prog_to_run::init_pipeline(&input_list);
+  let mut pipeline : Pipeline = program_to_run_akv::init_pipeline();
 
   // For every tick create a new packet with the 
   // specified input fields set to random values from
@@ -50,21 +54,21 @@ fn main() {
   // retrieve resulting packet.
   for _t in 0..ticks {
     
-    let map : HashMap <String, i32> = HashMap::new();
-    let mut container : PhvContainer <i32> = PhvContainer::with_map(map);
-    let mut packet : Phv = Phv::with_container (container);
-
+    let mut packet : Phv<i32> = Phv::new();
     // Initializes packet with all of the input fields
     // along with a random value
     input_list
         .iter()
         .for_each ( |s| {
-            packet[s] = rand::thread_rng().gen_range(0,100); 
+            packet.add_container_to_phv(PhvContainer {field_value : rand::thread_rng().gen_range(0,100)});            
         });
 
+    println!("Tick {}", _t);
     println!("Input packet: {} ", packet);
-    let new_packet : Phv = pipeline.tick (packet);
-    println!("Is bubble: {}", new_packet.is_bubble());
+    // println!("Is bubble: {}", packet.is_bubble());
+    let new_packet : Phv<i32> = pipeline.tick (packet);
+    // println!("Is bubble: {}", new_packet.is_bubble());
+    // println!("Value of first container in packet {}", new_packet.packets[0].field_value);
 
     if !new_packet.is_bubble() {
       println! ("Output packet: {} ", new_packet);
