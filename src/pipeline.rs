@@ -12,7 +12,8 @@ use std::fmt;
 
 pub struct Pipeline {
    pipeline_stages : Vec<PipelineStage>,
-   //[stage number, phv]
+   
+   //Format : key = stage_number, value = PHV
    old_phvs: HashMap<usize, Phv<i32>>,
    new_phvs: HashMap<usize, Phv<i32>>,
 }
@@ -24,7 +25,7 @@ impl Pipeline {
     Pipeline { pipeline_stages : stages, old_phvs: HashMap::new(), new_phvs : HashMap::new() }
   }
 
-   pub fn with_pipeline_stages (t_pipeline_stages : Vec <PipelineStage>) -> Self {
+  pub fn with_pipeline_stages (t_pipeline_stages : Vec <PipelineStage>) -> Self {
     let mut old_phv : HashMap<usize, Phv<i32>> = HashMap::new();
     let mut new_phv : HashMap<usize, Phv<i32>> = HashMap::new();
     for i in 0..t_pipeline_stages.len(){
@@ -35,7 +36,6 @@ impl Pipeline {
   }
 
   pub fn tick (&mut self, t_packet : Phv<i32>) -> Phv<i32> {
-
     if(self.pipeline_stages.len() == 1){
       assert!(self.old_phvs.len() == 0 && self.new_phvs.len() == 0);
       self.pipeline_stages[0].tick(t_packet)
@@ -75,6 +75,3 @@ impl fmt::Display for Pipeline{
       write!(f, "{}", s)
   }
 }
-
-
-

@@ -20,7 +20,6 @@ pub struct ALU{
             &mut Vec<PhvContainer<i32>>
             ),
         
-    //Change this to a state-variable
     pub state_variables : HashMap<String, i32>,
     pub input_mux : InputMux,
     pub output_mux : OutputMux
@@ -55,6 +54,8 @@ impl ALU {
            );
     }
 
+    //Helper functions to allow values to passed from and to muxs
+    
     pub fn input_mux_output(&self) -> PhvContainer<i32>{
         self.input_mux.output()
     }

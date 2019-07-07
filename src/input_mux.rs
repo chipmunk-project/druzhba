@@ -9,7 +9,6 @@ use crate::alu::ALU;
 pub struct InputMux{
     pub input_phv: Phv<i32>,
     pub index: i32,
-    // pub output_value: Option<PhvContainer<T>>
 }
 
 impl InputMux{

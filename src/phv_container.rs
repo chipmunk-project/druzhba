@@ -1,5 +1,3 @@
-  /*By design, PHV Containers are only supposed to hold one field and one value. Hashmaps are intended to hold
-  multiple key-value pairs, so I think this way would be better*/
   use std::clone::Clone;
 
   #[derive(Clone, Default)]
@@ -16,20 +14,3 @@
           self.field_value
       }
     }
-
-    // impl<T> Clone for PhvContainer<T> {
-    //     fn clone(&self) -> PhvContainer<T> {
-    //         *self
-    //     }
-    // }
-
-
-
-// impl<T> Copy for Generate<T> {}
-
-// impl<T> Clone for Generate<T> {
-//     fn clone(&self) -> Self {
-//         *self
-//     }
-// }
-

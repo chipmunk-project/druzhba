@@ -18,7 +18,6 @@ impl PipelineStage {
     let vec_of_atoms : Vec <ALU> = Vec::new();
     PipelineStage { atoms : vec_of_atoms }
   }
-
   pub fn with_atoms (vec_of_atoms : Vec <ALU> ) -> Self{
     PipelineStage { atoms : vec_of_atoms }
   }
@@ -42,10 +41,15 @@ impl PipelineStage {
 
       for atom in tmp_atoms.iter_mut() {
         
+        //PHV is passed to it's corresponding input mux, and
+        //a single container is outputted. Container is put
+        //into a vector and passed to atom
         atom.send_packets_to_input_mux(input_phv.clone());
         let output_of_input_mux = atom.input_mux_output();
         let mut packet_fields : Vec<PhvContainer<i32>> = vec![output_of_input_mux];
         
+        //After being passed to atom, value is sent to an
+        //output mux and put into a PHV
         atom.run(&mut packet_fields);
         atom.send_packets_to_output_mux(packet_fields);
         output_phv.add_container_to_phv(atom.output_mux.output());

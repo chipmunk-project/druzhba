@@ -15,7 +15,6 @@ pub struct Phv<T> {
   pub packets : Vec<PhvContainer<T>> // Vector of PHV Containers
 }
 
-/*different PhvContainer types should be allowed in the PHV*/
 
 impl<T> Phv<T>{
 
@@ -39,8 +38,12 @@ impl<T> Phv<T>{
   }
 }
 
-/*No need for AddAssign Trait implementation for PHV's - there is only one phv per pipeline stage*/
+// Note: No need for AddAssign Trait implementation for PHV's -
+// there is typically one phv per pipeline stage, and all atoms
+// take packet inputs from that PHV
 
+
+//Allows easy access to a container in a PHV
 impl<T> Index<i32> for Phv<T>{
   type Output = PhvContainer<T>;
   fn index(&self, i : i32) -> &Self::Output {
@@ -48,12 +51,14 @@ impl<T> Index<i32> for Phv<T>{
   }
 }
 
+//Allows easy mutation of a container in a PHV
 impl<T> IndexMut<i32> for Phv<T> {
   fn index_mut(&mut self, i: i32 ) -> &mut PhvContainer<T> {
     &mut self.packets[i as usize]
   }
 }
 
+//Allows printing of container values
 impl<T> fmt::Display for Phv<T> where T : fmt::Display {
 
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -66,7 +71,3 @@ impl<T> fmt::Display for Phv<T> where T : fmt::Display {
       write!(f, "{}", s)
   }
 }
-
-
-
-
