@@ -1,5 +1,3 @@
-// TODO: File representing a PHV
-
 use crate::phv_container::PhvContainer;
 use std::collections::HashMap;
 use std::ops::{Index, IndexMut, AddAssign};
@@ -12,81 +10,63 @@ pub type PacketFieldSet = Vec <String>;
 
 
 #[derive(Clone)]
-pub struct Phv {
-  bubble : bool, // false if initialized, true otherwise
-  packet : PhvContainer <i32> // Contains packet fields/values
+pub struct Phv<T> {
+  pub bubble : bool, // false if initialized, true otherwise
+  pub packets : Vec<PhvContainer<T>> // Vector of PHV Containers
 }
 
-impl Phv{
-  // Constructor that initializes new Phv with a new PhvContainer.
-  // Bool bubble is set to true since values have not been
-  // initialized
-  pub fn new () -> Self {
-    let m : HashMap <FieldName, FieldType> = HashMap::new();
-    let c : PhvContainer <i32> = PhvContainer{ map : m };
+/*different PhvContainer types should be allowed in the PHV*/
 
-    Phv { bubble : true, packet : c }
-  } 
+impl<T> Phv<T>{
 
-  // Alternate constructor that takes in a PhvContainer
-  pub fn with_container (c : PhvContainer <i32>) -> Self{
-    Phv { bubble : false, packet : c}
+  pub fn new() -> Self {
+    Phv{ bubble : true, packets: Vec::new()}
   }
-  pub fn is_bubble (&self) -> bool {
-    self.bubble
-  }
-}
-// Overloads the index operator: [ ]. Enables packet 
-// fields to be attained by using phv [fn], where fn
-// is the field name.
-impl Index<&str> for Phv{
 
-  type Output=FieldType;
-  fn index (&self, idx : &str) -> &FieldType{
-    &self.packet[idx]
+  pub fn new_with_pack(pack : PhvContainer<T>) -> Self {
+    let list : Vec<PhvContainer<T>> = vec![pack];
+    Phv{ bubble : false, packets : list }
   }
-}
-// Overloads the index operator: [ ]. Enables packet
-// field values to be mutated by returning a mutable
-// reference. phv [fn] = value where fn is the fieldname
-// and value is the new value
-impl IndexMut<&str> for Phv {
 
-  fn index_mut (&mut self, idx : &str) -> &mut FieldType {
-    &mut self.packet[idx]
+  pub fn is_bubble(&self) -> bool {
+    self.bubble == true
   }
-}
-// Overloads the += operator. If the given packet has been
-// initialized (i.e. bubble is false) then it relies upon
-// PhvContainer's += operator.
-//
-// Note that add_assign takes ownership of the given packet
-// so ensure to clone it when using += if the ownership
-// is intended to be retained.
-impl AddAssign for Phv {
-  fn add_assign (&mut self, t_packet : Self){
 
-    assert! (!t_packet.is_bubble());
-    if self.bubble {
-      self.bubble = false;   
-    }
-    self.packet += t_packet.packet.clone(); 
+  pub fn add_container_to_phv(&mut self, pack: PhvContainer<T>) -> &Self {
+    self.packets.push(pack);
+    self.bubble = false;
+    self
   }
 }
 
-// Uses the fmt functon as part of the Display trait. Allows
-// Phv to be printed with println!("{}", p) where p is a 
-// Phv. Using Display trait also enables the to_string 
-// method to be implemented automatically
-impl fmt::Display for Phv {
-  fn fmt (&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let mut s : String = String::from("");
-    if self.bubble {
-      s.push_str("Bubble: true\n") ;
-    }
+/*No need for AddAssign Trait implementation for PHV's - there is only one phv per pipeline stage*/
 
-    s.push_str (&self.packet.to_string());
-    write!(f, "{}", s)
+impl<T> Index<i32> for Phv<T>{
+  type Output = PhvContainer<T>;
+  fn index(&self, i : i32) -> &Self::Output {
+    &self.packets[i as usize]
   }
 }
+
+impl<T> IndexMut<i32> for Phv<T> {
+  fn index_mut(&mut self, i: i32 ) -> &mut PhvContainer<T> {
+    &mut self.packets[i as usize]
+  }
+}
+
+impl<T> fmt::Display for Phv<T> where T : fmt::Display {
+
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+      let mut s : String = String::from(""); 
+      let mut counter = 0;
+      for container in &self.packets {
+        write!(f, "\nindex : {}, value : {}\n", &counter.to_string(), &self.packets[counter].field_value.to_string());
+        counter += 1;
+      }
+      write!(f, "{}", s)
+  }
+}
+
+
+
 
