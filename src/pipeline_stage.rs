@@ -1,5 +1,3 @@
-// Represents a stage in the pipeline
-
 extern crate rand;
 
 use crate::phv::Phv;
@@ -8,10 +6,11 @@ use crate::phv_container::PhvContainer;
 
 use std::collections::HashMap;
 use self::rand::{thread_rng, Rng};
-#[derive(Clone)]
 
+
+#[derive(Clone)]
 pub struct PipelineStage {
-   atoms : Vec<ALU>,
+   pub atoms : Vec<ALU>,
 }
 
 impl PipelineStage {
@@ -29,37 +28,32 @@ impl PipelineStage {
 
   // Iterates through all atoms stored and calls their 
   // underlying function on the incoming Phv in 
-  // random order. Returns the Phv of the summation
-  // of all atom runs on the Phv.
-  pub fn tick(&self, t_packet : Phv) -> Phv { 
+  // random order. Pass the mutated phv containers to their respective muxes.
+  pub fn tick(&self, input_phv: Phv<i32>) -> Phv<i32>{ 
 
-    if t_packet.is_bubble(){
-      t_packet
-    }
-    
-    else {
-
-      let map : HashMap <String, i32> = HashMap::new();
-      let container : PhvContainer <i32> = PhvContainer::with_map(map);
-      let mut ret = Phv::with_container(container);
+      if (input_phv.is_bubble()) {
+          Phv::new()
+      }
+      else{
+      
+      let mut output_phv : Phv<i32> = Phv {bubble : false, packets: Vec::new() };
       let mut tmp_atoms : Vec <ALU> = self.atoms.clone();
-      // TODO: Currently shuffling tmp_atoms. Consider
-      // adding self.atoms. To do so, we would also need
-      // to make tick functions in this file and in 
-      // pipeline.rs take mutable reference to self
       thread_rng().shuffle(&mut tmp_atoms);
 
-      // Goes through atoms in random order and calls 
-      // each atom on incoming packet. Accumulate them
-      // all together in ret
       for atom in tmp_atoms.iter_mut() {
+        
+        atom.send_packets_to_input_mux(input_phv.clone());
+        let output_of_input_mux = atom.input_mux_output();
+        let mut packet_fields : Vec<PhvContainer<i32>> = vec![output_of_input_mux];
+        
+        atom.run(&mut packet_fields);
+        atom.send_packets_to_output_mux(packet_fields);
+        output_phv.add_container_to_phv(atom.output_mux.output());
+      }
 
-        let mut current_phv = t_packet.clone();
-        atom.run (&mut current_phv);
-        ret += current_phv;
+      output_phv
 
       }
-      ret
+  
     }
   }
-}
