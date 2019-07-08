@@ -1,4 +1,3 @@
-extern crate rand;
 pub mod pipeline_stage;
 pub mod pipeline;
 pub mod phv;
