@@ -45,7 +45,7 @@ impl PipelineStage {
         //a single container is outputted. Container is put
         //into a vector and passed to atom
         atom.send_packets_to_input_mux(input_phv.clone());
-        let output_of_input_mux = atom.input_mux_output();
+        let output_of_input_mux : PhvContainer<i32> = atom.input_mux_output();
         let mut packet_fields : Vec<PhvContainer<i32>> = vec![output_of_input_mux];
         
         //After being passed to atom, value is sent to an
