@@ -42,9 +42,6 @@ impl Pipeline {
     }
     else{
       self.new_phvs.insert(0, self.pipeline_stages[0].tick(t_packet.clone()));
-      for x in 1..5{
-
-      }
       for x in 1..self.pipeline_stages.len() - 1 {
         self.new_phvs.insert(x, self.pipeline_stages[x].tick(self.old_phvs[&(x-1)].clone()));
       }
