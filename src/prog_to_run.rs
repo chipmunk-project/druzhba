@@ -9,7 +9,6 @@ use std::collections::HashMap;
 
 pub type StateScalar = PhvContainer <i32>;
 pub type StateArray = PhvContainer <Vec <i32> >;
-
 // Test ALUs to be used in pipeline that mutate
 // Phv, StateScalar, and StateArray
 fn atom0 (packet : &mut Phv, 

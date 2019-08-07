@@ -3,41 +3,44 @@ use crate::phv_container::PhvContainer;
 use crate::phv::Phv;
 use crate::output_mux::OutputMux;
 use crate::input_mux::InputMux;
-use std::collections::HashMap;
 
 //Use a PHV Container as an object containing all states - *just for now*
 //return the previous states, unmodified or not
 
 
-#[derive(Clone)]
 pub struct ALU{
     
     /*Packet containers from multiple muxs' are passed to an ALU, so should be a struct field and organized
     as a vector of containers compared to a PHV*/
     
     pub sequential_function :
-        fn (&mut HashMap<String, i32>,
-            &mut Vec<PhvContainer<i32>>
-            ),
-        
-    pub state_variables : HashMap<String, i32>,
-    pub input_mux : InputMux,
-    pub output_mux : OutputMux
+        Box <dyn Fn (&mut Vec<i32>,
+             &mut Vec<PhvContainer<i32> >) 
+            -> Vec <i32> >,
+    pub state_variables : Vec<i32>,
+    pub input_muxes : Vec <InputMux> ,
+    pub output_mux : OutputMux,
+    pub is_stateful : bool,
 }
 
 impl ALU {
        
-    pub fn new (function : fn ( &mut HashMap<String, i32>, 
-                                &mut Vec<PhvContainer<i32>>),
-            state_vars : HashMap<String, i32>,
-            imux: InputMux,
-            omux : OutputMux) 
+    pub fn new (function : Box <dyn Fn ( &mut Vec <i32>, 
+                                &mut Vec<PhvContainer<i32>>) 
+                                -> Vec <i32> >,
+            state_vars : Vec <i32>,
+            new_input_muxes: Vec <InputMux>,
+            new_output_mux : OutputMux,
+            stateful_alu : bool) 
             -> ALU {
 
       ALU { sequential_function : function,
             state_variables: state_vars,
-            input_mux: imux,
-            output_mux : omux }
+            input_muxes: new_input_muxes,
+            output_mux : new_output_mux,
+            is_stateful : stateful_alu,
+      
+      }
     }
 
     // Receives mutable reference to Phv and calls underlying 
@@ -46,25 +49,38 @@ impl ALU {
     // packet values. Once function is run, phv value should
     // be passed to the output mux. 
 
-    pub fn run (&mut self, packet_fields: &mut Vec<PhvContainer<i32>>) {
+    pub fn run (&mut self, packet_fields: &mut Vec<PhvContainer<i32>>) -> Vec <i32> {
 
       (self.sequential_function) 
           (&mut self.state_variables,
            packet_fields
-           );
+           )
     }
 
     //Helper functions to allow values to passed from and to muxs
     
-    pub fn input_mux_output(&self) -> PhvContainer<i32>{
-        self.input_mux.output()
+    pub fn input_mux_output(&self) -> Vec<PhvContainer<i32> >{
+        let mut packet_fields : Vec <PhvContainer <i32> > = 
+            Vec::new();
+        for mux in &self.input_muxes{
+          packet_fields.push(mux.output());
+        }
+        packet_fields
     }
-    pub fn send_packets_to_input_mux(&mut self, values: Phv<i32>) {
-        self.input_mux.input_phv = values;   
+    pub fn send_packets_to_input_muxes(&mut self, values : Phv<i32>) {
+        for mux in &mut self.input_muxes{
+          mux.input_phv = values.clone();   
+        }
     }
-    pub fn send_packets_to_output_mux(&mut self, mut values: Vec<PhvContainer<i32>>) {
+    pub fn send_packets_to_output_mux(&mut self, mut values: Vec<i32>) {
         self.output_mux.input_phv_containers.append(&mut values);   
     }  
+    pub fn is_stateful (&self) -> bool {
+        self.is_stateful
+    }
+    pub fn get_state_varables (&self) -> Vec <i32> {
+        self.state_variables.clone()
+    }
 }
 
 

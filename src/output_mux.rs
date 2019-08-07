@@ -1,23 +1,21 @@
 use crate::phv_container::PhvContainer;
-use crate::phv::Phv;
-use crate::alu::ALU;
 
 #[derive(Clone)]
 pub struct OutputMux{
-    pub input_phv_containers: Vec<PhvContainer<i32>>,
+    pub input_phv_containers: Vec<i32>,
     pub index: i32
 }
 
 impl OutputMux{
 
-    pub fn new(&self, input: Vec<PhvContainer<i32>>, i : i32) -> Self {
+    pub fn new(&self, input: Vec<i32>, i : i32) -> Self {
         OutputMux {input_phv_containers : input, index: i}
     }
     
     /*Add a Phv Container to the list of
      input PHV Containers supplied to the OutputMux*/
 
-    pub fn add_phv_container(&mut self, phv_cont : PhvContainer<i32>) {
+    pub fn add_phv_container(&mut self, phv_cont : i32) {
         self.input_phv_containers.push(phv_cont);
     }
     
@@ -25,6 +23,11 @@ impl OutputMux{
      from a list of them */
 
     pub fn output(&self) -> PhvContainer<i32>{
-        self.input_phv_containers[self.index as usize].clone()
+        if self.input_phv_containers.len() == 0{
+            panic!("Error: This output mux has no inputs");
+        }
+        PhvContainer {
+            field_value : self.input_phv_containers[self.index as usize].clone()
+        }
     }
 }
