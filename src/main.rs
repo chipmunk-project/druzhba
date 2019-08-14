@@ -4,14 +4,10 @@ mod program_to_run_akv;
 
 extern crate druzhba;
 
-use druzhba::output_mux::OutputMux;
-use druzhba::input_mux::InputMux;
 use druzhba::pipeline::Pipeline;
 use druzhba::phv::Phv;
 use druzhba::phv_container::PhvContainer;
-use druzhba::pipeline_stage::PipelineStage;
 use druzhba::alu::ALU;
-use druzhba::alu::StateVar;
 
 use rand::Rng;
 use std::env;
