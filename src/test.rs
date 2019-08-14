@@ -1,34 +1,28 @@
-use druzhba::pipeline_stage::PipelineStage;
+use druzhba::output_mux::OutputMux;
+use druzhba::input_mux::InputMux;
 use druzhba::pipeline::Pipeline;
 use druzhba::phv::Phv;
 use druzhba::phv_container::PhvContainer;
+use druzhba::pipeline_stage::PipelineStage;
 use druzhba::alu::ALU;
 use druzhba::alu::StateVar;
-use druzhba::input_mux::InputMux;
-use druzhba::output_mux::OutputMux;
-use std::collections::HashMap;
+
+#[test]
+fn test_pipeline() {
+    fn alu_stateless_fn(  _state_vars: &mut Vec<StateVar>,
+                    packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
+     
+        vec! [packet[0].field_value * 3]
+    }
+
+    fn alu_stateful_fn(  state_vars: &mut Vec<StateVar>,
+                    packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
+        let old_state : Vec <i32> = state_vars.clone();
+        state_vars [0] = 10;
+        old_state
+    }
 
 
-//Stateless ALU
-pub fn alu_stateless_fn(  _state_vars: &mut Vec<StateVar>,
-                packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
- 
-    vec! [packet[0].field_value * 21]
-}
-
-pub fn alu_stateful_fn(  state_vars: &mut Vec<StateVar>,
-                packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
-    let old_state : Vec <i32> = state_vars.clone();
-    state_vars [0] = 21;
-    old_state
-}
-
-
-
-pub fn init_pipeline() -> Pipeline {
-
-    /*Holes provided by *Chipmunk* for input and output muxes of two stages. */
-    
     // Picks the first phv container to input
     // into ALU 
     let alu_one_one_input_mux_index_hole = 0 ;
@@ -77,7 +71,7 @@ pub fn init_pipeline() -> Pipeline {
               output_mux: alu_one_two_output_mux, 
               is_stateful : false };
     
-    let pipeline_stage_one : PipelineStage = PipelineStage{ 
+    let pipeline_stage_one : PipelineStage = PipelineStage { 
         stateful_atoms: vec![alu_one_one], 
         stateless_atoms : vec![alu_one_two] };
 
@@ -90,8 +84,10 @@ pub fn init_pipeline() -> Pipeline {
         vec![InputMux{input_phv: second_phv.clone() , index : alu_two_one_input_mux_index_hole}];
     let alu_two_two_input_muxes : Vec<InputMux> = 
         vec![InputMux{input_phv: second_phv.clone() , index : alu_two_two_input_mux_index_hole}];
-    let alu_two_one_output_mux : OutputMux = OutputMux{input_phv_containers: Vec::new() , index: alu_two_one_output_mux_index_hole};
-    let alu_two_two_output_mux : OutputMux = OutputMux{input_phv_containers: Vec::new() , index: alu_two_two_output_mux_index_hole};
+    let alu_two_one_output_mux : OutputMux = 
+        OutputMux{input_phv_containers: Vec::new() , index: alu_two_one_output_mux_index_hole};
+    let alu_two_two_output_mux : OutputMux = 
+        OutputMux{input_phv_containers: Vec::new() , index: alu_two_two_output_mux_index_hole};
 
     //generate ALUs for second pipeline stage
     
@@ -113,11 +109,42 @@ pub fn init_pipeline() -> Pipeline {
         stateful_atoms: vec![alu_two_one], 
         stateless_atoms: vec![alu_two_two]
     };
-
     //generate pipeline
+    let mut pipeline : Pipeline = Pipeline::with_pipeline_stages(
+        vec![pipeline_stage_one, pipeline_stage_two]);
 
-    let pipeline : Pipeline = Pipeline::with_pipeline_stages(vec![pipeline_stage_one, pipeline_stage_two]);
 
-    pipeline
+    let field_values : Vec<i32> = vec![1, 2, 3, 4, 5, 6,
+                                       7, 8, 9, 10, 11, 12, 
+                                       13, 14, 15, 16, 17, 18,
+                                       19, 20];
+    
+    let ticks : i32 = 20;
+    let mut output_phvs : Vec<Phv<i32>> = Vec::new();
+    for t in 0..ticks {
+    
+        let mut packet : Phv<i32> = Phv::new();
+
+        packet.add_container_to_phv (PhvContainer {
+            field_value : field_values [(t as usize)],
+        });
+        let new_packet : Phv<i32> = pipeline.tick (packet);
+        if !new_packet.is_bubble() {
+          output_phvs.push (new_packet);
+        }
+    }
+    // Assert that the PhvContainer in every Phv is equal
+    // to the initial PhvContainer * 9. This is because we
+    // have two pipeline stages each with a stateless ALU
+    // that returns the Phv's first PhvContainer multiplied
+    // by 3 and the output mux writes this value back to
+    // that same PhvContainer.
+    let mut index : usize = 0;
+    for p in &output_phvs {
+        assert! (p[0].get_value() == 
+                 field_values [index]*9);
+        index+=1;
+    }
 
 }
+

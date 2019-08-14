@@ -1,6 +1,5 @@
 use crate::phv_container::PhvContainer;
-use std::collections::HashMap;
-use std::ops::{Index, IndexMut, AddAssign};
+use std::ops::{Index, IndexMut};
 use std::fmt;
 
 
@@ -62,9 +61,9 @@ impl<T> IndexMut<i32> for Phv<T> {
 impl<T> fmt::Display for Phv<T> where T : fmt::Display {
 
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-      let mut s : String = String::from(""); 
+      let s : String = String::from(""); 
       let mut counter = 0;
-      for container in &self.packets {
+      for _container in &self.packets {
         write!(f, "\nindex : {}, value : {}\n", &counter.to_string(), &self.packets[counter].field_value.to_string());
         counter += 1;
       }

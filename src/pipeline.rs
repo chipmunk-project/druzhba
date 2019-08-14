@@ -35,21 +35,27 @@ impl Pipeline {
     Pipeline { pipeline_stages : t_pipeline_stages, old_phvs: old_phv, new_phvs: new_phv }
   }
 
+  pub fn len (&self) -> usize {
+    self.pipeline_stages.len()
+  }
   pub fn tick (&mut self, t_packet : Phv<i32>) -> Phv<i32> {
-    if(self.pipeline_stages.len() == 1){
+    if self.pipeline_stages.len() == 1{
       assert!(self.old_phvs.len() == 0 && self.new_phvs.len() == 0);
+      
       self.pipeline_stages[0].tick(t_packet)
     }
     else{
+    
       self.new_phvs.insert(0, self.pipeline_stages[0].tick(t_packet.clone()));
       for x in 1..self.pipeline_stages.len() - 1 {
         self.new_phvs.insert(x, self.pipeline_stages[x].tick(self.old_phvs[&(x-1)].clone()));
       }
 
-      let last_phv = self.pipeline_stages[self.pipeline_stages.len() - 1].tick(self.old_phvs[&(self.pipeline_stages.len() - 2)].clone());
-      
+      let length : usize = self.pipeline_stages.len();
+
+      let last_phv = self.pipeline_stages[length - 1].tick(self.old_phvs[&(length - 2)].clone());
+
       mem::swap(&mut self.new_phvs, &mut self.old_phvs);
-      
       last_phv
     }
   }
@@ -59,7 +65,7 @@ impl Pipeline {
 impl fmt::Display for Pipeline{
 
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-      let mut s : String = String::from(""); 
+      let s : String = String::from(""); 
       write!(f, "Old Phvs: \n");
       for (key, value) in &self.old_phvs {
         write!(f, "stage {} : \n{}\n", key, value);
