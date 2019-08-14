@@ -28,6 +28,7 @@ impl PipelineStage {
   // random order. Pass the mutated phv containers to their respective muxes.
   pub fn tick(&mut self, input_phv: Phv<i32>) -> Phv<i32>{ 
 
+//      println!("Working on this input phv {}", input_phv);
       if input_phv.is_bubble() {
         Phv::new()
       }
@@ -63,13 +64,19 @@ impl PipelineStage {
           //After being passed to atom, value is sent to an
           //output mux and put into a PHV
 
-          let result : i32 =  atom.run(&mut packet_fields)[0];
+          let result : i32 =  atom.run(&packet_fields)[0];
           // State variables and returned value from stateless ALU
           let mut output_mux_fields : Vec <i32> = old_state.clone();
+
           output_mux_fields.push (result);
+
+/*          println!("INPUT PHV: {}", input_phv);
+          println!("PAssing {:?} into output mux", output_mux_fields);
+          println!("RESULT: {}", result);*/
           atom.send_packets_to_output_mux(output_mux_fields);
           output_phv.add_container_to_phv(atom.output_mux.output());
         }
+//        println!("OUTPUT PHV {}", output_phv);
         output_phv
       }
     }

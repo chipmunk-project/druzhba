@@ -18,6 +18,9 @@ impl OutputMux{
     pub fn add_phv_container(&mut self, phv_cont : i32) {
         self.input_phv_containers.push(phv_cont);
     }
+    pub fn swap_input_phv_containers (&mut self, t_phv_containers : &Vec <i32>){
+      self.input_phv_containers = t_phv_containers.clone();
+    }
     
     /*  Use input index, to return a single PHV Container
      from a list of them */

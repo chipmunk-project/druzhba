@@ -7,15 +7,15 @@ use crate::input_mux::InputMux;
 //Use a PHV Container as an object containing all states - *just for now*
 //return the previous states, unmodified or not
 
-
+pub type StateVar = i32;
 pub struct ALU{
     
     /*Packet containers from multiple muxs' are passed to an ALU, so should be a struct field and organized
     as a vector of containers compared to a PHV*/
     
     pub sequential_function :
-        Box <dyn Fn (&mut Vec<i32>,
-             &mut Vec<PhvContainer<i32> >) 
+        Box <dyn Fn (&mut Vec <StateVar>,
+                     &Vec <PhvContainer<i32> >) 
             -> Vec <i32> >,
     pub state_variables : Vec<i32>,
     pub input_muxes : Vec <InputMux> ,
@@ -26,19 +26,19 @@ pub struct ALU{
 impl ALU {
        
     pub fn new (function : Box <dyn Fn ( &mut Vec <i32>, 
-                                &mut Vec<PhvContainer<i32>>) 
+                                &Vec<PhvContainer<i32>>) 
                                 -> Vec <i32> >,
-            state_vars : Vec <i32>,
-            new_input_muxes: Vec <InputMux>,
-            new_output_mux : OutputMux,
-            stateful_alu : bool) 
+            t_state_variables : Vec <i32>,
+            t_input_muxes: Vec <InputMux>,
+            t_output_mux : OutputMux,
+            t_is_stateful : bool) 
             -> ALU {
 
       ALU { sequential_function : function,
-            state_variables: state_vars,
-            input_muxes: new_input_muxes,
-            output_mux : new_output_mux,
-            is_stateful : stateful_alu,
+            state_variables: t_state_variables,
+            input_muxes: t_input_muxes,
+            output_mux : t_output_mux,
+            is_stateful : t_is_stateful,
       
       }
     }
@@ -49,7 +49,7 @@ impl ALU {
     // packet values. Once function is run, phv value should
     // be passed to the output mux. 
 
-    pub fn run (&mut self, packet_fields: &mut Vec<PhvContainer<i32>>) -> Vec <i32> {
+    pub fn run (&mut self, packet_fields: &Vec<PhvContainer<i32>>) -> Vec <i32> {
 
       (self.sequential_function) 
           (&mut self.state_variables,
@@ -73,7 +73,7 @@ impl ALU {
         }
     }
     pub fn send_packets_to_output_mux(&mut self, mut values: Vec<i32>) {
-        self.output_mux.input_phv_containers.append(&mut values);   
+      self.output_mux.swap_input_phv_containers (&values);
     }  
     pub fn is_stateful (&self) -> bool {
         self.is_stateful

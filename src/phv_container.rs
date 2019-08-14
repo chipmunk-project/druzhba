@@ -9,7 +9,7 @@ impl<T> PhvContainer<T> where T : Clone {
   pub fn new (value: T) -> Self{
       PhvContainer{ field_value: value, }
   }
-  pub fn get_value(self) -> T {
+  pub fn get_value(&self) -> T {
       self.field_value.clone()
   }
 }
