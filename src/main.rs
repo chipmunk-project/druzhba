@@ -7,7 +7,6 @@ extern crate druzhba;
 use druzhba::pipeline::Pipeline;
 use druzhba::phv::Phv;
 use druzhba::phv_container::PhvContainer;
-use druzhba::alu::ALU;
 
 use rand::Rng;
 use std::env;
@@ -53,6 +52,5 @@ fn main() {
 }
 
 // Runs test in test.rs
-#[cfg(test)]
-mod test;
-
+//#[cfg(test)]
+//mod test;

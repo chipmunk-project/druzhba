@@ -6,18 +6,18 @@ use druzhba::alu::ALU;
 use druzhba::alu::StateVar;
 use druzhba::input_mux::InputMux;
 use druzhba::output_mux::OutputMux;
-use std::collections::HashMap;
 
 
 //Stateless ALU
-pub fn alu_stateless_fn(  _state_vars: &mut Vec<StateVar>,
-                packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
+
+pub fn alu_stateless_fn( _state_vars: &mut Vec<StateVar>,
+                         packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
  
     vec! [packet[0].field_value * 21]
 }
 
-pub fn alu_stateful_fn(  state_vars: &mut Vec<StateVar>,
-                packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
+pub fn alu_stateful_fn( state_vars: &mut Vec<StateVar>,
+                       _packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
     let old_state : Vec <i32> = state_vars.clone();
     state_vars [0] = 21;
     old_state
@@ -70,6 +70,7 @@ pub fn init_pipeline() -> Pipeline {
               input_muxes: alu_one_one_input_muxes, 
               output_mux: alu_one_one_output_mux, 
               is_stateful : true };
+
     let alu_one_two : ALU = 
         ALU { sequential_function: Box::new(alu_stateless_fn), 
               state_variables: Vec::new(), 

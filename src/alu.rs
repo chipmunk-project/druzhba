@@ -12,11 +12,10 @@ pub struct ALU{
     
     /*Packet containers from multiple muxs' are passed to an ALU, so should be a struct field and organized
     as a vector of containers compared to a PHV*/
-    
     pub sequential_function :
         Box <dyn Fn (&mut Vec <StateVar>,
                      &Vec <PhvContainer<i32> >) 
-            -> Vec <i32> >,
+                    -> Vec <i32> >,
     pub state_variables : Vec<i32>,
     pub input_muxes : Vec <InputMux> ,
     pub output_mux : OutputMux,
@@ -39,7 +38,6 @@ impl ALU {
             input_muxes: t_input_muxes,
             output_mux : t_output_mux,
             is_stateful : t_is_stateful,
-      
       }
     }
 
@@ -48,7 +46,6 @@ impl ALU {
     // state_array. Mutates Phv in place with appropriate 
     // packet values. Once function is run, phv value should
     // be passed to the output mux. 
-
     pub fn run (&mut self, packet_fields: &Vec<PhvContainer<i32>>) -> Vec <i32> {
 
       (self.sequential_function) 
@@ -58,7 +55,6 @@ impl ALU {
     }
 
     //Helper functions to allow values to passed from and to muxs
-    
     pub fn input_mux_output(&self) -> Vec<PhvContainer<i32> >{
         let mut packet_fields : Vec <PhvContainer <i32> > = 
             Vec::new();
@@ -72,8 +68,8 @@ impl ALU {
           mux.input_phv = values.clone();   
         }
     }
-    pub fn send_packets_to_output_mux(&mut self, mut values: Vec<i32>) {
-      self.output_mux.swap_input_phv_containers (&values);
+    pub fn send_packets_to_output_mux(&mut self, values: &Vec<i32>) {
+      self.output_mux.swap_input_phv_containers (values);
     }  
     pub fn is_stateful (&self) -> bool {
         self.is_stateful

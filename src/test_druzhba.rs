@@ -1,27 +1,26 @@
-use druzhba::output_mux::OutputMux;
-use druzhba::input_mux::InputMux;
-use druzhba::pipeline::Pipeline;
-use druzhba::phv::Phv;
-use druzhba::phv_container::PhvContainer;
-use druzhba::pipeline_stage::PipelineStage;
-use druzhba::alu::ALU;
-use druzhba::alu::StateVar;
+use output_mux::OutputMux;
+use input_mux::InputMux;
+use pipeline::Pipeline;
+use phv::Phv;
+use phv_container::PhvContainer;
+use pipeline_stage::PipelineStage;
+use alu::ALU;
+use alu::StateVar;
 
 #[test]
 fn test_pipeline() {
-    fn alu_stateless_fn(  _state_vars: &mut Vec<StateVar>,
-                    packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
+    fn alu_stateless_fn( _state_vars: &mut Vec<StateVar>,
+                         packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
      
         vec! [packet[0].field_value * 3]
     }
 
-    fn alu_stateful_fn(  state_vars: &mut Vec<StateVar>,
-                    packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
+    fn alu_stateful_fn( state_vars: &mut Vec<StateVar>,
+                        _packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
         let old_state : Vec <i32> = state_vars.clone();
         state_vars [0] = 10;
         old_state
     }
-
 
     // Picks the first phv container to input
     // into ALU 
@@ -145,6 +144,5 @@ fn test_pipeline() {
                  field_values [index]*9);
         index+=1;
     }
-
 }
 

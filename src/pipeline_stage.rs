@@ -28,7 +28,6 @@ impl PipelineStage {
   // random order. Pass the mutated phv containers to their respective muxes.
   pub fn tick(&mut self, input_phv: Phv<i32>) -> Phv<i32>{ 
 
-//      println!("Working on this input phv {}", input_phv);
       if input_phv.is_bubble() {
         Phv::new()
       }
@@ -50,7 +49,6 @@ impl PipelineStage {
             old_state.push (elem);
           }
         }
-        let results : Vec <i32> = Vec::new();
         // Gets return values from the ALUs and inserts
         // them into output muxes along with old state vars
         for atom in self.stateless_atoms.iter_mut() {
@@ -59,7 +57,7 @@ impl PipelineStage {
           //a single container is outputted. Container is put
           //into a vector and passed to atom
           atom.send_packets_to_input_muxes(input_phv.clone());
-          let mut packet_fields : Vec<PhvContainer<i32>> = 
+          let packet_fields : Vec<PhvContainer<i32>> = 
               atom.input_mux_output();
           //After being passed to atom, value is sent to an
           //output mux and put into a PHV
@@ -70,13 +68,9 @@ impl PipelineStage {
 
           output_mux_fields.push (result);
 
-/*          println!("INPUT PHV: {}", input_phv);
-          println!("PAssing {:?} into output mux", output_mux_fields);
-          println!("RESULT: {}", result);*/
-          atom.send_packets_to_output_mux(output_mux_fields);
+          atom.send_packets_to_output_mux(&output_mux_fields);
           output_phv.add_container_to_phv(atom.output_mux.output());
         }
-//        println!("OUTPUT PHV {}", output_phv);
         output_phv
       }
     }
