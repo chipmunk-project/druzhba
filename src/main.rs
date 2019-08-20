@@ -43,10 +43,11 @@ fn main() {
             }); 
         });
 
+    println!("Tick Number: {} ", _t);
     println! ("Input packet: {} ", packet);
     let new_packet : Phv<i32> = pipeline.tick (packet);
     if !new_packet.is_bubble() {
-      println! ("Output packet: {} ", new_packet);
+      println! ("Output packet: {}\n\n", new_packet);
     }
   }
 }
