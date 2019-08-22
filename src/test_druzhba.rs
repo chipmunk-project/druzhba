@@ -10,7 +10,7 @@ use alu::StateVar;
 use std::collections::HashMap;
 
 #[test]
-fn test_pipeline() {
+fn test_basic_pipeline_1() {
     // state_vars is unused
     fn alu_stateless_fn( _state_vars: &mut Vec<StateVar>,
                          packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
@@ -151,7 +151,7 @@ fn test_pipeline() {
 }
 
 #[test]
-fn test_pipeline_hole_inputs() {
+fn test_basic_pipeline_2 () {
     // state_vars is unused
     fn alu_stateless_fn( _state_vars: &mut Vec<StateVar>,
                          packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
