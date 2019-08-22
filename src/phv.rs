@@ -62,13 +62,11 @@ impl<T> fmt::Display for Phv<T> where T : fmt::Display {
 
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
       let mut s : String = String::from(""); 
-      let mut counter = 0;
-      for _container in &self.packets {
+      for counter in 0..self.packets.len() {
         s.push_str(&format!( "\nindex : {}, value : {}\n", 
                              &counter.to_string(), 
                              &self.packets[counter].field_value
                                   .to_string()));
-        counter += 1;
       }
       write!(f, "{}", s)
   }

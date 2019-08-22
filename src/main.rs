@@ -1,6 +1,6 @@
 extern crate rand;
 
-mod program_to_run_akv;
+mod prog_to_run;
 
 extern crate druzhba;
 
@@ -25,7 +25,7 @@ fn main() {
       Err (_)         => panic!("Failure: Unable to unwrap ticks"),
     };
   assert! (ticks >= 1);
-  let mut pipeline : Pipeline = program_to_run_akv::init_pipeline();
+  let mut pipeline : Pipeline = prog_to_run::init_pipeline();
   let num_containers : i32 = 1;
   // For every tick create a new packet with the 
   // specified input fields set to random values from
@@ -51,7 +51,3 @@ fn main() {
     }
   }
 }
-
-// Runs test in test.rs
-//#[cfg(test)]
-//mod test;

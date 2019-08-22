@@ -6,7 +6,6 @@ use crate::phv_container::PhvContainer;
 
 use self::rand::{thread_rng, Rng};
 
-//#[derive(Clone)]
 pub struct PipelineStage {
    pub stateless_atoms : Vec<ALU>,
    pub stateful_atoms : Vec<ALU>,

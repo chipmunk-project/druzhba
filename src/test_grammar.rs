@@ -281,8 +281,10 @@ pub fn test_ast ()
         _                  => false,
       })
   };
+
   let pkt_0 : String = String::from("pkt_0");
-  let pkt_1 : String = String::from("pkt_1");
+  let pkt_10 : String = String::from("pkt_1");
+  let pkt_11 : String = String::from("pkt_1");
   assert! 
   (match *result {
     ast::Alu::Program (opt_header, header, stmt) => {
@@ -316,7 +318,6 @@ pub fn test_ast ()
                        stmt_elif, 
                        stmt_else)  => 
         {
-          
           (match *expr_if {
             ast::Expr::Op (e1, op, e2) => 
                 check_comparison (&*e1, &op, &*e2),
@@ -327,7 +328,8 @@ pub fn test_ast ()
           (match &*stmt_if[0] {
             ast::Stmt::Return (expr) => {
               match &**expr {
-                ast::Expr::Var (pkt_1) => true,
+                ast::Expr::Var (s) => 
+                    s == "pkt_1",
                 _                                      => false,
               }
             },
@@ -345,7 +347,8 @@ pub fn test_ast ()
           (match &*stmt_elif[0].1[0] {
             ast::Stmt::Return (expr) => {
               match &**expr {
-                ast::Expr::Var (pkt_0) => true,
+                ast::Expr::Var (s) => 
+                    s == "pkt_0",
                 _                                      => false,
               }
             },
@@ -358,7 +361,8 @@ pub fn test_ast ()
               (match &*stmts[0] {
                 ast::Stmt::Return (expr) => {
                   match &**expr {
-                    ast::Expr::Var (pkt_1) => true,
+                    ast::Expr::Var (s) => 
+                        s == "pkt_1",
                     _                                      => false,
                   }
                 },

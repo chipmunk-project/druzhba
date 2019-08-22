@@ -9,6 +9,7 @@ use alu::StateVar;
 
 #[test]
 fn test_pipeline() {
+    // Unused state_vars
     fn alu_stateless_fn( _state_vars: &mut Vec<StateVar>,
                          packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
      

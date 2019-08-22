@@ -32,7 +32,9 @@ impl Pipeline {
       old_phv.insert(i as usize, Phv::new());
       new_phv.insert(i as usize, Phv::new());
     }
-    Pipeline { pipeline_stages : t_pipeline_stages, old_phvs: old_phv, new_phvs: new_phv }
+    Pipeline { pipeline_stages : t_pipeline_stages, 
+               old_phvs: old_phv, 
+               new_phvs: new_phv }
   }
 
   pub fn len (&self) -> usize {
