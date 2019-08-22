@@ -149,57 +149,229 @@ pub fn test_comment()
           "// This is a number 15").is_ok());
 
 }
+
 #[test]
-pub fn test_stateless_alus ()
+pub fn test_stateless_alu ()
 {
 
-  let alu1 = fs::read_to_string("example_alus/stateless_alus/stateless_alu_arith.alu")
+  let alu = fs::read_to_string("example_alus/stateless_alus/stateless_alu.alu")
     .expect("Something went wrong reading the file");
-  assert! (alugrammar::AluParser::new().parse(&alu1).is_ok());
 
-  let alu2 = fs::read_to_string("example_alus/stateless_alus/stateless_alu.alu")
+  assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
+  let result : Box <ast::Alu> = match alugrammar::AluParser::new().parse(&alu){
+    Ok (s) => s,
+    _      => panic! ("Parsing stateless ALU failed"),
+  };
+}
+#[test]
+pub fn test_stateless_alu_arith ()
+{
+  let alu = fs::read_to_string("example_alus/stateless_alus/stateless_alu_arith.alu")
     .expect("Something went wrong reading the file");
-  assert! (alugrammar::AluParser::new().parse(&alu2).is_ok());
+  assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
+}
+#[test]
+pub fn test_stateless_alu_arith_rel ()
+{
 
-   let alu3 = fs::read_to_string("example_alus/stateless_alus/stateless_alu_arith.alu")
+   let alu = fs::read_to_string("example_alus/stateless_alus/stateless_alu_arith_rel.alu")
     .expect("Something went wrong reading the file");
-  assert! (alugrammar::AluParser::new().parse(&alu3).is_ok());
+  assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
+}
+#[test]
+pub fn test_stateless_alu_arith_rel_cond ()
+{
+ let alu = fs::read_to_string("example_alus/stateless_alus/stateless_alu_arith_rel_cond.alu")
+    .expect("Something went wrong reading the file");
+  assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
+}
+#[test]
+pub fn test_stateless_alu_arith_rel_cond_bool ()
+{
 
- let alu4 = fs::read_to_string("example_alus/stateless_alus/stateless_alu_arith.alu")
+  let alu = fs::read_to_string("example_alus/stateless_alus/stateless_alu_arith_rel_cond_bool.alu")
     .expect("Something went wrong reading the file");
-  assert! (alugrammar::AluParser::new().parse(&alu4).is_ok());
-
-  let alu5 = fs::read_to_string("example_alus/stateless_alus/stateless_alu_arith.alu")
-    .expect("Something went wrong reading the file");
-  assert! (alugrammar::AluParser::new().parse(&alu5).is_ok());
+  assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
 
 }
 #[test]
-pub fn test_stateful_alus ()
+pub fn test_raw ()
 {
-  let alu1 = fs::read_to_string("example_alus/stateful_alus/raw.alu")
+  let alu = fs::read_to_string("example_alus/stateful_alus/raw.alu")
     .expect("Something went wrong reading the file");
-  assert! (alugrammar::AluParser::new().parse(&alu1).is_ok());
-
-  let alu2 = fs::read_to_string("example_alus/stateful_alus/sub.alu")
+  assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
+}
+#[test]
+pub fn test_sub ()
+{
+  let alu = fs::read_to_string("example_alus/stateful_alus/sub.alu")
     .expect("Something went wrong reading the file");
-  assert! (alugrammar::AluParser::new().parse(&alu2).is_ok());
-
-   let alu3 = fs::read_to_string("example_alus/stateful_alus/if_else_raw.alu")
+  assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
+}
+#[test]
+pub fn test_if_else_raw ()
+{
+   let alu = fs::read_to_string("example_alus/stateful_alus/if_else_raw.alu")
     .expect("Something went wrong reading the file");
-  assert! (alugrammar::AluParser::new().parse(&alu3).is_ok());
-
- let alu4 = fs::read_to_string("example_alus/stateful_alus/nested_ifs.alu")
+  assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
+}
+#[test]
+pub fn test_nested_ifs ()
+{
+ let alu = fs::read_to_string("example_alus/stateful_alus/nested_ifs.alu")
     .expect("Something went wrong reading the file");
-  assert! (alugrammar::AluParser::new().parse(&alu4).is_ok());
-
-  let alu5 = fs::read_to_string("example_alus/stateful_alus/pred_raw.alu")
+  assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
+}
+#[test]
+pub fn pred_raw ()
+{
+  let alu = fs::read_to_string("example_alus/stateful_alus/pred_raw.alu")
     .expect("Something went wrong reading the file");
-  assert! (alugrammar::AluParser::new().parse(&alu5).is_ok());
-
-  let alu6 = fs::read_to_string("example_alus/stateful_alus/pair.alu")
+  assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
+}
+#[test] 
+pub fn pair ()
+{
+  let alu = fs::read_to_string("example_alus/stateful_alus/pair.alu")
     .expect("Something went wrong reading the file");
-  assert! (alugrammar::AluParser::new().parse(&alu6).is_ok());
+  assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
 
+}
+// Tests that all of the nodes in the ast resulting 
+// from the given spec match the expected nodes
+#[test]
+pub fn test_ast ()
+{
+
+  let alu = String::from(
+          " type : stateless
+            state variables : {}
+            hole variables : {opcode, immediate_operand}
+            packet fields : {pkt_0, pkt_1}
+
+            if (opcode==0) {
+                return pkt_1;
+            } elif (opcode==1) {
+                return pkt_0;
+            } else {
+                return pkt_1;   
+            }
+            ");
+  assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
+  let result : Box <ast::Alu> = 
+      match alugrammar::AluParser::new().parse(&alu){
+    Ok (s) => s,
+    _      => panic! ("Parsing stateless ALU failed"),
+  };
+
+  // Asserts if condition is ID == NUM
+  let check_comparison = | e1 : &ast::Expr,
+                           op : &ast::Opcode, 
+                           e2 : &ast::Expr | -> bool {
+    (match e1 {
+        ast::Expr::Var (_) => true,
+        _       => false,
+      }) &&
+      (match op {
+        ast::Opcode::Equal => true,
+        _                  => false,
+      }) &&
+      (match e2 {
+        ast::Expr::Num (_) => true,
+        _                  => false,
+      })
+  };
+  let pkt_0 : String = String::from("pkt_0");
+  let pkt_1 : String = String::from("pkt_1");
+  assert! 
+  (match *result {
+    ast::Alu::Program (opt_header, header, stmt) => {
+      (match opt_header {
+        // There is no OptHeader in this spec
+        Some (_) => false,
+        _        => true,
+      }) &&
+      (match *header {
+        ast::Header::InputData (state, 
+                                state_vec, 
+                                hole_vec, 
+                                container_vec) => 
+        {
+            // Ensure the header has the expected
+            // values
+            state == "stateless" && 
+            state_vec.len() == 0 &&
+            hole_vec.len() == 2 &&
+            hole_vec[0] == "opcode" &&
+            hole_vec[1] == "immediate_operand" &&
+            container_vec.len() == 2 &&
+            container_vec[0] == "pkt_0" &&
+            container_vec[1] == "pkt_1"
+        },
+        _   => false,
+      }) &&
+      (match *stmt {
+        ast::Stmt::If (expr_if, 
+                       stmt_if, 
+                       stmt_elif, 
+                       stmt_else)  => 
+        {
+          
+          (match *expr_if {
+            ast::Expr::Op (e1, op, e2) => 
+                check_comparison (&*e1, &op, &*e2),
+            _                          => false,
+          // Check if return statement and verifies that
+          // there's only 1 statement
+          }) && stmt_if.len() == 1 &&
+          (match &*stmt_if[0] {
+            ast::Stmt::Return (expr) => {
+              match &**expr {
+                ast::Expr::Var (pkt_1) => true,
+                _                                      => false,
+              }
+            },
+            _                        => false,
+          }) && stmt_elif.len() == 1 &&
+          // Checks if the vector of elif statements
+          // is equal to 1
+          stmt_elif[0].1.len() == 1 &&
+          (match &*stmt_elif[0].0 {
+            ast::Expr::Op (e1, op, e2) => 
+                check_comparison (&*e1, &op, &*e2),
+            _                          => false,
+          }) &&
+          // Check elif return statement
+          (match &*stmt_elif[0].1[0] {
+            ast::Stmt::Return (expr) => {
+              match &**expr {
+                ast::Expr::Var (pkt_0) => true,
+                _                                      => false,
+              }
+            },
+            _                        => false,
+          }) &&
+          // Check else return statement
+          (match stmt_else {
+            Some (stmts) => {
+              stmts.len() == 1 &&
+              (match &*stmts[0] {
+                ast::Stmt::Return (expr) => {
+                  match &**expr {
+                    ast::Expr::Var (pkt_1) => true,
+                    _                                      => false,
+                  }
+                },
+                _                        => false,
+              })
+            },
+            _           => false
+          })
+        },
+        _   => false,
+      }) 
+    },
+    _   => false,
+  });
 }
 
