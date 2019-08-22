@@ -258,7 +258,8 @@ pub fn test_ast ()
             }
             ");
   assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
-  let result : Box <ast::Alu> = 
+  // Used in pattern match but unused otherwise
+  let _result : Box <ast::Alu> = 
       match alugrammar::AluParser::new().parse(&alu){
     Ok (s) => s,
     _      => panic! ("Parsing stateless ALU failed"),
@@ -282,11 +283,8 @@ pub fn test_ast ()
       })
   };
 
-  let pkt_0 : String = String::from("pkt_0");
-  let pkt_10 : String = String::from("pkt_1");
-  let pkt_11 : String = String::from("pkt_1");
   assert! 
-  (match *result {
+  (match *_result {
     ast::Alu::Program (opt_header, header, stmt) => {
       (match opt_header {
         // There is no OptHeader in this spec
@@ -310,7 +308,6 @@ pub fn test_ast ()
             container_vec[0] == "pkt_0" &&
             container_vec[1] == "pkt_1"
         },
-        _   => false,
       }) &&
       (match *stmt {
         ast::Stmt::If (expr_if, 
@@ -375,7 +372,6 @@ pub fn test_ast ()
         _   => false,
       }) 
     },
-    _   => false,
   });
 }
 
