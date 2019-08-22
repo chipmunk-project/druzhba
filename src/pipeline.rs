@@ -22,7 +22,9 @@ impl Pipeline {
     
   pub fn new () -> Self {
     let stages : Vec <PipelineStage> = Vec::new();
-    Pipeline { pipeline_stages : stages, old_phvs: HashMap::new(), new_phvs : HashMap::new() }
+    Pipeline { pipeline_stages : stages, 
+               old_phvs: HashMap::new(), 
+               new_phvs : HashMap::new() }
   }
 
   pub fn with_pipeline_stages (t_pipeline_stages : Vec <PipelineStage>) -> Self {

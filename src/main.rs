@@ -31,12 +31,14 @@ fn main() {
   // specified input fields set to random values from
   // 0 to 100. Send packet through pipeline and 
   // retrieve resulting packet.
+  // _t not used
   for _t in 0..ticks {
     
     let mut packet : Phv<i32> = Phv::new();
     // Initializes packet with all of the input fields
     // along with a random value
     (0..num_containers)
+        // _s not used
         .for_each ( |_s| {
             packet.add_container_to_phv(PhvContainer {
                 field_value : rand::thread_rng().gen_range(0,100),

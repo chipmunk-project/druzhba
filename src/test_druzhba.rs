@@ -9,13 +9,14 @@ use alu::StateVar;
 
 #[test]
 fn test_pipeline() {
-    // Unused state_vars
+    // state_vars is unused
     fn alu_stateless_fn( _state_vars: &mut Vec<StateVar>,
                          packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
      
         vec! [packet[0].field_value * 3]
     }
 
+    // packet is unused
     fn alu_stateful_fn( state_vars: &mut Vec<StateVar>,
                         _packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
         let old_state : Vec <i32> = state_vars.clone();
