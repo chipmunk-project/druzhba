@@ -1,116 +1,125 @@
-
 use druzhba::pipeline_stage::PipelineStage;
 use druzhba::pipeline::Pipeline;
 use druzhba::phv::Phv;
 use druzhba::phv_container::PhvContainer;
 use druzhba::alu::ALU;
+use druzhba::alu::StateVar;
+use druzhba::input_mux::InputMux;
+use druzhba::output_mux::OutputMux;
 
-use std::collections::HashMap;
 
-pub type StateScalar = PhvContainer <i32>;
-pub type StateArray = PhvContainer <Vec <i32> >;
-// Test ALUs to be used in pipeline that mutate
-// Phv, StateScalar, and StateArray
-fn atom0 (packet : &mut Phv, 
-          state_scalar : &mut StateScalar, 
-          state_array : &mut StateArray) 
-{
-  packet["new_hop"] = (packet["sport"] * packet["dport"]) % 10;
-  if packet["arrival_time"] - state_scalar["last_time"] > 5{
-    state_scalar["next_hop"]= packet["new_hop"];
-  }
-  state_scalar["last_time"]= packet["arrival_time"];
-  packet["next_hop"] = state_scalar ["next_hop"];
+//Stateless ALU
+// state_vars not used
+pub fn alu_stateless_fn( _state_vars: &mut Vec<StateVar>,
+                         packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
+ 
+    vec! [packet[0].field_value * 21]
 }
-
-fn atom1 (packet : &mut Phv, 
-          state_scalar : &mut StateScalar, 
-          state_array : &mut StateArray) {
-
-  state_scalar ["new_hop"] = packet ["new_hop"];
-  packet["new_hop"] = 0;
-  state_scalar ["sport"] = packet ["sport"] * 5;
-  packet ["sport"] = 23 - state_scalar ["dport"] * 2;
-  if packet ["sport"] > 5{
-    packet["sport"] -= 2;
-  }
-}
-
-// atom2 and atom3 and run in the same pipeline_stage because
-// they do not alter any existing fields
-fn atom2 (packet : &mut Phv, 
-          state_scalar : &mut StateScalar, 
-          state_array : &mut StateArray) 
-{
-
-  packet["new_field"] = -1;
-  state_scalar["dport"] = 2;
-}
-fn atom3 ( packet : &mut Phv, 
-           state_scalar : &mut StateScalar, 
-           state_array : &mut StateArray) {
-
-  state_scalar ["last_time"] += 1;
-  let mut v : Vec <i32> = Vec::new();
-  v.push (3);
-  v.push (10);
-  state_array ["test_field"] = v;
+// Stateful ALU
+// packet not used
+pub fn alu_stateful_fn( state_vars: &mut Vec<StateVar>,
+                       _packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
+    let old_state : Vec <i32> = state_vars.clone();
+    state_vars [0] = 21;
+    old_state
 }
 
 
-// Initializes a new pipeline by creating ALUs based on the
-// above atom functions, placing them each into a pipeline_stage,
-// and adding each pipeline_stage into the pipeline.
-pub fn init_pipeline (input_fields : &Vec <String>) -> Pipeline
-{
+
+pub fn init_pipeline() -> Pipeline {
+
+    /*Holes provided by *Chipmunk* for input and output muxes of two stages. */
     
-  let mut stages : Vec<PipelineStage> = Vec::new();
+    // Picks the first phv container to input
+    // into ALU 
+    let alu_one_one_input_mux_index_hole = 0 ;
+    let alu_one_two_input_mux_index_hole = 0 ;
+    // Picks the third input which is the result from
+    // the stateless ALU (state vars vector has 2 elements)
+    let alu_one_one_output_mux_index_hole = 2 ;
+    let alu_one_two_output_mux_index_hole = 2 ;
 
-  // Create new HashMap for the state_scalar
-  let mut map : HashMap <String,i32> = HashMap::new();
-  let vec_map : HashMap <String, Vec <i32> > = HashMap::new();
+    let alu_two_one_input_mux_index_hole = 0 ;
+    let alu_two_two_input_mux_index_hole = 0 ;
+    let alu_two_one_output_mux_index_hole = 2 ;
+    let alu_two_two_output_mux_index_hole = 2 ;
 
-  // Initialize HashMap values with input fields to be used
-  // in PhvContainer StateScalar
-  input_fields.iter()
-              .for_each ( |s| {
-               map.insert(s.to_string(), 0); });
+    //arbitrary state variables
+    let mut state_vars : Vec<StateVar> = Vec::new();
+    state_vars.push(0);
+    state_vars.push(1);
 
 
-  let state_scalar : StateScalar = PhvContainer::with_map (map);
+    /* Stage 1 */
+    let first_phv : Phv<i32> = Phv{bubble: true, packets: Vec::new()};
 
-  let state_array : StateArray = PhvContainer::with_map (vec_map);
-  
-  let mut atoms0 : Vec<ALU> = Vec::new();
+    //generate input and output muxes for both ALUs in the first stage
+    
+    let alu_one_one_input_muxes : Vec<InputMux> = 
+        vec![InputMux {input_phv: first_phv.clone() , index : alu_one_one_input_mux_index_hole}];
+    let alu_one_two_input_muxes : Vec<InputMux> = 
+        vec![InputMux{input_phv: first_phv.clone() , index : alu_one_two_input_mux_index_hole}];
+    let alu_one_one_output_mux : OutputMux = OutputMux{input_phv_containers: Vec::new() , index: alu_one_one_output_mux_index_hole};
 
-  // Initialize ALUs using above atom functions along with
-  // state vectors and put them into vectors
-  let alu0 : ALU = ALU::new(atom0, state_scalar.clone(), state_array.clone());
-  atoms0.push (alu0);
+    let alu_one_two_output_mux : OutputMux = OutputMux{input_phv_containers: Vec::new() , index: alu_one_two_output_mux_index_hole};
 
-  let mut atoms1 : Vec <ALU> = Vec::new();
-  let alu1 : ALU = ALU::new (atom1, state_scalar.clone(), state_array.clone());
-  atoms1.push (alu1);
+    //generate ALUs for first pipeline stage
+   
+    let alu_one_one : ALU = 
+        ALU { sequential_function: Box::new(alu_stateful_fn), 
+              state_variables: state_vars.clone(), 
+              input_muxes: alu_one_one_input_muxes, 
+              output_mux: alu_one_one_output_mux, 
+              is_stateful : true };
 
-  let mut atoms2 : Vec <ALU> = Vec::new();
-  let alu2 : ALU = ALU::new (atom2, state_scalar.clone(), state_array.clone());
-  atoms2.push (alu2);
-  let alu3 : ALU = ALU::new (atom3, state_scalar.clone(), state_array.clone());
+    let alu_one_two : ALU = 
+        ALU { sequential_function: Box::new(alu_stateless_fn), 
+              state_variables: Vec::new(), 
+              input_muxes: alu_one_two_input_muxes, 
+              output_mux: alu_one_two_output_mux, 
+              is_stateful : false };
+    
+    let pipeline_stage_one : PipelineStage = PipelineStage{ 
+        stateful_atoms: vec![alu_one_one], 
+        stateless_atoms : vec![alu_one_two] };
 
-  // Create pipeline stages, initializing them with atom vectors
-  let pipeline_stage0 : PipelineStage = PipelineStage::with_atoms(atoms0);
-  let pipeline_stage1 : PipelineStage = PipelineStage::with_atoms(atoms1);
-  let mut pipeline_stage2 : PipelineStage = PipelineStage::with_atoms(atoms2);
-  // Append alu3 directly to pipeline_stage instead of adding to 
-  // ALU vector
-  pipeline_stage2.add_atom (alu3);
+    /* Stage 2 */
+    let second_phv : Phv<i32> = Phv {bubble: true, packets: Vec::new()};
 
-  // Add stages to the pipeline
-  stages.push (pipeline_stage0);
-  stages.push (pipeline_stage1);
-  stages.push (pipeline_stage2);
+    //generate input and output muxes for both ALUs in the second stage
+    
+    let alu_two_one_input_muxes : Vec<InputMux> = 
+        vec![InputMux{input_phv: second_phv.clone() , index : alu_two_one_input_mux_index_hole}];
+    let alu_two_two_input_muxes : Vec<InputMux> = 
+        vec![InputMux{input_phv: second_phv.clone() , index : alu_two_two_input_mux_index_hole}];
+    let alu_two_one_output_mux : OutputMux = OutputMux{input_phv_containers: Vec::new() , index: alu_two_one_output_mux_index_hole};
+    let alu_two_two_output_mux : OutputMux = OutputMux{input_phv_containers: Vec::new() , index: alu_two_two_output_mux_index_hole};
 
-  let pipeline : Pipeline = Pipeline::with_pipeline_stages(stages);
-  pipeline 
+    //generate ALUs for second pipeline stage
+    
+    let alu_two_one : ALU = 
+        ALU { sequential_function: Box::new(alu_stateful_fn), 
+              state_variables: state_vars.clone(), 
+              input_muxes : alu_two_one_input_muxes, 
+              output_mux: alu_two_one_output_mux, 
+              is_stateful : true };
+    let alu_two_two : ALU = 
+        ALU { sequential_function: Box::new(alu_stateless_fn), 
+              state_variables: Vec::new(), 
+              input_muxes : alu_two_two_input_muxes, 
+              output_mux: alu_two_two_output_mux, 
+              is_stateful: false 
+        };
+
+    let pipeline_stage_two : PipelineStage = PipelineStage{
+        stateful_atoms: vec![alu_two_one], 
+        stateless_atoms: vec![alu_two_two]
+    };
+
+    //generate pipeline
+
+    let pipeline : Pipeline = Pipeline::with_pipeline_stages(vec![pipeline_stage_one, pipeline_stage_two]);
+
+    pipeline
+
 }
-

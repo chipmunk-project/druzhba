@@ -61,11 +61,12 @@ impl<T> IndexMut<i32> for Phv<T> {
 impl<T> fmt::Display for Phv<T> where T : fmt::Display {
 
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-      let s : String = String::from(""); 
-      let mut counter = 0;
-      for _container in &self.packets {
-        write!(f, "\nindex : {}, value : {}\n", &counter.to_string(), &self.packets[counter].field_value.to_string());
-        counter += 1;
+      let mut s : String = String::from(""); 
+      for counter in 0..self.packets.len() {
+        s.push_str(&format!( "\nindex : {}, value : {}\n", 
+                             &counter.to_string(), 
+                             &self.packets[counter].field_value
+                                  .to_string()));
       }
       write!(f, "{}", s)
   }

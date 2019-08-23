@@ -22,7 +22,9 @@ impl Pipeline {
     
   pub fn new () -> Self {
     let stages : Vec <PipelineStage> = Vec::new();
-    Pipeline { pipeline_stages : stages, old_phvs: HashMap::new(), new_phvs : HashMap::new() }
+    Pipeline { pipeline_stages : stages, 
+               old_phvs: HashMap::new(), 
+               new_phvs : HashMap::new() }
   }
 
   pub fn with_pipeline_stages (t_pipeline_stages : Vec <PipelineStage>) -> Self {
@@ -32,7 +34,9 @@ impl Pipeline {
       old_phv.insert(i as usize, Phv::new());
       new_phv.insert(i as usize, Phv::new());
     }
-    Pipeline { pipeline_stages : t_pipeline_stages, old_phvs: old_phv, new_phvs: new_phv }
+    Pipeline { pipeline_stages : t_pipeline_stages, 
+               old_phvs: old_phv, 
+               new_phvs: new_phv }
   }
 
   pub fn len (&self) -> usize {
@@ -45,7 +49,6 @@ impl Pipeline {
       self.pipeline_stages[0].tick(t_packet)
     }
     else{
-    
       self.new_phvs.insert(0, self.pipeline_stages[0].tick(t_packet.clone()));
       for x in 1..self.pipeline_stages.len() - 1 {
         self.new_phvs.insert(x, self.pipeline_stages[x].tick(self.old_phvs[&(x-1)].clone()));
@@ -54,7 +57,6 @@ impl Pipeline {
       let length : usize = self.pipeline_stages.len();
 
       let last_phv = self.pipeline_stages[length - 1].tick(self.old_phvs[&(length - 2)].clone());
-
       mem::swap(&mut self.new_phvs, &mut self.old_phvs);
       last_phv
     }
@@ -65,15 +67,15 @@ impl Pipeline {
 impl fmt::Display for Pipeline{
 
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-      let s : String = String::from(""); 
-      write!(f, "Old Phvs: \n");
+      let mut s : String = String::from(""); 
+      s.push_str( "Old Phvs: \n");
       for (key, value) in &self.old_phvs {
-        write!(f, "stage {} : \n{}\n", key, value);
+        s.push_str(&format!( "stage {} : \n{}\n", key, value));
       }
 
-      write!(f, "\nNew Phvs: \n");
+      s.push_str ("\nNew Phvs: \n");
       for (key_, value_) in &self.new_phvs {
-        write!(f, "stage {} :  \n{}\n", key_, value_);
+        s.push_str( &format!("stage {} :  \n{}\n", key_, value_));
       }
     
       write!(f, "{}", s)
