@@ -154,7 +154,7 @@ pub fn test_comment()
 pub fn test_stateless_alu ()
 {
 
-  let alu = fs::read_to_string("example_alus/stateless_alus/stateless_alu.alu")
+  let alu = fs::read_to_string("../example_alus/stateless_alus/stateless_alu.alu")
     .expect("Something went wrong reading the file");
 
   assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
@@ -166,7 +166,7 @@ pub fn test_stateless_alu ()
 #[test]
 pub fn test_stateless_alu_arith ()
 {
-  let alu = fs::read_to_string("example_alus/stateless_alus/stateless_alu_arith.alu")
+  let alu = fs::read_to_string("../example_alus/stateless_alus/stateless_alu_arith.alu")
     .expect("Something went wrong reading the file");
   assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
 }
@@ -174,14 +174,14 @@ pub fn test_stateless_alu_arith ()
 pub fn test_stateless_alu_arith_rel ()
 {
 
-   let alu = fs::read_to_string("example_alus/stateless_alus/stateless_alu_arith_rel.alu")
+   let alu = fs::read_to_string("../example_alus/stateless_alus/stateless_alu_arith_rel.alu")
     .expect("Something went wrong reading the file");
   assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
 }
 #[test]
 pub fn test_stateless_alu_arith_rel_cond ()
 {
- let alu = fs::read_to_string("example_alus/stateless_alus/stateless_alu_arith_rel_cond.alu")
+ let alu = fs::read_to_string("../example_alus/stateless_alus/stateless_alu_arith_rel_cond.alu")
     .expect("Something went wrong reading the file");
   assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
 }
@@ -189,7 +189,7 @@ pub fn test_stateless_alu_arith_rel_cond ()
 pub fn test_stateless_alu_arith_rel_cond_bool ()
 {
 
-  let alu = fs::read_to_string("example_alus/stateless_alus/stateless_alu_arith_rel_cond_bool.alu")
+  let alu = fs::read_to_string("../example_alus/stateless_alus/stateless_alu_arith_rel_cond_bool.alu")
     .expect("Something went wrong reading the file");
   assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
 
@@ -197,42 +197,42 @@ pub fn test_stateless_alu_arith_rel_cond_bool ()
 #[test]
 pub fn test_raw ()
 {
-  let alu = fs::read_to_string("example_alus/stateful_alus/raw.alu")
+  let alu = fs::read_to_string("../example_alus/stateful_alus/raw.alu")
     .expect("Something went wrong reading the file");
   assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
 }
 #[test]
 pub fn test_sub ()
 {
-  let alu = fs::read_to_string("example_alus/stateful_alus/sub.alu")
+  let alu = fs::read_to_string("../example_alus/stateful_alus/sub.alu")
     .expect("Something went wrong reading the file");
   assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
 }
 #[test]
 pub fn test_if_else_raw ()
 {
-   let alu = fs::read_to_string("example_alus/stateful_alus/if_else_raw.alu")
+   let alu = fs::read_to_string("../example_alus/stateful_alus/if_else_raw.alu")
     .expect("Something went wrong reading the file");
   assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
 }
 #[test]
 pub fn test_nested_ifs ()
 {
- let alu = fs::read_to_string("example_alus/stateful_alus/nested_ifs.alu")
+ let alu = fs::read_to_string("../example_alus/stateful_alus/nested_ifs.alu")
     .expect("Something went wrong reading the file");
   assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
 }
 #[test]
 pub fn pred_raw ()
 {
-  let alu = fs::read_to_string("example_alus/stateful_alus/pred_raw.alu")
+  let alu = fs::read_to_string("../example_alus/stateful_alus/pred_raw.alu")
     .expect("Something went wrong reading the file");
   assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
 }
 #[test] 
 pub fn pair ()
 {
-  let alu = fs::read_to_string("example_alus/stateful_alus/pair.alu")
+  let alu = fs::read_to_string("../example_alus/stateful_alus/pair.alu")
     .expect("Something went wrong reading the file");
   assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
 

@@ -35,6 +35,9 @@ impl<T> Phv<T>{
     self.bubble = false;
     self
   }
+  pub fn get_num_phv_containers (&self) -> i32 {
+    self.packets.len() as i32
+  }
 }
 
 // Note: No need for AddAssign Trait implementation for PHV's -
@@ -61,13 +64,15 @@ impl<T> IndexMut<i32> for Phv<T> {
 impl<T> fmt::Display for Phv<T> where T : fmt::Display {
 
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-      let mut s : String = String::from(""); 
+
+      let mut s : String = String::from("{"); 
       for counter in 0..self.packets.len() {
-        s.push_str(&format!( "\nindex : {}, value : {}\n", 
+        s.push_str(&format!( "[index : {}, value : {}], ", 
                              &counter.to_string(), 
                              &self.packets[counter].field_value
                                   .to_string()));
       }
+      s.push_str ("}");
       write!(f, "{}", s)
   }
 }
