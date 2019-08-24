@@ -10,12 +10,12 @@ Example:
 
 To execute dgen, run
 
-    cd dgen_lib
+    cd dgen
     cargo buld && cargo run <spec name> <stateful alu file> <stateless alu file> <pipeline depth> <pipeline width>
 
 Example:
 
-    cd dgen_lib
+    cd dgen
     cargo build && cargo run simple ../example_alus/stateful_alus/raw.alu ../example_alus/stateless_alus/stateless_alu.alu 2 2
 
 Tests will ensure that alu grammar is being parsed
@@ -28,9 +28,9 @@ To run these tests:
 
     cargo test
 
-Similarly, for dgen_lib:
+Similarly, for dgen:
 
-    cd dgen_lib
+    cd dgen
     cargo test
 
 Note: Rust nightly may need to be enabled before LALRPOP
