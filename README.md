@@ -18,10 +18,12 @@ Example:
 With dgen's generated prog_to_run.rs file constructed,
 , run the following to execute Druzhba:
 
+    cd ..
     cargo build && cargo run <hole configuration file> <number of containers per phv> <number of stateful ALUs> <ticks>
 
 Example:
 
+    cd ..
     cargo build && cargo run hole_configurations/simple_raw_stateless_alu_2_2_hole_cfgs.txt 2 1 100
 
 For quick execution using the build.sh script, use:
