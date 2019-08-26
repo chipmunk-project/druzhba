@@ -1,6 +1,6 @@
 
-pub mod ast;
-pub mod alu_to_parse;
+pub mod rust_code_generator;
+pub mod alu_parsing_utils;
 // Important: nightly must be enabled to work
 #[macro_use] extern crate lazy_static;
 #[macro_use] extern crate lalrpop_util;
@@ -8,7 +8,7 @@ pub mod alu_to_parse;
 lalrpop_mod!(pub alugrammar); // synthesized by LALRPOP
 
 use std::env; 
-use alu_to_parse::AluToParse;
+use alu_parsing_utils::AluParsingUtils;
 use std::fs;
 
 pub fn generate_alus (name : String,
@@ -18,22 +18,21 @@ pub fn generate_alus (name : String,
                       pipeline_width : i32)
 {
 
-  // Stateful AluToParse initialization
+  // Stateful AluParsingUtils initialization
   let stateful_alu = fs::read_to_string(&stateful_file)
     .expect("Something went wrong reading the file");
-  //println!("{}", stateful_alu);
-  let mut full_stateful_alu : AluToParse = 
-      AluToParse::new(0, 0, 
+  let mut full_stateful_alu : AluParsingUtils = 
+      AluParsingUtils::new(0, 0, 
                       name.clone(), 
                       stateful_alu,
                       true);
 
-  // Stateless AluToParse initialization
+  // Stateless AluParsingUtils initialization
   let stateless_alu = fs::read_to_string(&stateless_file)
     .expect("Something went wrong reading the file");
 
-  let mut full_stateless_alu : AluToParse = 
-      AluToParse::new(0, 0, 
+  let mut full_stateless_alu : AluParsingUtils = 
+      AluParsingUtils::new(0, 0, 
                       name.clone(), 
                       stateless_alu,
                       false);
@@ -45,13 +44,13 @@ pub fn generate_alus (name : String,
   for _i in 0..pipeline_depth {
     let stateful_alu_string : String = 
       match alugrammar::AluParser::new().parse(
-          &full_stateful_alu.get_string_to_parse()){
+          &full_stateful_alu.prepend_opt_header_to_alu()){
         Ok (s) => s.to_string(),
         _      => panic!("Parsing stateful ALU failed"),
       };
 
     // ALU stateful helper functions
-    let stateful_helper_string : String = ast::get_helper_string();
+    let stateful_helper_string : String = rust_code_generator::get_helper_string();
     pipeline_alus_string.push_str (&stateful_helper_string);
     pipeline_alus_string.push_str (&stateful_alu_string);
     full_stateful_alu.increment_pipeline_stage();
@@ -60,12 +59,12 @@ pub fn generate_alus (name : String,
 
       let stateless_alu_string : String =  
         match alugrammar::AluParser::new().parse(
-            &full_stateless_alu.get_string_to_parse()){
+            &full_stateless_alu.prepend_opt_header_to_alu()){
           Ok (s) => s.to_string(),
           _      => panic! ("Parsing stateless ALU failed"),
         };
       // ALU stateless helper functions
-      let stateless_helper_string : String = ast::get_helper_string();
+      let stateless_helper_string : String = rust_code_generator::get_helper_string();
       pipeline_alus_string.push_str (&stateless_helper_string);
       pipeline_alus_string.push_str (&stateless_alu_string);
       full_stateless_alu.increment_alu_count();

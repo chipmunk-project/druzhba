@@ -1,10 +1,7 @@
 // Represents the Alu that's read from the
 // .alu files
 
-// TODO: Implement functions to get the number of 
-// phv container inputs and state vars inputs to 
-// use in generate_pipeline()
-pub struct AluToParse {
+pub struct AluParsingUtils {
 
   pipeline_stage : i32,
   alu_count : i32,
@@ -13,14 +10,14 @@ pub struct AluToParse {
   is_stateful : bool,
 }
 
-impl AluToParse {
+impl AluParsingUtils {
 
   pub fn new (t_pipeline_stage : i32,
               t_alu_count : i32,
               t_name : String,
               t_alu_body : String,
               t_is_stateful : bool,) -> Self {
-    AluToParse {
+    AluParsingUtils {
       pipeline_stage : t_pipeline_stage,
       alu_count : t_alu_count,
       name : t_name, 
@@ -31,7 +28,7 @@ impl AluToParse {
   
   // Returns the correct formatted string to be parsed
   // by LALRPOP
-  pub fn get_string_to_parse (&self) -> String{
+  pub fn prepend_opt_header_to_alu (&self) -> String{
     let name_header : String = 
         format! ("name : {}\n", self.name);
     let pipeline_stage_header : String = 

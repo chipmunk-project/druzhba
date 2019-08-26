@@ -1,5 +1,5 @@
 use std::fs;
-use ast;
+use rust_code_generator;
 use alugrammar;
 
 #[test]
@@ -158,7 +158,7 @@ pub fn test_stateless_alu ()
     .expect("Something went wrong reading the file");
 
   assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
-  let result : Box <ast::Alu> = match alugrammar::AluParser::new().parse(&alu){
+  let result : Box <rust_code_generator::Alu> = match alugrammar::AluParser::new().parse(&alu){
     Ok (s) => s,
     _      => panic! ("Parsing stateless ALU failed"),
   };
@@ -237,10 +237,10 @@ pub fn pair ()
   assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
 
 }
-// Tests that all of the nodes in the ast resulting 
+// Tests that all of the nodes in the rust_code_generator resulting 
 // from the given spec match the expected nodes
 #[test]
-pub fn test_ast ()
+pub fn test_rust_code_generator ()
 {
 
   let alu = String::from(
@@ -259,40 +259,40 @@ pub fn test_ast ()
             ");
   assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
   // Used in pattern match but unused otherwise
-  let _result : Box <ast::Alu> = 
+  let _result : Box <rust_code_generator::Alu> = 
       match alugrammar::AluParser::new().parse(&alu){
     Ok (s) => s,
     _      => panic! ("Parsing stateless ALU failed"),
   };
 
   // Asserts if condition is ID == NUM
-  let check_comparison = | e1 : &ast::Expr,
-                           op : &ast::Opcode, 
-                           e2 : &ast::Expr | -> bool {
+  let check_comparison = | e1 : &rust_code_generator::Expr,
+                           op : &rust_code_generator::Opcode, 
+                           e2 : &rust_code_generator::Expr | -> bool {
     (match e1 {
-        ast::Expr::Var (_) => true,
+        rust_code_generator::Expr::Var (_) => true,
         _       => false,
       }) &&
       (match op {
-        ast::Opcode::Equal => true,
+        rust_code_generator::Opcode::Equal => true,
         _                  => false,
       }) &&
       (match e2 {
-        ast::Expr::Num (_) => true,
+        rust_code_generator::Expr::Num (_) => true,
         _                  => false,
       })
   };
 
   assert! 
   (match *_result {
-    ast::Alu::Program (opt_header, header, stmt) => {
+    rust_code_generator::Alu::Program (opt_header, header, stmt) => {
       (match opt_header {
         // There is no OptHeader in this spec
         Some (_) => false,
         _        => true,
       }) &&
       (match *header {
-        ast::Header::InputData (state, 
+        rust_code_generator::Header::InputData (state, 
                                 state_vec, 
                                 hole_vec, 
                                 container_vec) => 
@@ -310,22 +310,22 @@ pub fn test_ast ()
         },
       }) &&
       (match *stmt {
-        ast::Stmt::If (expr_if, 
+        rust_code_generator::Stmt::If (expr_if, 
                        stmt_if, 
                        stmt_elif, 
                        stmt_else)  => 
         {
           (match *expr_if {
-            ast::Expr::Op (e1, op, e2) => 
+            rust_code_generator::Expr::Op (e1, op, e2) => 
                 check_comparison (&*e1, &op, &*e2),
             _                          => false,
           // Check if return statement and verifies that
           // there's only 1 statement
           }) && stmt_if.len() == 1 &&
           (match &*stmt_if[0] {
-            ast::Stmt::Return (expr) => {
+            rust_code_generator::Stmt::Return (expr) => {
               match &**expr {
-                ast::Expr::Var (s) => 
+                rust_code_generator::Expr::Var (s) => 
                     s == "pkt_1",
                 _                                      => false,
               }
@@ -336,15 +336,15 @@ pub fn test_ast ()
           // is equal to 1
           stmt_elif[0].1.len() == 1 &&
           (match &*stmt_elif[0].0 {
-            ast::Expr::Op (e1, op, e2) => 
+            rust_code_generator::Expr::Op (e1, op, e2) => 
                 check_comparison (&*e1, &op, &*e2),
             _                          => false,
           }) &&
           // Check elif return statement
           (match &*stmt_elif[0].1[0] {
-            ast::Stmt::Return (expr) => {
+            rust_code_generator::Stmt::Return (expr) => {
               match &**expr {
-                ast::Expr::Var (s) => 
+                rust_code_generator::Expr::Var (s) => 
                     s == "pkt_0",
                 _                                      => false,
               }
@@ -356,9 +356,9 @@ pub fn test_ast ()
             Some (stmts) => {
               stmts.len() == 1 &&
               (match &*stmts[0] {
-                ast::Stmt::Return (expr) => {
+                rust_code_generator::Stmt::Return (expr) => {
                   match &**expr {
-                    ast::Expr::Var (s) => 
+                    rust_code_generator::Expr::Var (s) => 
                         s == "pkt_1",
                     _                                      => false,
                   }

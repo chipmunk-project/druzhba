@@ -49,7 +49,7 @@ impl fmt::Display for Alu {
         }.expect ("Error: issue with match statement on OptHeader");
         // The function inside of the initialize ALU function that
         // will be returned
-        let inner_header : String = String::from ("    let alu = move |state_vec : &mut Vec <i32>, phv_containers : &Vec <PhvContainer <i32>>| -> Vec <i32>{\n");
+        let inner_header : String = String::from ("    let alu = move |state_vec : &mut Vec <i32>, phv_containers : &Vec <PhvContainer <i32>>| -> (Vec <i32>, Vec <i32>){\n");
         let body : String = String::from(&format!("{}{}", header, stmt));
         let state_var_length = STATE_VAR_MAP.read().unwrap().len();
         let mut end : String = String::from("");
@@ -58,7 +58,7 @@ impl fmt::Display for Alu {
           end.push_str("    };\n   Box::new(alu)\n}\n"); 
         }
         else {
-          end.push_str("    old_state\n    };\n    Box::new(alu)\n}\n");
+          end.push_str("    (old_state, state_vec.clone())\n    };\n    Box::new(alu)\n}\n");
         }
 
         // Function name to initialize ALU function
@@ -76,7 +76,7 @@ impl fmt::Display for Alu {
 
         let mut outer_header : String = String::from("pub fn ");
         outer_header.push_str (&init_name);
-        outer_header.push_str ("(hole_vars : HashMap <String, i32>) -> Box <dyn Fn (&mut Vec <i32>, &Vec <PhvContainer <i32>>) -> Vec <i32> >{\n");
+        outer_header.push_str ("(hole_vars : HashMap <String, i32>) -> Box <dyn Fn (&mut Vec <i32>, &Vec <PhvContainer <i32>>) -> (Vec <i32>, Vec <i32> ) >{\n");
         
         write!(f, "{}{}{}{}", outer_header, inner_header, body, end)
       },
@@ -168,7 +168,7 @@ impl fmt::Display for Stmt {
     // of data in tuple
     match &*self{
       Stmt::Return (e) => 
-          write!(f, "        vec![({}) as i32]\n", e),
+          write!(f, "        (vec![({}) as i32], Vec::new())\n", e),
 
       // Generates if statement
       Stmt::If (e1, if_block, elif_block, else_block) => {
@@ -460,7 +460,7 @@ fn generate_mux3 (mux3_name : String)
   let else_if_ret : String = String::from
       ("  else if ctrl == 1 {\n    op2\n  }\n");
   let else_ret : String = String::from
-      ("  else {\n  op2\n  }\n}\n");
+      ("  else {\n  op3\n  }\n}\n");
 
   let mux3_fn : String= format! ("{}{}{}{}", fn_header, 
                                  if_ret, else_if_ret, else_ret);
