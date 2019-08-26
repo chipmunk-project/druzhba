@@ -43,7 +43,7 @@ fn get_hole_cfgs (hole_cfgs_file : String) -> HashMap <String, i32> {
 fn main() {
 
   let args : Vec<String> = env::args().collect();
-  assert!(args.len() == 3);
+  assert!(args.len() == 5);
 
   // Parse returns a result so unwrap
   let ticks : i32 = 
@@ -52,17 +52,30 @@ fn main() {
       Ok  (ticks_arg) => ticks_arg,
       Err (_)         => panic!("Failure: Unable to unwrap ticks"),
     };
-  let hole_cfgs_file : String = args[2].clone();
+  let num_containers : i32 = 
+    match args[2].parse::<i32>() {
+
+      Ok  (ticks_arg) => ticks_arg,
+      Err (_)         => panic!("Failure: Unable to unwrap num_containers"),
+    };
+   let num_stateful_alus : i32 = 
+    match args[3].parse::<i32>() {
+
+      Ok  (ticks_arg) => ticks_arg,
+      Err (_)         => panic!("Failure: Unable to unwrap num_stateful_alus"),
+    };
+  let hole_cfgs_file : String = args[4].clone();
   let hole_cfgs : HashMap <String, i32> = get_hole_cfgs (hole_cfgs_file.clone());
+
+  // TODO: Currently hardcoded at 2. Change later in case a stateful
+  // ALU takes in more than 2 state variables?
+  let num_state_variables = 2;
   println!("{:?}", hole_cfgs);
   assert! (ticks >= 1);
+  assert! (num_stateful_alus>=1);
   let mut pipeline : Pipeline = 
       prog_to_run::init_pipeline(hole_cfgs.clone());
-  let num_containers : i32 = 2;
-  // TODO: Determine how many state operands are needed.
-  // Use 2 for now
-  let num_state : i32 = 2;
-  let num_stateful_alus : i32 = 1;
+
   // For every tick create a new packet with the 
   // specified input fields set to random values from
   // 0 to 100. Send packet through pipeline and 
@@ -79,16 +92,14 @@ fn main() {
         // _s not used
         .for_each ( |_s| {
             packet.add_container_to_phv(PhvContainer {
-                field_value :// 0,
-                rand::thread_rng().gen_range(0,100),
+                field_value : rand::thread_rng().gen_range(0,100),
             }); 
         });
 
-//    packet.set_state (vec![0; num_state as usize]);
     let mut state : Vec <Vec <i32> > = Vec::new();
     for i in (0..num_stateful_alus){
       let mut tmp_state_vec : Vec<i32> = Vec::new();
-      for j in (0..num_state) {
+      for j in (0..num_state_variables) {
         tmp_state_vec.push(rand::thread_rng().gen_range(0,100));
       }
       state.push (tmp_state_vec);
