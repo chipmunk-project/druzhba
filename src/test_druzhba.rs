@@ -11,9 +11,196 @@ use druzhba::alu::StateVar;
 
 use prog_to_run;
 
+use test_files::simple_pair_stateless_alu_arith_2_2_prog_to_run;
+use test_files::simple_if_else_raw_stateless_alu_arith_rel_2_2_prog_to_run;
+use test_files::simple_raw_stateless_alu_2_2_prog_to_run;
+use test_files::simple_raw_stateless_alu_arith_2_2_prog_to_run;
+use test_files::simple_raw_stateless_alu_arith_rel_cond_2_2_prog_to_run;
+
 use rand::Rng;
 use std::fs;
 use std::collections::HashMap;
+
+fn get_input_phvs (ticks : i32,
+                   num_containers : i32,
+                   num_state_vars : i32,
+                   num_stateful_alus : i32) -> Vec <Phv <i32> >
+{
+  let mut input_phvs : Vec <Phv <i32> > = Vec::new();
+    // Initializes packet with all of the input fields
+    // along with a random value
+  for _i in 0..ticks {
+    let mut packet : Phv<i32> = Phv::new();
+    for _j in (0..num_containers){
+        packet.add_container_to_phv(PhvContainer {
+            field_value : rand::thread_rng().gen_range(0,100),
+      }); 
+    }
+    let mut state_vec : Vec <Vec <i32>>  = Vec::new();
+    for _i in 0..num_stateful_alus {
+      let mut tmp_state_vec : Vec <i32> = Vec::new();
+      for _j in 0..num_state_vars {
+        tmp_state_vec.push (rand::thread_rng().gen_range(0,100));
+      }
+      state_vec.push (tmp_state_vec);
+    }
+    packet.set_state (state_vec);
+    input_phvs.push (packet.clone());
+  }
+  input_phvs
+
+}
+// Initializes hole config HashMap and initializes pipeline.
+// Runs input phvs through pipeline and returns the resulting
+// output phvs
+fn get_hole_cfgs (hole_cfgs_file : String) -> HashMap <String, i32 > {
+  let mut hole_cfgs_map : HashMap <String, i32> = HashMap::new();
+  let hole_cfgs_file_contents : String = fs::read_to_string(hole_cfgs_file).expect ("Error: Hole configs file could not be found");
+  let hole_cfgs_file_vec : Vec <String> = hole_cfgs_file_contents
+                                          .split ("\n")
+                                          .map (|s| s.to_string())
+                                          .collect();
+
+  for hole_var in hole_cfgs_file_vec {
+      let hole_entry : Vec <&str> = hole_var
+                                    .split("=")
+                                    .map(|s| s.trim())
+                                    .collect();
+      if hole_entry.len() < 2 {
+        continue;
+      }
+      hole_cfgs_map.insert (hole_entry[0].to_string(), 
+                            hole_entry[1].to_string().parse::<i32>()
+                                                     .expect ("Error: hole value set to non-integer value"));
+  }
+  println!("{:?}", hole_cfgs_map);
+  hole_cfgs_map
+}
+
+fn run_pipeline (input_phvs : Vec <Phv <i32> >,
+                 mut pipeline : Pipeline,
+                 ticks : i32) -> Vec <Phv <i32 > > {
+  let mut output_phvs : Vec <Phv <i32> > = Vec::new();
+  for t in 0..ticks {
+    let new_packet : Phv<i32> = 
+        pipeline.tick (input_phvs[t as usize].clone());
+    if !new_packet.is_bubble() {
+      output_phvs.push(new_packet.clone());
+    }
+  }
+  output_phvs
+}
+#[test]
+fn test_simple_raw_stateless_alu_2_2 () {
+
+  let ticks : i32 = 100;
+  // 4 input phvs with 2 containers each
+  let mut input_phvs : Vec <Phv <i32> > = get_input_phvs(ticks, 2, 1,1);
+  let hole_cfg_file : String = String::from("hole_configurations/simple_raw_stateless_alu_2_2_hole_cfgs.txt");
+  let output_phvs : Vec <Phv <i32> > =  Vec::new();
+  let hole_cfgs_map : HashMap <String, i32> = get_hole_cfgs (hole_cfg_file);
+
+
+  let mut pipeline : Pipeline = 
+      simple_raw_stateless_alu_2_2_prog_to_run::init_pipeline(hole_cfgs_map.clone());
+
+  let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
+                                                     pipeline,
+                                                     ticks);
+  for i in 0..output_phvs.len() {
+    assert!(output_phvs[i][0].get_value() ==
+            input_phvs[i].get_state()[0][0] + 1);
+
+  }
+}
+
+#[test]
+fn test_simple_raw_stateless_alu_arith_2_2 () {
+
+  let ticks : i32 = 100;
+  // 4 input phvs with 2 containers each
+  let mut input_phvs : Vec <Phv <i32> > = get_input_phvs(ticks, 2, 1,1);
+
+  let hole_cfg_file : String = String::from("hole_configurations/simple_raw_stateless_alu_arith_2_2_hole_cfgs.txt");
+  let hole_cfgs_map : HashMap <String, i32> = get_hole_cfgs (hole_cfg_file);
+
+  let mut pipeline : Pipeline = 
+      simple_raw_stateless_alu_arith_2_2_prog_to_run::init_pipeline(hole_cfgs_map.clone());
+  let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
+                                                     pipeline,
+                                                     ticks);
+
+  for i in 0..output_phvs.len() {
+    assert!(output_phvs[i][0].get_value() ==
+            input_phvs[i].get_state()[0][0] + 1);
+  }
+}
+#[test]
+fn test_simple_raw_stateless_alu_arith_rel_cond_2_2 () {
+
+  let ticks : i32 = 100;
+  // 4 input phvs with 2 containers each
+  let mut input_phvs : Vec <Phv <i32> > = get_input_phvs(ticks, 2, 1, 1);
+
+  let hole_cfg_file : String = String::from("hole_configurations/simple_raw_stateless_alu_arith_rel_cond_2_2_hole_cfgs.txt");
+  let hole_cfgs_map : HashMap <String, i32> = get_hole_cfgs (hole_cfg_file);
+
+  let mut pipeline : Pipeline = 
+      simple_raw_stateless_alu_arith_rel_cond_2_2_prog_to_run::init_pipeline(hole_cfgs_map.clone());
+  let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
+                                                     pipeline,
+                                                     ticks);
+
+  for i in 0..output_phvs.len() {
+    assert!(output_phvs[i][0].get_value() ==
+            input_phvs[i].get_state()[0][0] + 1);
+  }
+}
+
+
+#[test]
+fn test_simple_if_else_raw_stateless_alu_arith_rel_2_2 () {
+   let ticks : i32 = 100;
+  // 4 input phvs with 2 containers each
+  let mut input_phvs : Vec <Phv <i32> > = get_input_phvs(ticks, 2, 1, 1);
+
+  let hole_cfg_file : String = String::from("hole_configurations/simple_if_else_raw_stateless_alu_arith_rel_2_2_hole_cfgs.txt");
+  let hole_cfgs_map : HashMap <String, i32> = get_hole_cfgs (hole_cfg_file);
+  let mut pipeline : Pipeline = 
+      simple_if_else_raw_stateless_alu_arith_rel_2_2_prog_to_run::init_pipeline(hole_cfgs_map.clone());
+  let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
+                                                     pipeline,
+                                                     ticks);
+
+  let mut state_accumulator : i32 = 0;
+  for i in 0..output_phvs.len() {
+    assert!(output_phvs[i][0].get_value() ==
+            input_phvs[i].get_state()[0][0] + 1);
+
+    }
+}
+
+#[test]
+fn test_simple_pair_stateless_alu_arith_2_2 () {
+   let ticks : i32 = 100;
+  // 4 input phvs with 2 containers each
+  let mut input_phvs : Vec <Phv <i32> > = get_input_phvs(ticks, 2, 2, 1);
+
+  let hole_cfg_file : String = String::from("hole_configurations/simple_pair_stateless_alu_arith_2_2_hole_cfgs.txt");
+  let hole_cfgs_map : HashMap <String, i32> = get_hole_cfgs (hole_cfg_file);
+  let mut pipeline : Pipeline = 
+      simple_pair_stateless_alu_arith_2_2_prog_to_run::init_pipeline(hole_cfgs_map.clone());
+  let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
+                                                     pipeline,
+                                                     ticks);
+
+  for i in 0..output_phvs.len() {
+    assert!(output_phvs[i][0].get_value() ==
+            input_phvs[i].get_state()[0][0] + 1);
+  }
+
+}
+
 #[test]
 fn test_basic_pipeline_1() {
     // state_vars is unused

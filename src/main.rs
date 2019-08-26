@@ -2,6 +2,7 @@ extern crate rand;
 extern crate druzhba;
 
 mod prog_to_run;
+mod test_files;
 
 use druzhba::pipeline::Pipeline;
 use druzhba::phv::Phv;
