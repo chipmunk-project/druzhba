@@ -15,11 +15,14 @@ Example:
     cd dgen
     cargo build && cargo run simple ../example_alus/stateful_alus/raw.alu ../example_alus/stateless_alus/stateless_alu.alu 2 2
 
+Note: as of this pull request, Druzhba will use the hardcoded 
+prog_to_run.rs file for now. As of right now, Dgen will only 
+produce a test_prog_to_run.rs that only contains the ALU functions
+and their helpers 
+
 
 With dgen's generated prog_to_run.rs file constructed,
-, run the following to execute Druzhba (note: as of this
-pull request, Druzhba will use the hardcoded prog_to_run.rs 
-file for now):
+, run the following to execute Druzhba :
 
     cargo build && cargo run <ticks>
 
