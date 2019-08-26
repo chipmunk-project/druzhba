@@ -1,29 +1,34 @@
-use output_mux::OutputMux;
-use input_mux::InputMux;
-use pipeline::Pipeline;
-use phv::Phv;
-use phv_container::PhvContainer;
-use pipeline_stage::PipelineStage;
-use alu::ALU;
-use alu::StateVar;
+extern crate druzhba;
 
+use druzhba::output_mux::OutputMux;
+use druzhba::input_mux::InputMux;
+use druzhba::pipeline::Pipeline;
+use druzhba::phv::Phv;
+use druzhba::phv_container::PhvContainer;
+use druzhba::pipeline_stage::PipelineStage;
+use druzhba::alu::ALU;
+use druzhba::alu::StateVar;
+
+use prog_to_run;
+
+use rand::Rng;
+use std::fs;
 use std::collections::HashMap;
-
 #[test]
 fn test_basic_pipeline_1() {
     // state_vars is unused
     fn alu_stateless_fn( _state_vars: &mut Vec<StateVar>,
-                         packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
+                         packet : &Vec<PhvContainer<i32>>) -> (Vec  <i32>, Vec <i32> ){
      
-        vec! [packet[0].field_value * 3]
+        (vec! [packet[0].field_value * 3], Vec::new())
     }
 
     // packet is unused
     fn alu_stateful_fn( state_vars: &mut Vec<StateVar>,
-                        _packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
+                        _packet : &Vec<PhvContainer<i32>>) -> (Vec <i32>, Vec <i32>) {
         let old_state : Vec <i32> = state_vars.clone();
         state_vars [0] = 10;
-        old_state
+        (old_state, state_vars.clone())
     }
 
     // Picks the first phv container to input
@@ -41,13 +46,10 @@ fn test_basic_pipeline_1() {
     let alu_two_two_output_mux_index_hole = 2 ;
 
     //arbitrary state variables
-    let mut state_vars : Vec<StateVar> = Vec::new();
-    state_vars.push(0);
-    state_vars.push(1);
-
+    let state_vars : Vec <i32> = vec![0,1];
 
     /* Stage 1 */
-    let first_phv : Phv<i32> = Phv{bubble: true, packets: Vec::new()};
+    let first_phv : Phv<i32> = Phv{bubble: true, packets: Vec::new(), state : vec![vec![0;1]]};
 
     //generate input and output muxes for both ALUs in the first stage
     
@@ -76,10 +78,11 @@ fn test_basic_pipeline_1() {
     
     let pipeline_stage_one : PipelineStage = PipelineStage { 
         stateful_atoms: vec![alu_one_one], 
-        stateless_atoms : vec![alu_one_two] };
+        stateless_atoms : vec![alu_one_two],
+        salu_configs : vec![0]};
 
     /* Stage 2 */
-    let second_phv : Phv<i32> = Phv {bubble: true, packets: Vec::new()};
+    let second_phv : Phv<i32> = Phv {bubble: true, packets: Vec::new(), state : vec![vec![0;1]]};
 
     //generate input and output muxes for both ALUs in the second stage
     
@@ -110,7 +113,8 @@ fn test_basic_pipeline_1() {
 
     let pipeline_stage_two : PipelineStage = PipelineStage{
         stateful_atoms: vec![alu_two_one], 
-        stateless_atoms: vec![alu_two_two]
+        stateless_atoms: vec![alu_two_two],
+        salu_configs : vec![0],
     };
     //generate pipeline
     let mut pipeline : Pipeline = Pipeline::with_pipeline_stages(
@@ -131,10 +135,12 @@ fn test_basic_pipeline_1() {
         packet.add_container_to_phv (PhvContainer {
             field_value : field_values [(t as usize)],
         });
+        packet.set_state (vec![vec![0]]);
         let new_packet : Phv<i32> = pipeline.tick (packet);
         if !new_packet.is_bubble() {
           output_phvs.push (new_packet);
         }
+        
     }
     // Assert that the PhvContainer in every Phv is equal
     // to the initial PhvContainer * 9. This is because we
@@ -154,17 +160,17 @@ fn test_basic_pipeline_1() {
 fn test_basic_pipeline_2 () {
     // state_vars is unused
     fn alu_stateless_fn( _state_vars: &mut Vec<StateVar>,
-                         packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
-        vec! [packet[0].field_value * 2]
+                         packet : &Vec<PhvContainer<i32>>) -> ( Vec <i32>, Vec <i32>) {
+        (vec! [packet[0].field_value * 2], Vec::new())
         
     }
 
     // packet is unused
     fn alu_stateful_fn( state_vars: &mut Vec<StateVar>,
-                        _packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
+                        _packet : &Vec<PhvContainer<i32>>) -> (Vec <i32>, Vec <i32>) {
         let old_state : Vec <i32> = state_vars.clone();
         state_vars [0] = state_vars[0] + 2;
-        old_state
+        (old_state, state_vars.clone())
     }
 
     // Picks the first phv container to input
@@ -189,7 +195,7 @@ fn test_basic_pipeline_2 () {
 
 
     /* Stage 1 */
-    let first_phv : Phv<i32> = Phv{bubble: true, packets: Vec::new()};
+    let first_phv : Phv<i32> = Phv{bubble: true, packets: Vec::new(), state : vec![vec![0;1]]};
 
     //generate input and output muxes for both ALUs in the first stage
     
@@ -218,10 +224,12 @@ fn test_basic_pipeline_2 () {
     
     let pipeline_stage_one : PipelineStage = PipelineStage { 
         stateful_atoms: vec![alu_one_one], 
-        stateless_atoms : vec![alu_one_two] };
+        stateless_atoms : vec![alu_one_two],
+        salu_configs : vec![0],
+    };
 
     /* Stage 2 */
-    let second_phv : Phv<i32> = Phv {bubble: true, packets: Vec::new()};
+    let second_phv : Phv<i32> = Phv {bubble: true, packets: Vec::new(), state : vec![vec![0;1]]};
 
     //generate input and output muxes for both ALUs in the second stage
     
@@ -252,7 +260,8 @@ fn test_basic_pipeline_2 () {
 
     let pipeline_stage_two : PipelineStage = PipelineStage{
         stateful_atoms: vec![alu_two_one], 
-        stateless_atoms: vec![alu_two_two]
+        stateless_atoms: vec![alu_two_two],
+        salu_configs : vec![0],
     };
     //generate pipeline
     let mut pipeline : Pipeline = Pipeline::with_pipeline_stages(
@@ -273,6 +282,7 @@ fn test_basic_pipeline_2 () {
         packet.add_container_to_phv (PhvContainer {
             field_value : field_values [(t as usize)],
         });
+        packet.set_state(vec![vec![0]]);
         let new_packet : Phv<i32> = pipeline.tick (packet);
         if !new_packet.is_bubble() {
           output_phvs.push (new_packet);

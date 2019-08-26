@@ -11,19 +11,15 @@ pub type PacketFieldSet = Vec <String>;
 #[derive(Clone)]
 pub struct Phv<T> {
   pub bubble : bool, // false if initialized, true otherwise
-  pub packets : Vec<PhvContainer<T>> // Vector of PHV Containers
+  pub packets : Vec<PhvContainer<T>>, // Vector of PHV Containers
+  pub state : Vec< Vec<i32> > // Initial state value
 }
 
 
 impl<T> Phv<T>{
 
   pub fn new() -> Self {
-    Phv{ bubble : true, packets: Vec::new()}
-  }
-
-  pub fn new_with_pack(pack : PhvContainer<T>) -> Self {
-    let list : Vec<PhvContainer<T>> = vec![pack];
-    Phv{ bubble : false, packets : list }
+    Phv{ bubble : true, packets: Vec::new(), state : Vec::new()}
   }
 
   pub fn is_bubble(&self) -> bool {
@@ -34,6 +30,12 @@ impl<T> Phv<T>{
     self.packets.push(pack);
     self.bubble = false;
     self
+  }
+  pub fn set_state (&mut self, t_state : Vec <Vec<i32> >) {
+    self.state = t_state;
+  }
+  pub fn get_state (&self) -> Vec <Vec <i32> > {
+    self.state.clone()
   }
   pub fn get_num_phv_containers (&self) -> i32 {
     self.packets.len() as i32
@@ -49,7 +51,7 @@ impl<T> Phv<T>{
 impl<T> Index<i32> for Phv<T>{
   type Output = PhvContainer<T>;
   fn index(&self, i : i32) -> &Self::Output {
-    &self.packets[i as usize]
+     &self.packets[i as usize]
   }
 }
 
@@ -66,11 +68,20 @@ impl<T> fmt::Display for Phv<T> where T : fmt::Display {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 
       let mut s : String = String::from("{"); 
-      for counter in 0..self.packets.len() {
+      for i in 0..self.packets.len() {
         s.push_str(&format!( "[index : {}, value : {}], ", 
-                             &counter.to_string(), 
-                             &self.packets[counter].field_value
+                             &i.to_string(), 
+                             &self.packets[i].field_value
                                   .to_string()));
+      }
+      for i in 0..self.state.len() {
+        for j in 0..self.state[i].len(){
+            
+          s.push_str(&format!("[state group : {}, state : {}, value : {}], ",
+                              &i.to_string(),
+                              &j.to_string(),
+                              &self.state[i][j]));
+        }
       }
       s.push_str ("}");
       write!(f, "{}", s)

@@ -13,10 +13,18 @@ pub struct InputMux{
 impl InputMux{
 
     pub fn new(&self, input: Phv<i32>, hole_index : i32) -> Self {
-        InputMux {input_phv : input, index : hole_index }
+        let num_phv_containers : i32 = input.get_num_phv_containers();
+        InputMux {input_phv : input, index : hole_index}
     
     }
     pub fn output(&self) -> PhvContainer<i32> {
-        self.input_phv [self.index].clone()
+        // TODO: THis is a quick fix but what do we do when
+        // hole is greater than number of phv containers?
+        if self.index >= self.input_phv.get_num_phv_containers() {
+          self.input_phv [self.input_phv.get_num_phv_containers()-1].clone()
+        }
+        else {
+          self.input_phv [self.index].clone()
+        }
     }
 }

@@ -9,16 +9,19 @@ use self::rand::{thread_rng, Rng};
 pub struct PipelineStage {
    pub stateless_atoms : Vec<ALU>,
    pub stateful_atoms : Vec<ALU>,
+   pub salu_configs : Vec<i32>,
 }
 
 impl PipelineStage {
   pub fn new () -> Self {
     PipelineStage { stateless_atoms : Vec::new(),
-                    stateful_atoms : Vec::new(), }
+                    stateful_atoms : Vec::new(), 
+                    salu_configs : vec![0]}
   }
-  pub fn with_atoms (stateless : Vec <ALU>, stateful : Vec<ALU>) -> Self{
+  pub fn with_atoms (stateless : Vec <ALU>, stateful : Vec<ALU>, t_salu_configs : Vec<i32>) -> Self{
     PipelineStage { stateless_atoms : stateless,
                     stateful_atoms : stateful, 
+                    salu_configs : t_salu_configs,
     }
   }
 
@@ -26,7 +29,6 @@ impl PipelineStage {
   // underlying function on the incoming Phv in 
   // random order. Pass the mutated phv containers to their respective muxes.
   pub fn tick(&mut self, input_phv: Phv<i32>) -> Phv<i32>{ 
-
       if input_phv.is_bubble() {
         Phv::new()
       }
@@ -34,19 +36,28 @@ impl PipelineStage {
       
         let mut output_phv : Phv<i32> = 
             Phv { bubble : false, 
-                  packets: Vec::new() };
-        thread_rng().shuffle(&mut self.stateful_atoms);
-        thread_rng().shuffle(&mut self.stateless_atoms);
+                  packets: Vec::new(),
+                  state : Vec::new() };
 
         let mut old_state : Vec <i32> = Vec::new();
+        // List of new state variables for output mux
+        let mut new_state : Vec <Vec <i32> > = Vec::new();
         // Need old state variables first to put them
         // into output muxes later
         for atom in self.stateful_atoms.iter_mut () {
+            
+          for i in 0..self.salu_configs.len() {
+            if self.salu_configs[i] == 1 {
+              atom.set_state_variables (input_phv.get_state()[i].clone());
+            }
+          }
           atom.send_packets_to_input_muxes(input_phv.clone());
           let mut packet_fields : Vec<PhvContainer<i32>> = atom.input_mux_output();
-          for elem in atom.run (&mut packet_fields){
-            old_state.push (elem);
-          }
+          let state_result = atom.run (&mut packet_fields);
+          let mut old_state_result : Vec <i32> = state_result.0;
+          let new_state_result : Vec <i32> = state_result.1;
+          old_state.append(&mut old_state_result);
+          new_state.push (new_state_result);
         }
         // Gets return values from the ALUs and inserts
         // them into output muxes along with old state vars
@@ -61,7 +72,7 @@ impl PipelineStage {
           //After being passed to atom, value is sent to an
           //output mux and put into a PHV
 
-          let result : i32 =  atom.run(&packet_fields)[0];
+          let result : i32 =  atom.run(&packet_fields).0[0];
           // State variables and returned value from stateless ALU
           let mut output_mux_fields : Vec <i32> = old_state.clone();
 
@@ -70,7 +81,20 @@ impl PipelineStage {
           atom.send_packets_to_output_mux(&output_mux_fields);
           output_phv.add_container_to_phv(atom.output_mux.output());
         }
+ 
+        // Update output_phv state variables
+        let mut output_state : Vec <Vec <i32> > = Vec::new();
+        for i in 0..self.salu_configs.len() {
+          if self.salu_configs[i] == 1 {
+            output_state.push (new_state[i].clone());
+          }
+          else {
+            output_state.push (input_phv.get_state()[i].clone());
+          }
+        }
+        output_phv.set_state (output_state);
         output_phv
       }
     }
   }
+

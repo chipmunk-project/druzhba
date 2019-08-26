@@ -1,125 +1,394 @@
+use druzhba::phv_container::PhvContainer;
 use druzhba::pipeline_stage::PipelineStage;
 use druzhba::pipeline::Pipeline;
-use druzhba::phv::Phv;
-use druzhba::phv_container::PhvContainer;
 use druzhba::alu::ALU;
-use druzhba::alu::StateVar;
 use druzhba::input_mux::InputMux;
-use druzhba::output_mux::OutputMux;
-
-
-//Stateless ALU
-// state_vars not used
-pub fn alu_stateless_fn( _state_vars: &mut Vec<StateVar>,
-                         packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
- 
-    vec! [packet[0].field_value * 21]
+use druzhba::output_mux::OutputMux;use druzhba::phv::Phv;
+use std::collections::HashMap;
+fn simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_alu_0_0_Opt_0 (op : i32, enable : i32) -> i32 {
+  if enable != 0 {
+    0
+  }
+else{
+  op
+  }
 }
-// Stateful ALU
-// packet not used
-pub fn alu_stateful_fn( state_vars: &mut Vec<StateVar>,
-                       _packet : &Vec<PhvContainer<i32>>) -> Vec <i32>{
-    let old_state : Vec <i32> = state_vars.clone();
-    state_vars [0] = 21;
-    old_state
+fn simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_alu_0_0_Mux2_0(op1 : i32, op2 : i32, ctrl : i32) -> i32{
+  if ctrl == 0 {
+    op1
+  }
+  else {
+  op2
+  }
 }
-
-
-
-pub fn init_pipeline() -> Pipeline {
-
-    /*Holes provided by *Chipmunk* for input and output muxes of two stages. */
-    
-    // Picks the first phv container to input
-    // into ALU 
-    let alu_one_one_input_mux_index_hole = 0 ;
-    let alu_one_two_input_mux_index_hole = 0 ;
-    // Picks the third input which is the result from
-    // the stateless ALU (state vars vector has 2 elements)
-    let alu_one_one_output_mux_index_hole = 2 ;
-    let alu_one_two_output_mux_index_hole = 2 ;
-
-    let alu_two_one_input_mux_index_hole = 0 ;
-    let alu_two_two_input_mux_index_hole = 0 ;
-    let alu_two_one_output_mux_index_hole = 2 ;
-    let alu_two_two_output_mux_index_hole = 2 ;
-
-    //arbitrary state variables
-    let mut state_vars : Vec<StateVar> = Vec::new();
-    state_vars.push(0);
-    state_vars.push(1);
-
-
-    /* Stage 1 */
-    let first_phv : Phv<i32> = Phv{bubble: true, packets: Vec::new()};
-
-    //generate input and output muxes for both ALUs in the first stage
-    
-    let alu_one_one_input_muxes : Vec<InputMux> = 
-        vec![InputMux {input_phv: first_phv.clone() , index : alu_one_one_input_mux_index_hole}];
-    let alu_one_two_input_muxes : Vec<InputMux> = 
-        vec![InputMux{input_phv: first_phv.clone() , index : alu_one_two_input_mux_index_hole}];
-    let alu_one_one_output_mux : OutputMux = OutputMux{input_phv_containers: Vec::new() , index: alu_one_one_output_mux_index_hole};
-
-    let alu_one_two_output_mux : OutputMux = OutputMux{input_phv_containers: Vec::new() , index: alu_one_two_output_mux_index_hole};
-
-    //generate ALUs for first pipeline stage
-   
-    let alu_one_one : ALU = 
-        ALU { sequential_function: Box::new(alu_stateful_fn), 
-              state_variables: state_vars.clone(), 
-              input_muxes: alu_one_one_input_muxes, 
-              output_mux: alu_one_one_output_mux, 
-              is_stateful : true };
-
-    let alu_one_two : ALU = 
-        ALU { sequential_function: Box::new(alu_stateless_fn), 
-              state_variables: Vec::new(), 
-              input_muxes: alu_one_two_input_muxes, 
-              output_mux: alu_one_two_output_mux, 
-              is_stateful : false };
-    
-    let pipeline_stage_one : PipelineStage = PipelineStage{ 
-        stateful_atoms: vec![alu_one_one], 
-        stateless_atoms : vec![alu_one_two] };
-
-    /* Stage 2 */
-    let second_phv : Phv<i32> = Phv {bubble: true, packets: Vec::new()};
-
-    //generate input and output muxes for both ALUs in the second stage
-    
-    let alu_two_one_input_muxes : Vec<InputMux> = 
-        vec![InputMux{input_phv: second_phv.clone() , index : alu_two_one_input_mux_index_hole}];
-    let alu_two_two_input_muxes : Vec<InputMux> = 
-        vec![InputMux{input_phv: second_phv.clone() , index : alu_two_two_input_mux_index_hole}];
-    let alu_two_one_output_mux : OutputMux = OutputMux{input_phv_containers: Vec::new() , index: alu_two_one_output_mux_index_hole};
-    let alu_two_two_output_mux : OutputMux = OutputMux{input_phv_containers: Vec::new() , index: alu_two_two_output_mux_index_hole};
-
-    //generate ALUs for second pipeline stage
-    
-    let alu_two_one : ALU = 
-        ALU { sequential_function: Box::new(alu_stateful_fn), 
-              state_variables: state_vars.clone(), 
-              input_muxes : alu_two_one_input_muxes, 
-              output_mux: alu_two_one_output_mux, 
-              is_stateful : true };
-    let alu_two_two : ALU = 
-        ALU { sequential_function: Box::new(alu_stateless_fn), 
-              state_variables: Vec::new(), 
-              input_muxes : alu_two_two_input_muxes, 
-              output_mux: alu_two_two_output_mux, 
-              is_stateful: false 
-        };
-
-    let pipeline_stage_two : PipelineStage = PipelineStage{
-        stateful_atoms: vec![alu_two_one], 
-        stateless_atoms: vec![alu_two_two]
+fn simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_alu_0_0_const_0 (constant : i32) -> i32 {
+  constant
+}
+pub fn init_simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_alu_0_0(hole_vars : HashMap <String, i32>) -> Box <dyn Fn (&mut Vec <i32>, &Vec <PhvContainer <i32>>) -> (Vec <i32>, Vec <i32> ) >{
+    let alu = move |state_vec : &mut Vec <i32>, phv_containers : &Vec <PhvContainer <i32>>| -> (Vec <i32>, Vec <i32>){
+    let old_state : Vec<i32> = state_vec.clone();
+        state_vec[0] = simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_alu_0_0_Opt_0(state_vec[0], hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_alu_0_0_Opt_0_global"])+simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_alu_0_0_Mux2_0(phv_containers[0].get_value(), simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_alu_0_0_const_0(hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_alu_0_0_const_0_global"]), hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_alu_0_0_Mux2_0_global"]);
+    (old_state, state_vec.clone())
     };
+    Box::new(alu)
+}
+pub fn init_simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0(hole_vars : HashMap <String, i32>) -> Box <dyn Fn (&mut Vec <i32>, &Vec <PhvContainer <i32>>) -> (Vec <i32>, Vec <i32> ) >{
+    let alu = move |state_vec : &mut Vec <i32>, phv_containers : &Vec <PhvContainer <i32>>| -> (Vec <i32>, Vec <i32>){
+        if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_opcode"]==0 {
+        (vec![(hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_immediate"]) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_opcode"]==1{
+        (vec![(phv_containers[0].get_value()+phv_containers[1].get_value()) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_opcode"]==2{
+        (vec![(phv_containers[0].get_value()+hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_immediate"]) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_opcode"]==3{
+        (vec![(phv_containers[0].get_value()-phv_containers[1].get_value()) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_opcode"]==4{
+        (vec![(phv_containers[0].get_value()-hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_immediate"]) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_opcode"]==5{
+        (vec![(hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_immediate"]-phv_containers[0].get_value()) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_opcode"]==6{
+        (vec![((phv_containers[0].get_value()!=phv_containers[1].get_value())) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_opcode"]==7{
+        (vec![((phv_containers[0].get_value()!=hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_immediate"])) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_opcode"]==8{
+        (vec![((phv_containers[0].get_value()==phv_containers[1].get_value())) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_opcode"]==9{
+        (vec![((phv_containers[0].get_value()==hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_immediate"])) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_opcode"]==10{
+        (vec![((phv_containers[0].get_value()>=phv_containers[1].get_value())) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_opcode"]==11{
+        (vec![((phv_containers[0].get_value()>=hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_immediate"])) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_opcode"]==12{
+        (vec![((phv_containers[0].get_value()<phv_containers[1].get_value())) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_opcode"]==13{
+        (vec![((phv_containers[0].get_value()<hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_immediate"])) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_opcode"]==14{
+        if phv_containers[0].get_value()!=0 {
+        (vec![(phv_containers[1].get_value()) as i32], Vec::new())
+        }
+        else{
+        (vec![(phv_containers[2].get_value()) as i32], Vec::new())
+        }
 
-    //generate pipeline
+        }
+        else{
+        if phv_containers[0].get_value()!=0 {
+        (vec![(phv_containers[1].get_value()) as i32], Vec::new())
+        }
+        else{
+        (vec![(hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_immediate"]) as i32], Vec::new())
+        }
 
-    let pipeline : Pipeline = Pipeline::with_pipeline_stages(vec![pipeline_stage_one, pipeline_stage_two]);
+        }
 
-    pipeline
+    };
+   Box::new(alu)
+}
+pub fn init_simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1(hole_vars : HashMap <String, i32>) -> Box <dyn Fn (&mut Vec <i32>, &Vec <PhvContainer <i32>>) -> (Vec <i32>, Vec <i32> ) >{
+    let alu = move |state_vec : &mut Vec <i32>, phv_containers : &Vec <PhvContainer <i32>>| -> (Vec <i32>, Vec <i32>){
+        if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_opcode"]==0 {
+        (vec![(hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_immediate"]) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_opcode"]==1{
+        (vec![(phv_containers[0].get_value()+phv_containers[1].get_value()) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_opcode"]==2{
+        (vec![(phv_containers[0].get_value()+hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_immediate"]) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_opcode"]==3{
+        (vec![(phv_containers[0].get_value()-phv_containers[1].get_value()) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_opcode"]==4{
+        (vec![(phv_containers[0].get_value()-hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_immediate"]) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_opcode"]==5{
+        (vec![(hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_immediate"]-phv_containers[0].get_value()) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_opcode"]==6{
+        (vec![((phv_containers[0].get_value()!=phv_containers[1].get_value())) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_opcode"]==7{
+        (vec![((phv_containers[0].get_value()!=hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_immediate"])) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_opcode"]==8{
+        (vec![((phv_containers[0].get_value()==phv_containers[1].get_value())) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_opcode"]==9{
+        (vec![((phv_containers[0].get_value()==hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_immediate"])) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_opcode"]==10{
+        (vec![((phv_containers[0].get_value()>=phv_containers[1].get_value())) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_opcode"]==11{
+        (vec![((phv_containers[0].get_value()>=hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_immediate"])) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_opcode"]==12{
+        (vec![((phv_containers[0].get_value()<phv_containers[1].get_value())) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_opcode"]==13{
+        (vec![((phv_containers[0].get_value()<hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_immediate"])) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_opcode"]==14{
+        if phv_containers[0].get_value()!=0 {
+        (vec![(phv_containers[1].get_value()) as i32], Vec::new())
+        }
+        else{
+        (vec![(phv_containers[2].get_value()) as i32], Vec::new())
+        }
 
+        }
+        else{
+        if phv_containers[0].get_value()!=0 {
+        (vec![(phv_containers[1].get_value()) as i32], Vec::new())
+        }
+        else{
+        (vec![(hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_immediate"]) as i32], Vec::new())
+        }
+
+        }
+
+    };
+   Box::new(alu)
+}
+fn simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_alu_1_0_Opt_0 (op : i32, enable : i32) -> i32 {
+  if enable != 0 {
+    0
+  }
+else{
+  op
+  }
+}
+fn simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_alu_1_0_Mux2_0(op1 : i32, op2 : i32, ctrl : i32) -> i32{
+  if ctrl == 0 {
+    op1
+  }
+  else {
+  op2
+  }
+}
+fn simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_alu_1_0_const_0 (constant : i32) -> i32 {
+  constant
+}
+pub fn init_simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_alu_1_0(hole_vars : HashMap <String, i32>) -> Box <dyn Fn (&mut Vec <i32>, &Vec <PhvContainer <i32>>) -> (Vec <i32>, Vec <i32> ) >{
+    let alu = move |state_vec : &mut Vec <i32>, phv_containers : &Vec <PhvContainer <i32>>| -> (Vec <i32>, Vec <i32>){
+    let old_state : Vec<i32> = state_vec.clone();
+        state_vec[0] = simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_alu_1_0_Opt_0(state_vec[0], hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_alu_1_0_Opt_0_global"])+simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_alu_1_0_Mux2_0(phv_containers[0].get_value(), simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_alu_1_0_const_0(hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_alu_1_0_const_0_global"]), hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_alu_1_0_Mux2_0_global"]);
+    (old_state, state_vec.clone())
+    };
+    Box::new(alu)
+}
+pub fn init_simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0(hole_vars : HashMap <String, i32>) -> Box <dyn Fn (&mut Vec <i32>, &Vec <PhvContainer <i32>>) -> (Vec <i32>, Vec <i32> ) >{
+    let alu = move |state_vec : &mut Vec <i32>, phv_containers : &Vec <PhvContainer <i32>>| -> (Vec <i32>, Vec <i32>){
+        if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_opcode"]==0 {
+        (vec![(hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_immediate"]) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_opcode"]==1{
+        (vec![(phv_containers[0].get_value()+phv_containers[1].get_value()) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_opcode"]==2{
+        (vec![(phv_containers[0].get_value()+hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_immediate"]) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_opcode"]==3{
+        (vec![(phv_containers[0].get_value()-phv_containers[1].get_value()) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_opcode"]==4{
+        (vec![(phv_containers[0].get_value()-hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_immediate"]) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_opcode"]==5{
+        (vec![(hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_immediate"]-phv_containers[0].get_value()) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_opcode"]==6{
+        (vec![((phv_containers[0].get_value()!=phv_containers[1].get_value())) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_opcode"]==7{
+        (vec![((phv_containers[0].get_value()!=hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_immediate"])) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_opcode"]==8{
+        (vec![((phv_containers[0].get_value()==phv_containers[1].get_value())) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_opcode"]==9{
+        (vec![((phv_containers[0].get_value()==hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_immediate"])) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_opcode"]==10{
+        (vec![((phv_containers[0].get_value()>=phv_containers[1].get_value())) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_opcode"]==11{
+        (vec![((phv_containers[0].get_value()>=hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_immediate"])) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_opcode"]==12{
+        (vec![((phv_containers[0].get_value()<phv_containers[1].get_value())) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_opcode"]==13{
+        (vec![((phv_containers[0].get_value()<hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_immediate"])) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_opcode"]==14{
+        if phv_containers[0].get_value()!=0 {
+        (vec![(phv_containers[1].get_value()) as i32], Vec::new())
+        }
+        else{
+        (vec![(phv_containers[2].get_value()) as i32], Vec::new())
+        }
+
+        }
+        else{
+        if phv_containers[0].get_value()!=0 {
+        (vec![(phv_containers[1].get_value()) as i32], Vec::new())
+        }
+        else{
+        (vec![(hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_immediate"]) as i32], Vec::new())
+        }
+
+        }
+
+    };
+   Box::new(alu)
+}
+pub fn init_simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1(hole_vars : HashMap <String, i32>) -> Box <dyn Fn (&mut Vec <i32>, &Vec <PhvContainer <i32>>) -> (Vec <i32>, Vec <i32> ) >{
+    let alu = move |state_vec : &mut Vec <i32>, phv_containers : &Vec <PhvContainer <i32>>| -> (Vec <i32>, Vec <i32>){
+        if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_opcode"]==0 {
+        (vec![(hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_immediate"]) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_opcode"]==1{
+        (vec![(phv_containers[0].get_value()+phv_containers[1].get_value()) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_opcode"]==2{
+        (vec![(phv_containers[0].get_value()+hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_immediate"]) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_opcode"]==3{
+        (vec![(phv_containers[0].get_value()-phv_containers[1].get_value()) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_opcode"]==4{
+        (vec![(phv_containers[0].get_value()-hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_immediate"]) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_opcode"]==5{
+        (vec![(hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_immediate"]-phv_containers[0].get_value()) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_opcode"]==6{
+        (vec![((phv_containers[0].get_value()!=phv_containers[1].get_value())) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_opcode"]==7{
+        (vec![((phv_containers[0].get_value()!=hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_immediate"])) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_opcode"]==8{
+        (vec![((phv_containers[0].get_value()==phv_containers[1].get_value())) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_opcode"]==9{
+        (vec![((phv_containers[0].get_value()==hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_immediate"])) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_opcode"]==10{
+        (vec![((phv_containers[0].get_value()>=phv_containers[1].get_value())) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_opcode"]==11{
+        (vec![((phv_containers[0].get_value()>=hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_immediate"])) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_opcode"]==12{
+        (vec![((phv_containers[0].get_value()<phv_containers[1].get_value())) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_opcode"]==13{
+        (vec![((phv_containers[0].get_value()<hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_immediate"])) as i32], Vec::new())
+        }
+        else if hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_opcode"]==14{
+        if phv_containers[0].get_value()!=0 {
+        (vec![(phv_containers[1].get_value()) as i32], Vec::new())
+        }
+        else{
+        (vec![(phv_containers[2].get_value()) as i32], Vec::new())
+        }
+
+        }
+        else{
+        if phv_containers[0].get_value()!=0 {
+        (vec![(phv_containers[1].get_value()) as i32], Vec::new())
+        }
+        else{
+        (vec![(hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_immediate"]) as i32], Vec::new())
+        }
+
+        }
+
+    };
+   Box::new(alu)
+}
+pub fn init_pipeline (hole_vars : HashMap <String, i32>) -> Pipeline { 
+  let mut pipeline_stages : Vec<PipelineStage> = Vec::new();
+
+  // Stage 0 stateful ALUs
+  let mut stateful_alus_0 : Vec <ALU> = Vec::new();
+  let mut stateless_alus_0 : Vec <ALU> = Vec::new();
+  let mut stateful_input_muxes_0_0 : Vec<InputMux> = Vec::new();
+  let empty_phv : Phv <i32> = Phv { bubble : true, packets : Vec::new(), state : Vec::new() };
+  stateful_input_muxes_0_0.push (InputMux { input_phv : empty_phv.clone(), index : hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_operand_mux_0_0_0_ctrl"] });
+  // No hole variables for stateful ALU OutputMux
+  let stateful_output_mux_0_0 : OutputMux = OutputMux {input_phv_containers : Vec::new(), index : 0 };
+  let state_variables_0_0 : Vec<i32> = vec![0; 1];
+  let stateful_alu_0_0 : ALU = ALU {sequential_function : init_simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_alu_0_0(hole_vars.clone()), state_variables : state_variables_0_0, input_muxes : stateful_input_muxes_0_0, output_mux : stateful_output_mux_0_0, is_stateful: true };
+  stateful_alus_0.push(stateful_alu_0_0);
+
+  // Stage 0 stateless ALUs
+  let mut stateless_input_muxes_0_0 : Vec<InputMux> = Vec::new();
+  stateless_input_muxes_0_0.push (InputMux { input_phv : empty_phv.clone(), index : hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_mux1_ctrl"] });
+  stateless_input_muxes_0_0.push (InputMux { input_phv : empty_phv.clone(), index : hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_mux2_ctrl"] });
+  stateless_input_muxes_0_0.push (InputMux { input_phv : empty_phv.clone(), index : hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0_mux3_ctrl"] });
+  let stateless_output_mux_0_0 : OutputMux = OutputMux { input_phv_containers : Vec::new(), index : hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_output_mux_phv_0_0_ctrl"]};
+  let stateless_alu_0_0 : ALU = ALU {sequential_function : init_simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_0(hole_vars.clone()), state_variables : Vec::new(), input_muxes : stateless_input_muxes_0_0, output_mux : stateless_output_mux_0_0, is_stateful: false };
+  stateless_alus_0.push(stateless_alu_0_0);
+  let mut stateless_input_muxes_0_1 : Vec<InputMux> = Vec::new();
+  stateless_input_muxes_0_1.push (InputMux { input_phv : empty_phv.clone(), index : hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_mux1_ctrl"] });
+  stateless_input_muxes_0_1.push (InputMux { input_phv : empty_phv.clone(), index : hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_mux2_ctrl"] });
+  stateless_input_muxes_0_1.push (InputMux { input_phv : empty_phv.clone(), index : hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1_mux3_ctrl"] });
+  let stateless_output_mux_0_1 : OutputMux = OutputMux { input_phv_containers : Vec::new(), index : hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_output_mux_phv_0_1_ctrl"]};
+  let stateless_alu_0_1 : ALU = ALU {sequential_function : init_simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_0_1(hole_vars.clone()), state_variables : Vec::new(), input_muxes : stateless_input_muxes_0_1, output_mux : stateless_output_mux_0_1, is_stateful: false };
+  stateless_alus_0.push(stateless_alu_0_1);
+  let salu_configs_0 : Vec <i32> = vec![hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_salu_config_0_0"]];
+  let pipeline_stage_0 : PipelineStage = PipelineStage {stateful_atoms : stateful_alus_0, stateless_atoms : stateless_alus_0 , salu_configs : salu_configs_0};
+  pipeline_stages.push(pipeline_stage_0);
+
+  // Stage 1 stateful ALUs
+  let mut stateful_alus_1 : Vec <ALU> = Vec::new();
+  let mut stateless_alus_1 : Vec <ALU> = Vec::new();
+  let mut stateful_input_muxes_1_0 : Vec<InputMux> = Vec::new();
+  let empty_phv : Phv <i32> = Phv { bubble : true, packets : Vec::new(), state : Vec::new() };
+  stateful_input_muxes_1_0.push (InputMux { input_phv : empty_phv.clone(), index : hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_operand_mux_1_0_0_ctrl"] });
+  // No hole variables for stateful ALU OutputMux
+  let stateful_output_mux_1_0 : OutputMux = OutputMux {input_phv_containers : Vec::new(), index : 0 };
+  let state_variables_1_0 : Vec<i32> = vec![0; 1];
+  let stateful_alu_1_0 : ALU = ALU {sequential_function : init_simple_raw_stateless_alu_arith_rel_cond_2_2_stateful_alu_1_0(hole_vars.clone()), state_variables : state_variables_1_0, input_muxes : stateful_input_muxes_1_0, output_mux : stateful_output_mux_1_0, is_stateful: true };
+  stateful_alus_1.push(stateful_alu_1_0);
+
+  // Stage 1 stateless ALUs
+  let mut stateless_input_muxes_1_0 : Vec<InputMux> = Vec::new();
+  stateless_input_muxes_1_0.push (InputMux { input_phv : empty_phv.clone(), index : hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_mux1_ctrl"] });
+  stateless_input_muxes_1_0.push (InputMux { input_phv : empty_phv.clone(), index : hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_mux2_ctrl"] });
+  stateless_input_muxes_1_0.push (InputMux { input_phv : empty_phv.clone(), index : hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0_mux3_ctrl"] });
+  let stateless_output_mux_1_0 : OutputMux = OutputMux { input_phv_containers : Vec::new(), index : hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_output_mux_phv_1_0_ctrl"]};
+  let stateless_alu_1_0 : ALU = ALU {sequential_function : init_simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_0(hole_vars.clone()), state_variables : Vec::new(), input_muxes : stateless_input_muxes_1_0, output_mux : stateless_output_mux_1_0, is_stateful: false };
+  stateless_alus_1.push(stateless_alu_1_0);
+  let mut stateless_input_muxes_1_1 : Vec<InputMux> = Vec::new();
+  stateless_input_muxes_1_1.push (InputMux { input_phv : empty_phv.clone(), index : hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_mux1_ctrl"] });
+  stateless_input_muxes_1_1.push (InputMux { input_phv : empty_phv.clone(), index : hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_mux2_ctrl"] });
+  stateless_input_muxes_1_1.push (InputMux { input_phv : empty_phv.clone(), index : hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1_mux3_ctrl"] });
+  let stateless_output_mux_1_1 : OutputMux = OutputMux { input_phv_containers : Vec::new(), index : hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_output_mux_phv_1_1_ctrl"]};
+  let stateless_alu_1_1 : ALU = ALU {sequential_function : init_simple_raw_stateless_alu_arith_rel_cond_2_2_stateless_alu_1_1(hole_vars.clone()), state_variables : Vec::new(), input_muxes : stateless_input_muxes_1_1, output_mux : stateless_output_mux_1_1, is_stateful: false };
+  stateless_alus_1.push(stateless_alu_1_1);
+  let salu_configs_1 : Vec <i32> = vec![hole_vars["simple_raw_stateless_alu_arith_rel_cond_2_2_salu_config_1_0"]];
+  let pipeline_stage_1 : PipelineStage = PipelineStage {stateful_atoms : stateful_alus_1, stateless_atoms : stateless_alus_1 , salu_configs : salu_configs_1};
+  pipeline_stages.push(pipeline_stage_1);
+
+  // Initializing Pipeline using all PipelineStages 
+  let pipeline : Pipeline = Pipeline::with_pipeline_stages(pipeline_stages);
+  pipeline
 }
