@@ -240,7 +240,7 @@ pub fn pair ()
 // Tests that all of the nodes in the rust_code_generator resulting 
 // from the given spec match the expected nodes
 #[test]
-pub fn test_rust_code_generator ()
+pub fn test_ast ()
 {
 
   let alu = String::from(
