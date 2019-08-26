@@ -46,25 +46,25 @@ fn main() {
   assert!(args.len() == 5);
 
   // Parse returns a result so unwrap
-  let ticks : i32 = 
-    match args[1].parse::<i32>() {
-
-      Ok  (ticks_arg) => ticks_arg,
-      Err (_)         => panic!("Failure: Unable to unwrap ticks"),
-    };
   let num_containers : i32 = 
     match args[2].parse::<i32>() {
 
-      Ok  (ticks_arg) => ticks_arg,
+      Ok  (t_num_containers) => t_num_containers,
       Err (_)         => panic!("Failure: Unable to unwrap num_containers"),
     };
-   let num_stateful_alus : i32 = 
+  let num_stateful_alus : i32 = 
     match args[3].parse::<i32>() {
 
-      Ok  (ticks_arg) => ticks_arg,
+      Ok  (t_num_stateful_alus) => t_num_stateful_alus,
       Err (_)         => panic!("Failure: Unable to unwrap num_stateful_alus"),
     };
-  let hole_cfgs_file : String = args[4].clone();
+   let ticks : i32 = 
+    match args[4].parse::<i32>() {
+
+      Ok  (t_ticks) => t_ticks,
+      Err (_)         => panic!("Failure: Unable to unwrap ticks"),
+    };
+  let hole_cfgs_file : String = args[1].clone();
   let hole_cfgs : HashMap <String, i32> = get_hole_cfgs (hole_cfgs_file.clone());
 
   // TODO: Currently hardcoded at 2. Change later in case a stateful
