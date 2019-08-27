@@ -97,9 +97,11 @@ fn main() {
         });
 
     let mut state : Vec <Vec <i32> > = Vec::new();
-    for i in (0..num_stateful_alus){
+    // _i not used
+    for _i in 0..num_stateful_alus{
       let mut tmp_state_vec : Vec<i32> = Vec::new();
-      for j in (0..num_state_variables) {
+      // _j not used
+      for _j in 0..num_state_variables {
         tmp_state_vec.push(rand::thread_rng().gen_range(0,100));
       }
       state.push (tmp_state_vec);

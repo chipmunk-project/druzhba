@@ -10,7 +10,12 @@ use druzhba::alu::ALU;
 use druzhba::alu::StateVar;
 
 use prog_to_run;
-
+use test_files::blue_increase_pair_stateless_alu_arith_2_2_prog_to_run;
+use test_files::blue_increase_pair_stateless_alu_2_2_prog_to_run;
+use test_files::marple_new_flow_pair_stateless_alu_arith_rel_cond_bool_3_3_prog_to_run;
+use test_files::marple_new_flow_pair_stateless_alu_arith_rel_cond_2_2_prog_to_run;
+use test_files::marple_new_flow_nested_ifs_stateless_alu_arith_rel_cond_2_2_prog_to_run;
+use test_files::marple_new_flow_if_else_raw_stateless_alu_2_2_prog_to_run;
 use test_files::simple_sub_stateless_alu_arith_rel_2_2_prog_to_run;
 use test_files::simple_pred_raw_stateless_alu_arith_rel_cond_bool_2_2_prog_to_run;
 use test_files::simple_nested_ifs_stateless_alu_arith_rel_2_2_prog_to_run;
@@ -24,6 +29,7 @@ use rand::Rng;
 use std::fs;
 use std::collections::HashMap;
 
+/* Test helper functions */
 fn get_input_phvs (ticks : i32,
                    num_containers : i32,
                    num_state_vars : i32,
@@ -76,7 +82,6 @@ fn get_hole_cfgs (hole_cfgs_file : String) -> HashMap <String, i32 > {
                             hole_entry[1].to_string().parse::<i32>()
                                                      .expect ("Error: hole value set to non-integer value"));
   }
-  println!("{:?}", hole_cfgs_map);
   hole_cfgs_map
 }
 
@@ -105,8 +110,30 @@ fn test_simple (input_phvs : Vec <Phv <i32> >,
             input_phvs[i].get_state()[0][0] + 1);
 
   }
-
 }
+fn test_marple_new_flow (input_phvs : Vec <Phv <i32> >,
+                         output_phvs : Vec <Phv <i32> >) {
+
+  for i in 0..output_phvs.len() {
+    if input_phvs[i].get_state()[0][0] == 0 {
+      assert! (output_phvs[i][0].get_value()==1);
+      assert! (output_phvs[i].get_state()[0][0]==1);
+    }
+  }
+}
+fn test_blue_increase (input_phvs : Vec <Phv <i32> >,
+                       output_phvs : Vec <Phv <i32> >) {
+
+  for i in 0..output_phvs.len() {
+    assert!(output_phvs[i][1].get_value() == input_phvs[i][0].get_value() - 1);
+    if output_phvs[i][1].get_value() > input_phvs[i].get_state()[1][0]{
+      assert!(output_phvs[i].get_state()[0][0] == input_phvs[i].get_state()[0][0]+1);
+      assert!(output_phvs[i].get_state()[1][0] == input_phvs[i][0].get_value());
+    }
+  }
+}
+
+/* Simple tests */
 #[test]
 fn test_simple_raw_stateless_alu_2_2 () {
 
@@ -234,6 +261,102 @@ fn test_simple_sub_stateless_alu_arith_rel_2_2 () {
 
   test_simple (input_phvs, output_phvs);
 }
+
+/* Marple new flow tests */
+#[test]
+fn test_marple_new_flow_if_else_raw_stateless_alu_arith_2_2 () {
+   let ticks : i32 = 1000;
+  let mut input_phvs : Vec <Phv <i32> > = get_input_phvs(ticks, 2, 1, 1);
+
+  let hole_cfg_file : String = String::from("hole_configurations/marple_new_flow_if_else_raw_stateless_alu_2_2_hole_cfgs.txt");
+  let hole_cfgs_map : HashMap <String, i32> = get_hole_cfgs (hole_cfg_file);
+  let mut pipeline : Pipeline = 
+      marple_new_flow_if_else_raw_stateless_alu_2_2_prog_to_run::init_pipeline(hole_cfgs_map.clone());
+  let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
+                                                     pipeline,
+                                                     ticks);
+
+  test_marple_new_flow (input_phvs, output_phvs);
+}
+#[test]
+pub fn marple_new_flow_nested_ifs_stateless_alu_arith_rel_cond_2_2(){
+   let ticks : i32 = 1000;
+  let mut input_phvs : Vec <Phv <i32> > = get_input_phvs(ticks, 2, 1, 1);
+
+  let hole_cfg_file : String = String::from("hole_configurations/marple_new_flow_nested_ifs_stateless_alu_arith_rel_cond_2_2_hole_cfgs.txt");
+  let hole_cfgs_map : HashMap <String, i32> = get_hole_cfgs (hole_cfg_file);
+  let mut pipeline : Pipeline = 
+      marple_new_flow_nested_ifs_stateless_alu_arith_rel_cond_2_2_prog_to_run::init_pipeline(hole_cfgs_map.clone());
+  let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
+                                                     pipeline,
+                                                     ticks);
+
+  test_marple_new_flow (input_phvs, output_phvs);
+}
+#[test]
+fn test_marple_new_flow_pair_stateless_alu_arith_rel_cond_2_2 (){
+  let ticks : i32 = 1000;
+  let mut input_phvs : Vec <Phv <i32> > = get_input_phvs(ticks, 2, 2, 1);
+
+  let hole_cfg_file : String = String::from("hole_configurations/marple_new_flow_pair_stateless_alu_arith_rel_cond_2_2_hole_cfgs.txt");
+  let hole_cfgs_map : HashMap <String, i32> = get_hole_cfgs (hole_cfg_file);
+  let mut pipeline : Pipeline = 
+      marple_new_flow_pair_stateless_alu_arith_rel_cond_2_2_prog_to_run::init_pipeline(hole_cfgs_map.clone());
+  let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
+                                                     pipeline,
+                                                     ticks);
+
+  test_marple_new_flow (input_phvs, output_phvs);
+}
+#[test]
+fn test_marple_new_flow_pair_stateless_alu_arith_rel_cond_bool_3_3 () {
+  let ticks : i32 = 1000;
+  let mut input_phvs : Vec <Phv <i32> > = get_input_phvs(ticks, 2, 3, 1);
+
+  let hole_cfg_file : String = String::from("hole_configurations/marple_new_flow_pair_stateless_alu_arith_rel_cond_bool_3_3_hole_cfgs.txt");
+  let hole_cfgs_map : HashMap <String, i32> = get_hole_cfgs (hole_cfg_file);
+  let mut pipeline : Pipeline = 
+      marple_new_flow_pair_stateless_alu_arith_rel_cond_bool_3_3_prog_to_run::init_pipeline(hole_cfgs_map.clone());
+  let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
+                                                     pipeline,
+                                                     ticks);
+
+  test_marple_new_flow (input_phvs, output_phvs);
+
+}
+
+/* blue increase tests */
+#[test]
+fn test_blue_increase_pair_stateless_alu_2_2() {
+  let ticks : i32 = 1000;
+  let mut input_phvs : Vec <Phv <i32> > = get_input_phvs(ticks, 2, 2, 2);
+
+  let hole_cfg_file : String = String::from("hole_configurations/blue_increase_pair_stateless_alu_2_2_hole_cfgs.txt");
+  let hole_cfgs_map : HashMap <String, i32> = get_hole_cfgs (hole_cfg_file);
+  let mut pipeline : Pipeline = 
+      blue_increase_pair_stateless_alu_2_2_prog_to_run::init_pipeline(hole_cfgs_map.clone());
+  let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
+                                                     pipeline,
+                                                     ticks);
+
+  test_blue_increase (input_phvs, output_phvs);
+}
+#[test]
+fn test_blue_increase_pair_stateless_alu_arith_2_2 (){
+  let ticks : i32 = 1000;
+  let mut input_phvs : Vec <Phv <i32> > = get_input_phvs(ticks, 2, 2, 2);
+
+  let hole_cfg_file : String = String::from("hole_configurations/blue_increase_pair_stateless_alu_arith_2_2_hole_cfgs.txt");
+  let hole_cfgs_map : HashMap <String, i32> = get_hole_cfgs (hole_cfg_file);
+  let mut pipeline : Pipeline = 
+      blue_increase_pair_stateless_alu_arith_2_2_prog_to_run::init_pipeline(hole_cfgs_map.clone());
+  let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
+                                                     pipeline,
+                                                     ticks);
+
+  test_blue_increase (input_phvs, output_phvs);
+}
+/* Druzhba pipeline tests */
 #[test]
 fn test_basic_pipeline_1() {
     // state_vars is unused
@@ -375,7 +498,6 @@ fn test_basic_pipeline_1() {
         index+=1;
     }
 }
-
 #[test]
 fn test_basic_pipeline_2 () {
     // state_vars is unused

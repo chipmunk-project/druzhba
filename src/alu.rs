@@ -63,7 +63,7 @@ impl ALU {
         }
         packet_fields
     }
-    pub fn send_packets_to_input_muxes(&mut self, mut values : Phv<i32>) {
+    pub fn send_packets_to_input_muxes(&mut self, values : Phv<i32>) {
         for mux in &mut self.input_muxes{
           mux.input_phv = values.clone();   
         }

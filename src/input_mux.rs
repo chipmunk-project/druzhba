@@ -13,7 +13,6 @@ pub struct InputMux{
 impl InputMux{
 
     pub fn new(&self, input: Phv<i32>, hole_index : i32) -> Self {
-        let num_phv_containers : i32 = input.get_num_phv_containers();
         InputMux {input_phv : input, index : hole_index}
     
     }

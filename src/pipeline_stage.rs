@@ -93,6 +93,7 @@ impl PipelineStage {
           }
         }
         output_phv.set_state (output_state);
+
         output_phv
       }
     }
