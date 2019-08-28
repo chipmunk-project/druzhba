@@ -140,15 +140,15 @@ fn generate_init_pipeline (name : String,
     for j in 0..num_stateful_alus {
       // init_alu function name
       let stateful_init_alu_name : String = format!("init_{}_stateful_alu_{}_{}", 
-                                                  &name, i, 0);
+                                                  &name, i, j);
 
       // Variable names
-      let stateful_alu_name : String = format!("stateful_alu_{}_{}", i, 0);
-      let state_variables : String = format!("state_variables_{}_{}", i, 0);
+      let stateful_alu_name : String = format!("stateful_alu_{}_{}", i, j);
+      let state_variables : String = format!("state_variables_{}_{}", i, j);
       let stateful_input_muxes : String = 
-          format! ("stateful_input_muxes_{}_{}", i, 0);
+          format! ("stateful_input_muxes_{}_{}", i, j);
       let stateful_output_mux : String = 
-          format! ("stateful_output_mux_{}_{}", i, 0);
+          format! ("stateful_output_mux_{}_{}", i, j);
       pipeline_stage.push_str (&format!("  let mut {} : Vec<InputMux> = Vec::new();\n", 
                                       stateful_input_muxes));
 
@@ -161,7 +161,7 @@ fn generate_init_pipeline (name : String,
         // Input mux ALU count value hardcoded to 0 because only
         // 1 stateful ALU per stage
         let input_mux_hole : String = format!("{}_stateful_operand_mux_{}_{}_{}_ctrl", 
-                                              &name, i, 0, k);
+                                              &name, i, j, k);
         pipeline_stage.push_str (&format!("  {}.push (InputMux {{ input_phv : empty_phv.clone(), index : hole_vars[\"{}\"] }});\n", 
                                           stateful_input_muxes,
                                           input_mux_hole));
