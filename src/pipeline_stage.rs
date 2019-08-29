@@ -44,20 +44,23 @@ impl PipelineStage {
         let mut new_state : Vec <Vec <i32> > = Vec::new();
         // Need old state variables first to put them
         // into output muxes later
+        let mut atom_count : usize = 0;
         for atom in self.stateful_atoms.iter_mut () {
-            
-          for i in 0..self.salu_configs.len() {
-            if self.salu_configs[i] == 1 {
-              atom.set_state_variables (input_phv.get_state()[i].clone());
-            }
+          if self.salu_configs[atom_count] == 1 {
+
+              atom.set_state_variables 
+                  (input_phv.get_state()[atom_count].clone());
           }
           atom.send_packets_to_input_muxes(input_phv.clone());
-          let mut packet_fields : Vec<PhvContainer<i32>> = atom.input_mux_output();
+          let mut packet_fields : Vec<PhvContainer<i32>> = 
+                atom.input_mux_output();
           let state_result = atom.run (&mut packet_fields);
           let mut old_state_result : Vec <i32> = state_result.0;
           let new_state_result : Vec <i32> = state_result.1;
+
           old_state.append(&mut old_state_result);
           new_state.push (new_state_result);
+          atom_count+=1;
         }
         // Gets return values from the ALUs and inserts
         // them into output muxes along with old state vars
