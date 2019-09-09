@@ -7,16 +7,16 @@ mod test_files;
 use druzhba::pipeline::Pipeline;
 use druzhba::phv::Phv;
 use druzhba::phv_container::PhvContainer;
-
+use rand::{Rng, SeedableRng, StdRng};
 use std::collections::HashMap;
-use rand::Rng;
+//use rand::Rng;
 use std::env;
 use std::fs;
 
 // Opens hole configs file of hole variable assignments
 // and initializes a HashMap from hole vaiables to
 // i32s.
-fn extract_hole_cfgs (hole_cfgs_file : String) -> HashMap <String, i32> {
+fn get_hole_cfgs (hole_cfgs_file : String) -> HashMap <String, i32> {
 
   let mut hole_cfgs_map : HashMap <String, i32> = HashMap::new();
   let hole_cfgs_file_contents : String = fs::read_to_string(hole_cfgs_file).expect ("Error: Hole configs file could not be found");
@@ -39,7 +39,21 @@ fn extract_hole_cfgs (hole_cfgs_file : String) -> HashMap <String, i32> {
   }
   hole_cfgs_map
 }
+fn blue_increase (input_phv : &Phv <i32>) -> Phv <i32> {
+  let mut result= input_phv.clone();
+  result[1].field_value = result[0].get_value() - 1;
 
+  let mut new_state : Vec <Vec<i32>> = result.get_state().clone();
+  if result[1].get_value() > result.get_state()[1][0] {
+      let new_state_0_0 = result.get_state()[0][0]+1;
+      let new_state_1_0 = result[0].get_value();
+      new_state[0][0] = new_state_0_0;
+      new_state[1][0] = new_state_1_0;
+  }
+
+  result.set_state (new_state);
+  result
+}
 #[warn(unused_imports)]
 fn main() {
 
@@ -60,9 +74,7 @@ fn main() {
       Err (_)         => panic!("Failure: Unable to unwrap ticks"),
     };
   let hole_cfgs_file : String = args[1].clone();
-  let hole_cfgs : HashMap <String, i32> = 
-      extract_hole_cfgs (hole_cfgs_file.clone());
-
+  let hole_cfgs : HashMap <String, i32> = get_hole_cfgs (hole_cfgs_file.clone());
   let num_stateful_alus = prog_to_run::num_stateful_alus();
   let num_state_values = prog_to_run::num_state_variables();
   println!("{:?}", hole_cfgs);
@@ -78,26 +90,23 @@ fn main() {
   let mut input_phvs : Vec <Phv <i32> > = Vec::new();
   let mut output_phvs : Vec <Phv <i32> > = Vec::new();
   // _t not used
-  for _t in 0..ticks {
+  for _t in 0..2 {
     
     let mut packet : Phv<i32> = Phv::new();
-    // Initializes packet with all of the input fields
-    // along with a random value
-    (0..num_containers)
-        // _s not used
-        .for_each ( |_s| {
-            packet.add_container_to_phv(PhvContainer {
-                field_value : rand::thread_rng().gen_range(0,100),
-            }); 
-        });
-
+    packet.add_container_to_phv(PhvContainer {
+        field_value : 89
+    });
+    packet.add_container_to_phv(PhvContainer {
+        field_value : 78
+    });
     let mut state : Vec <Vec <i32> > = Vec::new();
     // _i not used
     for _i in 0..num_stateful_alus{
       let mut tmp_state_vec : Vec<i32> = Vec::new();
       // _j not used
       for _j in 0..num_state_values {
-        tmp_state_vec.push(rand::thread_rng().gen_range(0,100));
+          tmp_state_vec.push((_i+1) + _j + 10);
+           
       }
       state.push (tmp_state_vec);
     }
@@ -109,14 +118,10 @@ fn main() {
       output_phvs.push(new_packet.clone());
     }
   }
-  println!("Input PHVs:\n");
-  for phv in input_phvs {
-    println!("{}", phv);
-  }
-  
-  println!("\n\nOutput PHVs:\n ");
-  for phv in output_phvs{
-    println!("{}", phv);
+  for i in 0..output_phvs.len(){
+    println!("Input: {}", input_phvs[i]);
+    println!("Expected: {}", blue_increase (&mut input_phvs[i].clone()));
+    println!("Actual: {}\n", output_phvs[i]);
   }
 }
 #[cfg(test)]
