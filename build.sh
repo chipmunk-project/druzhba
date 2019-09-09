@@ -27,8 +27,7 @@ else
   # Druhzba inputs:
   #   Hole configuration file (i.e. any file in hole_configurations)
   #   Containers per Phv
-  #   Stateful ALUs per stage
   #   Ticks
-  cargo build && cargo run $7 $8 $6 $9 
+  cargo build && cargo run $7 $8 $9 
 
 fi

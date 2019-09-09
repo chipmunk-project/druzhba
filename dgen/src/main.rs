@@ -78,7 +78,7 @@ pub fn generate_alus (name : String,
     full_stateless_alu.increment_pipeline_stage();
   }
   // Contains all of the necessary use statements
-  let file_intro : String = String::from ("use druzhba::phv_container::PhvContainer;\nuse druzhba::pipeline_stage::PipelineStage;\nuse druzhba::pipeline::Pipeline;\nuse druzhba::alu::ALU;\nuse druzhba::input_mux::InputMux;\nuse druzhba::output_mux::OutputMux;use druzhba::phv::Phv;\nuse std::collections::HashMap;\n");
+  let file_imports : String = String::from ("use druzhba::phv_container::PhvContainer;\nuse druzhba::pipeline_stage::PipelineStage;\nuse druzhba::pipeline::Pipeline;\nuse druzhba::alu::ALU;\nuse druzhba::input_mux::InputMux;\nuse druzhba::output_mux::OutputMux;use druzhba::phv::Phv;\nuse std::collections::HashMap;\n");
 
   let init_pipeline : String = generate_init_pipeline (name.clone(), 
                                                        pipeline_depth, 
@@ -87,18 +87,26 @@ pub fn generate_alus (name : String,
                                                        full_stateless_alu.get_number_of_operands(),
                                                        full_stateful_alu.get_number_of_state_variables(),
                                                        num_stateful_alus);
+  let alu_data : String = generate_alu_data_functions (name.clone(), 
+                                                       pipeline_depth, 
+                                                       pipeline_width,
+                                                       full_stateful_alu.get_number_of_operands(),
+                                                       full_stateless_alu.get_number_of_operands(),
+                                                       full_stateful_alu.get_number_of_state_variables(),
+                                                       num_stateful_alus);
 
-  let file_string : String = format! ("{}{}{}", 
-                                      file_intro, 
+  let file_string : String = format! ("{}{}{}{}", 
+                                      file_imports, 
+                                      alu_data,
                                       pipeline_alus_string, 
                                       init_pipeline);
-
+/*
   let test_path : String = format!("../src/test_files/{}_prog_to_run.rs", name.clone());
 
   println!("Writing to test file {}", test_path.clone());
   fs::write(test_path, file_string.clone())
       .expect("Error writing to prog_to_run.rs");
-
+*/
   fs::write("../src/prog_to_run.rs", file_string)
       .expect("Error writing to prog_to_run.rs");
 
@@ -264,6 +272,52 @@ fn generate_init_pipeline (name : String,
   pipeline.push_str ("  pipeline\n}\n");
   
   pipeline
+}
+fn generate_alu_data_functions (name : String,
+                                pipeline_depth : i32,
+                                pipeline_width : i32,
+                                num_stateful_operands : i32,
+                                num_stateless_operands : i32,
+                                num_state_variables : i32,
+                                num_stateful_alus : i32 ) -> String{
+  let name_fn : String = 
+      format!("pub fn name() -> String {{\n  \"{}\".to_string()\n}}\n",
+      name);
+  let pipeline_depth_fn : String = 
+      format!("pub fn pipeline_depth () -> i32 {{\n  {}\n}}\n",
+      pipeline_depth);
+  let pipeline_width_fn : String = 
+      format!("pub fn pipeline_width () -> i32 {{\n  {}\n}}\n",
+      pipeline_width);
+
+  let num_stateful_operands_fn : String = 
+      format!("pub fn num_stateful_operands () -> i32 {{\n  {}\n}}\n",
+      num_stateful_operands);
+  let num_stateless_operands_fn : String = 
+      format!("pub fn num_stateless_operands () -> i32 {{\n  {}\n}}\n",
+      num_stateless_operands);
+  let num_state_variables_fn : String =
+      format!("pub fn num_state_variables() -> i32 {{\n  {}\n}}\n",
+      num_state_variables);
+  let num_stateful_alus_fn : String = 
+      format!("pub fn num_stateful_alus() -> i32 {{\n  {}\n}}\n",
+      num_stateful_alus);
+
+  // Assert number of virtual stateful ALUs per pipeline stage
+  // is less than or equal to pipeline width. In other words,
+  // virtual stateful ALUs cannot exceed number of physical
+  // stateful ALUs
+  assert!(num_stateful_alus <= pipeline_width);
+  format!("{}{}{}{}{}{}{}",
+          name_fn,
+          pipeline_depth_fn,
+          pipeline_width_fn,
+          num_stateful_operands_fn,
+          num_stateless_operands_fn,
+          num_state_variables_fn,
+          num_stateful_alus_fn)
+
+  
 }
 fn main() {
     let args : Vec<String> = env::args().collect();

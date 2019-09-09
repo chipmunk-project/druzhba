@@ -8,7 +8,7 @@ which will allow the simulator to run.
 To execute dgen, run
 
     cd dgen
-    cargo buld && cargo run <spec name> <stateful alu file> <stateless alu file> <pipeline depth> <pipeline width> <number of stateful ALUs>
+    cargo build && cargo run <spec name> <stateful alu file> <stateless alu file> <pipeline depth> <pipeline width> <number of stateful ALUs>
 
 Example:
 
@@ -24,11 +24,11 @@ With dgen's generated prog_to_run.rs file constructed,
 Example:
 
     cd ..
-    cargo build && cargo run hole_configurations/simple_raw_stateless_alu_2_2_hole_cfgs.txt 2 1 100
+    cargo build && cargo run hole_configurations/simple_raw_stateless_alu_2_2_hole_cfgs.txt 2 100
 
 For quick execution using the build.sh script, use:
 
-    ./build.sh <spec name> <stateful ALU file> <stateless ALU file> <pipeline width> <pipeline depth> <stateful ALUs per stage> <hole configuration file> <containers per Phv> <ticks>
+    ./build.sh <spec name> <stateful ALU file> <stateless ALU file> <pipeline width> <pipeline depth> <hole configuration file> <containers per Phv> <ticks>
 
 Example:
 
