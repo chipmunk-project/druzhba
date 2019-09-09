@@ -28,7 +28,7 @@ Example:
 
 For quick execution using the build.sh script, use:
 
-    ./build.sh <spec name> <stateful ALU file> <stateless ALU file> <pipeline width> <pipeline depth> <hole configuration file> <containers per Phv> <ticks>
+    ./build.sh <spec name> <stateful ALU file> <stateless ALU file> <pipeline width> <pipeline depth> <stateful ALUs per stage> <hole configuration file> <containers per Phv> <ticks>
 
 Example:
 
