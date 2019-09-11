@@ -2,7 +2,7 @@ extern crate rand;
 extern crate druzhba;
 
 mod prog_to_run;
-mod test_files;
+//mod test_files;
 
 use druzhba::pipeline::Pipeline;
 use druzhba::phv::Phv;
@@ -90,7 +90,7 @@ fn main() {
   let mut input_phvs : Vec <Phv <i32> > = Vec::new();
   let mut output_phvs : Vec <Phv <i32> > = Vec::new();
   // _t not used
-  for _t in 0..2 {
+  for _t in 0..ticks {
     
     let mut packet : Phv<i32> = Phv::new();
     packet.add_container_to_phv(PhvContainer {

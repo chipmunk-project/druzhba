@@ -8,6 +8,7 @@ pub struct AluParsingUtils {
   name : String,
   alu_body : String,
   is_stateful : bool,
+  constant_vec : Vec<i32>,
 }
 
 impl AluParsingUtils {
@@ -16,13 +17,15 @@ impl AluParsingUtils {
               t_alu_count : i32,
               t_name : String,
               t_alu_body : String,
-              t_is_stateful : bool,) -> Self {
+              t_is_stateful : bool,
+              t_constant_vec : Vec <i32>) -> Self {
     AluParsingUtils {
       pipeline_stage : t_pipeline_stage,
       alu_count : t_alu_count,
       name : t_name, 
       alu_body : t_alu_body,
       is_stateful : t_is_stateful,
+      constant_vec : t_constant_vec,
     }
   }
   
@@ -35,9 +38,12 @@ impl AluParsingUtils {
         format! ("pipeline stage : {}\n", self.pipeline_stage);   
     let alu_count_header : String = 
         format! ("alu  : {}\n", self.alu_count);
-    format! ("{}{}{}{}", name_header, 
+    let constant_vec_header : String = 
+        format!("{:?}\n", self.constant_vec);
+    format! ("{}{}{}{}{}", name_header, 
                          pipeline_stage_header, 
                          alu_count_header, 
+                         constant_vec_header,
                          self.alu_body) 
   }
   pub fn get_number_of_operands (&mut self) -> i32{

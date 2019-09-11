@@ -23,6 +23,8 @@ lazy_static! {
       RwLock::new(String::from(""));
   static ref FUNC_COUNT : RwLock <HashMap <String, i32> >=
       RwLock::new (HashMap::new());
+  static ref CONSTANT_VEC : RwLock <Vec <String> >=
+      RwLock::new(Vec::new());
 }
 
 pub enum Alu {
@@ -41,6 +43,7 @@ impl fmt::Display for Alu {
           *PIPELINE_STAGE.write().unwrap() = 0;
           NAME.write().unwrap().clear();
           FUNC_COUNT.write().unwrap().clear();
+          CONSTANT_VEC.write().unwrap().clear();
         }
         
         match opt_header {
@@ -50,6 +53,15 @@ impl fmt::Display for Alu {
         // The function inside of the initialize ALU function that
         // will be returned
         let inner_header : String = String::from ("    let alu = move |state_vec : &mut Vec <i32>, phv_containers : &Vec <PhvContainer <i32>>| -> (Vec <i32>, Vec <i32>){\n");
+        let temp_constant_vec : Vec <String> = CONSTANT_VEC.read()
+                                                           .unwrap()
+                                                           .clone();
+        let mut constant_vec : Vec <i32> = Vec::new();
+        for x in temp_constant_vec.iter(){
+          constant_vec.push (x.parse::<i32>().unwrap());
+        }
+        let constant_vec_string : String = format!("    let constant_vec : Vec <i32> = vec!{:?};\n",
+                                            constant_vec);
         let body : String = String::from(&format!("{}{}", header, stmt));
         let state_var_length = STATE_VAR_MAP.read().unwrap().len();
         let mut end : String = String::from("");
@@ -78,7 +90,11 @@ impl fmt::Display for Alu {
         outer_header.push_str (&init_name);
         outer_header.push_str ("(hole_vars : HashMap <String, i32>) -> Box <dyn Fn (&mut Vec <i32>, &Vec <PhvContainer <i32>>) -> (Vec <i32>, Vec <i32> ) >{\n");
         
-        write!(f, "{}{}{}{}", outer_header, inner_header, body, end)
+        write!(f, "{}{}{}{}{}", outer_header, 
+                                inner_header, 
+                                constant_vec_string,
+                                body, 
+                                end)
       },
     }
   }
@@ -86,18 +102,20 @@ impl fmt::Display for Alu {
 pub enum OptHeader {
   Data (String,  // Sketch name
         i32, // Pipeline stage
-        i32) // ALU number
+        i32, // ALU number
+        Vec<String>)
 }
 
 impl fmt::Display for OptHeader {
 
   fn fmt (&self, f : &mut fmt::Formatter) -> fmt::Result {
     match *&self {
-      OptHeader::Data (name, stage, alu_num) => {
+      OptHeader::Data (name, stage, alu_num, constant_vec) => {
           
         *NAME.write().unwrap() = name.to_string();
         *PIPELINE_STAGE.write().unwrap() = *stage;       
         *ALU_NUMBER.write().unwrap() = *alu_num;
+        *CONSTANT_VEC.write().unwrap() = constant_vec.to_vec();
         write!(f, "")
      }
     }
@@ -303,7 +321,17 @@ impl fmt::Display for Expr {
             Some (ind2) => format!("phv_containers[{}].get_value()",ind2),
             _           => {
               match HOLE_VAR_MAP.read().unwrap().get(&variable){
-                Some (_ind3) => format!("hole_vars[\"{}\"]", generate_hole_name (variable.clone())),
+                Some (_ind3) => {
+                    let hole_name : String = generate_hole_name (variable.clone());
+                    let mut hole_var_access : String = String::from("");
+                    if hole_name.contains("immediate") {
+                      hole_var_access = format!("constant_vec[hole_vars[\"{}\"] as usize]", generate_hole_name (variable.clone()));
+                    }
+                    else {
+                      hole_var_access = format!("hole_vars[\"{}\"]", generate_hole_name (variable.clone()));
+                    }
+                    hole_var_access
+                },
                 
                 _            => panic! ("Error: variable '{}' is undefined", variable),
 
@@ -507,13 +535,25 @@ fn generate_arith_op (arith_op_name : String)
 } 
 fn generate_constant(constant_name : String)
 {
+
   let fn_header : String = 
       format! ("fn {} (constant : i32) -> i32 {{\n",
                constant_name);
-  let ret : String = String::from
-      ("  constant\n}\n");
+   let temp_constant_vec : Vec <String> = CONSTANT_VEC.read()
+                                                      .unwrap()
+                                                      .clone();
+   let mut constant_vec : Vec <i32> = Vec::new();
+   for x in temp_constant_vec.iter(){
+     constant_vec.push (x.parse::<i32>().unwrap());
+   }
+
+    let constant_vec_string : String = format!("  let constant_vec : Vec <i32> = vec!{:?};\n", 
+                                               constant_vec);
+    let ret : String = format!("  constant_vec[constant as usize]\n}}");
+
   let mut const_fn : String = String::from("");
   const_fn.push_str (&fn_header);
+  const_fn.push_str (&constant_vec_string);
   const_fn.push_str (&ret);
   HELPER_STRING.write().unwrap().push_str (&const_fn);
 

@@ -29,6 +29,9 @@ impl OutputMux{
         if self.input_phv_containers.len() == 0{
             panic!("Error: This output mux has no inputs");
         }
+
+        println!("Selecting {} in: ", self.index);
+        println!("{:?}\n", self.input_phv_containers);
         // If mux ctrl exceeds highest index of mux inputs, just
         // return the last value
         if self.index as usize >= self.input_phv_containers.len() {

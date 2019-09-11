@@ -10,7 +10,7 @@
 # Druzhba takes in number of ticks and hole
 # configuration file from Chipmunk.
 
-if [ "$#" -ne 9 ]
+if [ "$#" -ne 10 ]
 then
   echo "Wrong number of inputs. $# supplied."
 else
@@ -22,12 +22,12 @@ else
   #   Pipeline width
   #   Pipeline depth
   #   Stateful ALUs per stage
-  cargo build && cargo run $1 ../$2 ../$3 $4 $5 $6
+  cargo build && cargo run $1 ../$2 ../$3 $4 $5 $6 $7
   cd ..
   # Druhzba inputs:
   #   Hole configuration file (i.e. any file in hole_configurations)
   #   Containers per Phv
   #   Ticks
-  cargo build && cargo run $7 $8 $9 
+  cargo build && cargo run $8 $9 $(10)
 
 fi

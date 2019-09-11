@@ -16,7 +16,8 @@ pub fn generate_alus (name : String,
                       stateless_file : String,
                       pipeline_depth : i32,
                       pipeline_width : i32,
-                      num_stateful_alus : i32)
+                      num_stateful_alus : i32,
+                      constant_vec : Vec<i32>)
 {
   // Stateful AluParsingUtils initialization
   let stateful_alu = fs::read_to_string(&stateful_file)
@@ -25,18 +26,19 @@ pub fn generate_alus (name : String,
       AluParsingUtils::new(0, 0, 
                       name.clone(), 
                       stateful_alu,
-                      true);
+                      true,
+                      constant_vec.clone());
 
   // Stateless AluParsingUtils initialization
   let stateless_alu = fs::read_to_string(&stateless_file)
     .expect("Something went wrong reading the file");
 
- // println!("{}", stateless_alu);
   let mut full_stateless_alu : AluParsingUtils = 
       AluParsingUtils::new(0, 0, 
                       name.clone(), 
                       stateless_alu,
-                      false);
+                      false,
+                      constant_vec.clone());
 
 
   let mut pipeline_alus_string : String = String::from("");
@@ -254,14 +256,32 @@ fn generate_init_pipeline (name : String,
     }
    salu_configs.push_str("];\n");
     
+   let output_mux_globals_string : String = format!("output_mux_globals_{}",
+                                                    i);
+   let mut output_mux_globals : String = format!("  let {} : Vec <i32> = vec![",
+                                             output_mux_globals_string);
+   for k in 0..num_stateful_alus {
+     output_mux_globals.push_str (&format!("hole_vars[\"{}_stateful_alu_{}_{}_output_mux_global\"]",
+                                           name.clone(),
+                                           i,
+                                           k));
+     if k < num_stateful_alus - 1 {
+      output_mux_globals.push_str(",");
+     }
+   }
+
+   output_mux_globals.push_str("];\n");
    pipeline_stage.push_str (&salu_configs);
+
+   pipeline_stage.push_str (&output_mux_globals);
     // Initialize pipeline stage
     pipeline_stage.push_str 
-        (&format!("  let pipeline_stage_{} : PipelineStage = PipelineStage {{stateful_atoms : {}, stateless_atoms : {} , salu_configs : {}}};\n",
+        (&format!("  let pipeline_stage_{} : PipelineStage = PipelineStage {{stateful_atoms : {}, stateless_atoms : {} , salu_configs : {}, output_mux_globals : {} }};\n",
                   i, 
                   stateful_alus_vec, 
                   stateless_alus_vec,
-                  salu_configs_string));
+                  salu_configs_string,
+                  output_mux_globals_string));
     pipeline_stage.push_str 
         (&format!("  pipeline_stages.push(pipeline_stage_{});\n",i));
     pipeline.push_str (&pipeline_stage);
@@ -321,7 +341,7 @@ fn generate_alu_data_functions (name : String,
 }
 fn main() {
     let args : Vec<String> = env::args().collect();
-    assert! (args.len() == 7);
+    assert! (args.len() == 8);
 
     let spec_name : String = args[1].clone();
     let stateful_alu : String = 
@@ -343,6 +363,17 @@ fn main() {
           Ok (t_pipeline_width) => t_pipeline_width,
           Err (_)               => panic!("Failure: Unbale to unwrap number of stateful ALUs"),
         };
+    let constant_vec_string : String = args[7].clone();
+    let constant_vec : Vec <i32> = constant_vec_string
+                                   .split(",")
+                                   .map(|n| 
+                                        match n.trim().parse::<i32>() {
+                                          Ok (num) => num,
+                                          Err (_)  => panic!("Failrure: Unable to parse constant set"),
+                                   })
+                                    .collect();
+    
+    println!("Constant set: {:?}", constant_vec);
 
     let stateful_alu_split : Vec <String>= stateful_alu.split("/")
                                                        .map (|s| s.to_string())
@@ -369,7 +400,8 @@ fn main() {
                    stateless_alu, 
                    pipeline_depth, 
                    pipeline_width,
-                   num_stateful_alus);
+                   num_stateful_alus,
+                   constant_vec);
 }
 
 #[cfg(test)]
