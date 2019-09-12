@@ -32,12 +32,10 @@ impl PipelineStage {
   // underlying function on the incoming Phv in 
   // random order. Pass the mutated phv containers to their respective muxes.
   pub fn tick(&mut self, input_phv: Phv<i32>) -> Phv<i32>{ 
-      println!("TICK ----- ");
       if input_phv.is_bubble() {
         Phv::new()
       }
       else{
-        println!("STATEFUL ALUS");
         let mut output_phv : Phv<i32> = 
             Phv { bubble : false, 
                   packets: Vec::new(),
@@ -63,15 +61,11 @@ impl PipelineStage {
 
           let mut new_state_result : Vec <i32> = state_result.1;
 
-//            old_state.append(&mut old_state_result);
-
           if self.output_mux_globals[atom_count] == 0 {
-            println!("global old state");
             old_state.append(&mut old_state_result);
           }
           else {
 
-            println!("global new state");
             old_state.append(&mut new_state_result.clone());
           }
           new_state.push (new_state_result);
@@ -79,7 +73,6 @@ impl PipelineStage {
         }
         // Gets return values from the ALUs and inserts
         // them into output muxes along with old state vars
-        println!("STATELESS ALUS");
         for atom in self.stateless_atoms.iter_mut() {
         
           //PHV is passed to it's corresponding input mux, and
@@ -92,7 +85,6 @@ impl PipelineStage {
           //output mux and put into a PHV
 
           let result : i32 =  atom.run(&packet_fields).0[0];
-          println!("Result: {}", result);
           // State variables and returned value from stateless ALU
           let mut output_mux_fields : Vec <i32> = old_state.clone();
 
@@ -114,9 +106,6 @@ impl PipelineStage {
         }
         output_phv.set_state (output_state);
 
-  println!("output_phv:");
-  println!("{}", output_phv);
-  println!("DONE-----");
         output_phv
       }
     }

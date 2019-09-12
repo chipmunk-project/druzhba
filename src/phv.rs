@@ -67,23 +67,24 @@ impl<T> fmt::Display for Phv<T> where T : fmt::Display {
 
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 
-      let mut s : String = String::from("{"); 
+      let mut s : String = String::from("\nPHV Containers: {"); 
       for i in 0..self.packets.len() {
         s.push_str(&format!( "[index : {}, value : {}], ", 
                              &i.to_string(), 
                              &self.packets[i].field_value
                                   .to_string()));
       }
+      s.push_str("}\nState: {");
       for i in 0..self.state.len() {
         for j in 0..self.state[i].len(){
             
-          s.push_str(&format!("[state group : {}, state : {}, value : {}], ",
+          s.push_str(&format!("[state_group_{}_state_{} = {}], ",
                               &i.to_string(),
                               &j.to_string(),
                               &self.state[i][j]));
         }
       }
-      s.push_str ("}");
+      s.push_str ("}\n");
       write!(f, "{}", s)
   }
 }
