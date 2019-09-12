@@ -61,8 +61,9 @@ impl PipelineStage {
 
           let mut new_state_result : Vec <i32> = state_result.1;
 
-          if self.output_mux_globals[atom_count] == 0 {
+          if self.output_mux_globals[atom_count] == 1 {
             old_state.append(&mut old_state_result);
+            
           }
           else {
 
@@ -105,7 +106,6 @@ impl PipelineStage {
           }
         }
         output_phv.set_state (output_state);
-
         output_phv
       }
     }
