@@ -105,7 +105,8 @@ fn main() {
       let mut tmp_state_vec : Vec<i32> = Vec::new();
       // _j not used
       for _j in 0..num_state_values {
-          tmp_state_vec.push((_i+1) + _j + 10);
+          tmp_state_vec.push(0);
+//          tmp_state_vec.push((_i+1) + _j + 10);
            
       }
       state.push (tmp_state_vec);
