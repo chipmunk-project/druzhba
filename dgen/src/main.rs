@@ -17,7 +17,8 @@ pub fn generate_alus (name : String,
                       pipeline_depth : i32,
                       pipeline_width : i32,
                       num_stateful_alus : i32,
-                      constant_vec : Vec<i32>)
+                      constant_vec : Vec<i32>,
+                      file_path : String)
 {
   // Stateful AluParsingUtils initialization
   let stateful_alu = fs::read_to_string(&stateful_file)
@@ -102,14 +103,8 @@ pub fn generate_alus (name : String,
                                       alu_data,
                                       pipeline_alus_string, 
                                       init_pipeline);
-/*
-  let test_path : String = format!("../src/test_files/{}_prog_to_run.rs", name.clone());
 
-  println!("Writing to test file {}", test_path.clone());
-  fs::write(test_path, file_string.clone())
-      .expect("Error writing to prog_to_run.rs");
-*/
-  fs::write("../src/prog_to_run.rs", file_string)
+    fs::write(file_path, file_string)
       .expect("Error writing to prog_to_run.rs");
 
 
@@ -341,7 +336,8 @@ fn generate_alu_data_functions (name : String,
 }
 fn main() {
     let args : Vec<String> = env::args().collect();
-    assert! (args.len() == 8);
+    // Make room for optional output file path
+    assert! (args.len() == 8 || args.len() == 9);
 
     let spec_name : String = args[1].clone();
     let stateful_alu : String = 
@@ -372,6 +368,10 @@ fn main() {
                                           Err (_)  => panic!("Failrure: Unable to parse constant set"),
                                    })
                                     .collect();
+    let mut file_path = String::from("src/prog_to_run.rs");
+    if args.len() == 9 {
+        file_path = format!("{}", args[8].clone());
+    }
     
     println!("Constant set: {:?}", constant_vec);
 
@@ -401,7 +401,8 @@ fn main() {
                    pipeline_depth, 
                    pipeline_width,
                    num_stateful_alus,
-                   constant_vec);
+                   constant_vec,
+                   file_path);
 }
 
 #[cfg(test)]

@@ -2,3 +2,6 @@
 1
 test_prog_to_run.rs
 alugrammar.rs
+tests/*
+tests
+test_with_chipmunk.rs
