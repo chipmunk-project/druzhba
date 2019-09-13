@@ -2,14 +2,13 @@ extern crate rand;
 extern crate druzhba;
 
 mod prog_to_run;
-//mod test_files;
+mod tests;
 
 use druzhba::pipeline::Pipeline;
 use druzhba::phv::Phv;
 use druzhba::phv_container::PhvContainer;
 use rand::{Rng, SeedableRng, StdRng};
 use std::collections::HashMap;
-//use rand::Rng;
 use std::env;
 use std::fs;
 
@@ -138,5 +137,5 @@ fn main() {
   }
 }
 #[cfg(test)]
-mod test_druzhba;
-
+//mod test_druzhba;
+mod test_with_chipmunk;

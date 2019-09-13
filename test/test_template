@@ -1,9 +1,14 @@
+
 #[test]
 fn {name}() {{
-    let input = include_str!("{path}/input-data");
-    let expected_output = include_str!("{path}/output-data");
+  let mut input_phvs : Vec <Phv <i32> > = init_input_phvs (100, {num_containers}, {num_state_vars}, {num_stateful_alus});
+  let hole_cfg_file : String = String::from("{hole_configurations}");
+  let hole_cfgs_map : HashMap <String, i32> = extract_hole_cfgs (hole_cfg_file);
 
-    let actual_output = functionality_under_test(input);
-
-    assert_eq!(expected_output, actual_output);
+  let mut pipeline : Pipeline = 
+    {prog_to_run_file}::init_pipeline (hole_cfgs_map.clone());
+  let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
+                                                     pipeline,
+                                                     100);
+  {test_function} (input_phvs, output_phvs);
 }}

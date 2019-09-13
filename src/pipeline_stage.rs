@@ -4,8 +4,6 @@ use crate::phv::Phv;
 use crate::alu::ALU;
 use crate::phv_container::PhvContainer;
 
-use self::rand::{thread_rng, Rng};
-
 pub struct PipelineStage {
    pub stateless_atoms : Vec<ALU>,
    pub stateful_atoms : Vec<ALU>,
@@ -59,7 +57,7 @@ impl PipelineStage {
           let state_result = atom.run (&mut packet_fields);
           let mut old_state_result : Vec <i32> = state_result.0;
 
-          let mut new_state_result : Vec <i32> = state_result.1;
+          let new_state_result : Vec <i32> = state_result.1;
 
           if self.output_mux_globals[atom_count] == 1 {
             old_state.append(&mut old_state_result);
