@@ -7,7 +7,7 @@ mod tests;
 use druzhba::pipeline::Pipeline;
 use druzhba::phv::Phv;
 use druzhba::phv_container::PhvContainer;
-use rand::{Rng, SeedableRng, StdRng};
+use rand::Rng;
 use std::collections::HashMap;
 use std::env;
 use std::fs;
@@ -44,6 +44,19 @@ fn simple (input_phv : Phv <i32>) -> Phv<i32>{
 
     let mut new_phv : Phv<i32> = input_phv.clone();
     new_phv[0].field_value = new_phv.get_state()[0][0]+1;
+    new_phv
+
+}
+fn marple_new_flow (input_phv : Phv <i32>) -> Phv<i32>{
+
+    let mut new_phv : Phv<i32> = input_phv.clone();
+
+    let mut new_state : Vec <Vec <i32> > = new_phv.get_state().clone();
+    if new_state[0][0] == 0{
+      new_phv[0].field_value = 1;
+      new_state[0][0] = 1;
+      new_phv.set_state(new_state);
+    }
     new_phv
 
 }
@@ -126,9 +139,8 @@ fn main() {
       let mut tmp_state_vec : Vec<i32> = Vec::new();
       // _j not used
       for _j in 0..num_state_values {
-          tmp_state_vec.push(32);
  //         tmp_state_vec.push(rand::thread_rng().gen_range(0,100));
-//          tmp_state_vec.push(0);
+          tmp_state_vec.push(0);
            
       }
       state.push (tmp_state_vec);
@@ -143,11 +155,9 @@ fn main() {
   }
   for i in 0..output_phvs.len(){
     println!("Input: {}", input_phvs[i]);
-    println!("Expected: {}", simple (input_phvs[i].clone()));
     println!("Actual: {}\n", output_phvs[i]);
- //   assert!(output_phvs[i][0].get_value() == input_phvs[i].get_state()[0][0]+1);
   }
 }
 #[cfg(test)]
-//mod test_druzhba;
+mod test_druzhba;
 mod test_with_chipmunk;

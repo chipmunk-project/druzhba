@@ -17,11 +17,23 @@ fn main() {
   let test_case_names : Vec <String> = 
       vec![
            "simple_raw_stateless_alu_2_2".to_string(),
+           "simple_raw_stateless_alu_arith_3_4".to_string(),
            "simple_raw_stateless_alu_arith_2_3".to_string(),
+           "simple_if_else_raw_stateless_alu_arith_rel_cond_2_2".to_string(),
            "simple_if_else_raw_stateless_alu_arith_rel_cond_bool_2_4".to_string(),
            "simple_sub_stateless_alu_arith_rel_cond_2_3".to_string(),
            "simple_nested_ifs_stateless_alu_arith_rel_2_2".to_string(),
-           "blue_increase_pair_stateless_alu_arith_4_2".to_string()];
+
+           "simple_pair_stateless_alu_arith_2_4".to_string(),
+           "marple_new_flow_pred_raw_stateless_alu_arith_rel_cond_3_2".to_string(),
+           "marple_new_flow_sub_stateless_alu_arith_rel_cond_bool_2_3".to_string(),
+           "marple_new_flow_pair_stateless_alu_2_4".to_string(),
+           "blue_increase_pair_stateless_alu_arith_4_2".to_string(),
+
+           "learn_filter_pred_raw_stateless_alu_arith_rel_2_3".to_string(),
+           "learn_filter_if_else_raw_stateless_alu_2_3".to_string(),
+           "learn_filter_sub_stateless_alu_arith_rel_cond_2_3".to_string(),
+      ];
   let dgen_data : Vec <Vec <String> > = vec![
     // simple_raw_stateless_alu_2_2
     vec! ["simple".to_string(),
@@ -36,6 +48,19 @@ fn main() {
           "1".to_string(), // Stateful ALUs
           "hole_configurations/simple_raw_stateless_alu_2_2_hole_cfgs.txt".to_string() // Hole config file
         ],
+    // simple_raw_stateless_alu_arith_3_4
+    vec! ["simple".to_string(),
+          "example_alus/stateful_alus/raw.alu".to_string(),
+          "example_alus/stateless_alus/stateless_alu_arith.alu".to_string(),
+          "3".to_string(), // Pipeline depth
+          "4".to_string(), // Pipeline width
+          "1".to_string(), // Stateful ALUs
+          "0,1,2,3".to_string(),
+          "1".to_string(), // Num packets
+          "1".to_string(), // State vars
+          "1".to_string(), // Stateful ALUs
+          "hole_configurations/simple_raw_stateless_alu_arith_3_4_hole_cfgs.txt".to_string() // Hole config file
+        ],
     // simple_raw_stateless_alu_arith_2_3
     vec! ["simple".to_string(),
           "example_alus/stateful_alus/raw.alu".to_string(),
@@ -49,6 +74,20 @@ fn main() {
           "1".to_string(), // Stateful ALUs
           "hole_configurations/simple_raw_stateless_alu_arith_2_3_hole_cfgs.txt".to_string() // Hole config file
         ],
+    // simple_if_else_raw_stateless_alu_arith_rel_cond_2_2
+    vec! ["simple".to_string(),
+          "example_alus/stateful_alus/if_else_raw.alu".to_string(),
+          "example_alus/stateless_alus/stateless_alu_arith_rel_cond.alu".to_string(),
+          "2".to_string(), // Pipeline depth
+          "2".to_string(), // Pipeline width
+          "1".to_string(), // Stateful ALUs
+          "3,2,0,1,4".to_string(),
+          "1".to_string(), // Num packets
+          "1".to_string(), // State vars
+          "1".to_string(), // Stateful ALUs
+          "hole_configurations/simple_if_else_raw_stateless_alu_arith_rel_cond_2_2_hole_cfgs.txt".to_string() // Hole config file
+        ],
+
     // simple_if_else_raw_stateless_alu_arith_rel_cond_bool2_4
     vec! ["simple".to_string(),
           "example_alus/stateful_alus/if_else_raw.alu".to_string(),
@@ -90,6 +129,56 @@ fn main() {
           "1".to_string(), // Stateful ALUs
           "hole_configurations/simple_nested_ifs_stateless_alu_arith_rel_2_2_hole_cfgs.txt".to_string() // Hole config file
         ],
+    // simple_pair_stateless_alu_arith_2_4
+    vec! ["simple".to_string(),
+          "example_alus/stateful_alus/pair.alu".to_string(),
+          "example_alus/stateless_alus/stateless_alu_arith.alu".to_string(),
+          "2".to_string(),
+          "4".to_string(),
+          "1".to_string(),
+          "0,1,2,3".to_string(),
+          "1".to_string(), // Num packets
+          "2".to_string(), // State vars
+          "1".to_string(), // Stateful ALUs 
+          "hole_configurations/simple_pair_stateless_alu_arith_2_4_hole_cfgs.txt".to_string() // Hole config file
+        ],
+    vec! ["marple_new_flow".to_string(),
+          "example_alus/stateful_alus/pred_raw.alu".to_string(),
+          "example_alus/stateless_alus/stateless_alu_arith_rel_cond.alu".to_string(),
+          "3".to_string(), // Pipeline depth
+          "2".to_string(), // Pipeline width
+          "1".to_string(), // Stateful ALUs
+          "0,1,2,3".to_string(),
+          "1".to_string(), // Num packets
+          "1".to_string(), // State vars
+          "1".to_string(), // Stateful ALUs
+          "hole_configurations/marple_new_flow_pred_raw_stateless_alu_arith_rel_cond_3_2_hole_cfgs.txt".to_string() // Hole config file
+        ],
+    vec! ["marple_new_flow".to_string(),
+          "example_alus/stateful_alus/sub.alu".to_string(),
+          "example_alus/stateless_alus/stateless_alu_arith_rel_cond_bool.alu".to_string(),
+          "2".to_string(), // Pipeline depth
+          "3".to_string(), // Pipeline width
+          "1".to_string(), // Stateful ALUs
+          "1,2,3,0,4".to_string(),
+          "1".to_string(), // Num packets
+          "1".to_string(), // State vars
+          "1".to_string(), // Stateful ALUs
+          "hole_configurations/marple_new_flow_sub_stateless_alu_arith_rel_cond_bool_2_3_hole_cfgs.txt".to_string() // Hole config file
+        ],
+    vec! ["marple_new_flow".to_string(),
+          "example_alus/stateful_alus/pair.alu".to_string(),
+          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
+          "2".to_string(), // Pipeline depth
+          "4".to_string(), // Pipeline width
+          "1".to_string(), // Stateful ALUs
+          "0,1,2,3".to_string(),
+          "1".to_string(), // Num packets
+          "2".to_string(), // State vars
+          "1".to_string(), // Stateful ALUs
+          "hole_configurations/marple_new_flow_pair_stateless_alu_2_4_hole_cfgs.txt".to_string() // Hole config file
+        ],
+
     // blue_increase_pair_stateless_alu_arith_4_2
     vec! ["blue_increase".to_string(),
           "example_alus/stateful_alus/pair.alu".to_string(),
@@ -103,6 +192,49 @@ fn main() {
           "2".to_string(), // Stateful ALUs
           "hole_configurations/blue_increase_pair_stateless_alu_arith_4_2_hole_cfgs.txt".to_string() // Hole config file
         ],
+    // learn_filter_pred_raw_stateless_alu_arith_rel_2_3
+    vec! ["learn_filter".to_string(),
+          "example_alus/stateful_alus/pred_raw.alu".to_string(),
+          "example_alus/stateless_alus/stateless_alu_arith_rel.alu".to_string(),
+          "2".to_string(),
+          "3".to_string(),
+          "3".to_string(),
+          "4,3,0,5,1,2".to_string(),
+          "1".to_string(), // Num packets
+          "1".to_string(), // State vars
+          "3".to_string(), // Stateful ALUs
+          "hole_configurations/learn_filter_pred_raw_stateless_alu_arith_rel_2_3_hole_cfgs.txt".to_string() // Hole config file
+    ],
+    // learn_filter_if_else_raw_stateless_alu_2_2
+    vec! ["learn_filter".to_string(),
+          "example_alus/stateful_alus/if_else_raw.alu".to_string(),
+          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
+          "2".to_string(),
+          "3".to_string(),
+          "3".to_string(),
+          "0,1,2,3".to_string(),
+          "1".to_string(), // Num packets
+          "1".to_string(), // State vars
+          "3".to_string(), // Stateful ALUs
+          "hole_configurations/learn_filter_if_else_raw_stateless_alu_2_3_hole_cfgs.txt".to_string() // Hole config file
+        ],
+    // learn_filter_sub_stateless_alu_arith_rel_cond_2_3 
+    vec! ["learn_filter".to_string(),
+          "example_alus/stateful_alus/sub.alu".to_string(),
+          "example_alus/stateless_alus/stateless_alu_arith_rel_cond.alu".to_string(),
+          "2".to_string(),
+          "3".to_string(),
+          "3".to_string(),
+          "0,1,2,3,4,5".to_string(),
+          "1".to_string(), // Num packets
+          "1".to_string(), // State vars
+          "3".to_string(), // Stateful ALUs
+          "hole_configurations/learn_filter_sub_stateless_alu_arith_rel_cond_2_3_hole_cfgs.txt".to_string() // Hole config file
+        ],
+
+ 
+
+
   ];
    Command::new("mkdir")
            .arg("src/tests")
@@ -122,13 +254,12 @@ fn main() {
         Ok (f) => format!("{:?}", f.file_name()),
         Err (_)      => panic!("Unable to unwrap test file"),
       };
+
       if file_name.contains ("mod.rs") || index >= dgen_data.len() ||
           index >= test_case_names.len(){
         continue;
       }
 
-      println!("Index : {}", index);
-      println!("{:?}", dgen_data[index]);
       
     write_test(&mut test_file, 
                &dgen_data[index],
@@ -155,17 +286,18 @@ fn run_dgen (test_case_names : &Vec<String>,
   let mut index : usize = 0;
   for arg in dgen_args.iter(){
     
-    Command::new("./dgen_bin")
-             .arg(&arg[0]) // Name
-             .arg(&arg[1]) // Stateful ALU
-             .arg(&arg[2]) // Stateless ALU
-             .arg(&arg[3]) // Depth
-             .arg(&arg[4]) // Width
-             .arg(&arg[5]) // Stateful ALUs
-             .arg(&arg[6]) // constant vec
-             .arg(format!("src/tests/{}.rs", test_case_names[index]))
-             .output()
-             .expect("Error running dgen");
+    let status = Command::new("./dgen_bin")
+                 .arg(&arg[0]) // Name
+                 .arg(&arg[1]) // Stateful ALU
+                 .arg(&arg[2]) // Stateless ALU
+                 .arg(&arg[3]) // Depth
+                 .arg(&arg[4]) // Width
+                 .arg(&arg[5]) // Stateful ALUs
+                 .arg(&arg[6]) // constant vec
+                 .arg(format!("src/tests/{}.rs", test_case_names[index]))
+                 .output()
+                 .expect("Error running dgen");
+    println!("{} status: {:?}\n", test_case_names[index], status);
     index+=1;
   }
   // Cleanup

@@ -26,6 +26,14 @@ impl OutputMux{
      from a list of them */
 
     pub fn output(&self) -> PhvContainer<i32>{
+
+        println!("Output mux:");
+        for i in 0..self.input_phv_containers.len(){ 
+            println!("container {} = {}", i, self.input_phv_containers[i]);
+            
+        }
+
+        println!("Index: {}", self.index);
         if self.input_phv_containers.len() == 0{
             panic!("Error: This output mux has no inputs");
         }

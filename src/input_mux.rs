@@ -18,6 +18,8 @@ impl InputMux{
     }
     pub fn output(&self) -> PhvContainer<i32> {
 
+        println!("Input mux: {}", self.input_phv);
+        println!("Index: {}", self.index);
         if self.index >= self.input_phv.get_num_phv_containers() {
           self.input_phv [self.input_phv.get_num_phv_containers()-1].clone()
         }

@@ -8,31 +8,24 @@ which will allow the simulator to run.
 To execute dgen, run
 
     cd dgen
-    cargo build && cargo run <spec name> <stateful alu file> <stateless alu file> <pipeline depth> <pipeline width> <number of stateful ALUs>
+    cargo build && cargo run <spec name> <stateful alu file> <stateless alu file> <pipeline depth> <pipeline width> <number of stateful ALUs> <Constant vector> <Output file?>
 
 Example:
 
     cd dgen
-    cargo build && cargo run simple ../example_alus/stateful_alus/raw.alu ../example_alus/stateless_alus/stateless_alu.alu 2 2 1
+    cargo build && cargo run simple ../example_alus/stateful_alus/raw.alu ../example_alus/stateless_alus/stateless_alu.alu 2 2 1 "0,1,2,3" ../src/prog_to_run.rs
 
 With dgen's generated prog_to_run.rs file constructed,
 , run the following to execute Druzhba:
 
     cd ..
-    cargo build && cargo run <hole configuration file> <number of containers per phv> <number of stateful ALUs> <ticks>
+    cargo build && cargo run <hole configuration file> <number of containers per phv> <ticks>
 
 Example:
 
     cd ..
     cargo build && cargo run hole_configurations/simple_raw_stateless_alu_2_2_hole_cfgs.txt 2 100
 
-For quick execution using the build.sh script, use:
-
-    ./build.sh <spec name> <stateful ALU file> <stateless ALU file> <pipeline width> <pipeline depth> <stateful ALUs per stage> <hole configuration file> <containers per Phv> <ticks>
-
-Example:
-
-    ./build.sh simple example_alus/stateful_alus/raw.alu example_alus/stateless_alus/stateless_alu.alu 2 2 1 hole_configurations/simple_raw_stateless_alu_2_2_hole_cfgs.txt 2 5
 
 Tests will ensure the druhzba pipeline is outputting
 the correct packets relative to the input packets

@@ -34,6 +34,8 @@ impl PipelineStage {
         Phv::new()
       }
       else{
+          println!("STAAAGGEE---------");
+          println!("STATEFUL");
         let mut output_phv : Phv<i32> = 
             Phv { bubble : false, 
                   packets: Vec::new(),
@@ -69,6 +71,8 @@ impl PipelineStage {
           atom.reset_state_variables();
           atom_count+=1;
         }
+
+          println!("STATEFUL");
         // Gets return values from the ALUs and inserts
         // them into output muxes along with old state vars
         for atom in self.stateless_atoms.iter_mut() {
@@ -103,6 +107,7 @@ impl PipelineStage {
           }
         }
         output_phv.set_state (output_state);
+        println!("Output phv: {}\n", output_phv);
         output_phv
       }
       

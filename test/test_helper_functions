@@ -110,4 +110,12 @@ fn test_blue_increase (input_phvs : Vec <Phv <i32> >,
   }}
 }}
 
-
+fn test_learn_filter (input_phvs : Vec <Phv <i32> >,
+                      output_phvs : Vec <Phv <i32> >) {{
+  for i in 0..output_phvs.len() {{
+    assert!(output_phvs[i][0].get_value() == input_phvs[i][0].get_value());
+    assert!(output_phvs[i].get_state()[0][0] == 1);
+    assert!(output_phvs[i].get_state()[1][0] == 1);
+    assert!(output_phvs[i].get_state()[2][0] == 1);
+  }}
+}}
