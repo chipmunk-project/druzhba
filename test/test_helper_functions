@@ -1,7 +1,8 @@
 
 /* Test helper functions */
 fn init_input_phvs (ticks : i32,
-                   num_containers : i32,
+                   num_packets : i32,
+                   pipeline_width : i32,
                    num_state_vars : i32,
                    num_stateful_alus : i32) -> Vec <Phv <i32> >
 {{
@@ -10,10 +11,16 @@ fn init_input_phvs (ticks : i32,
     // along with a random value
   for _i in 0..ticks {{
     let mut packet : Phv<i32> = Phv::new();
-    for _j in (0..num_containers){{
+    for _j in (0..num_packets){{
         packet.add_container_to_phv(PhvContainer {{
             field_value : rand::thread_rng().gen_range(0,100),
         }}); 
+    }}
+    for _j in (num_packets..pipeline_width) {{
+      packet.add_container_to_phv(PhvContainer {{
+          field_value : 0,
+      }}); 
+
     }}
     let mut state_vec : Vec <Vec <i32>>  = Vec::new();
     for _i in 0..num_stateful_alus {{

@@ -61,13 +61,12 @@ impl PipelineStage {
 
           if self.output_mux_globals[atom_count] == 1 {
             old_state.append(&mut old_state_result);
-            
           }
           else {
-
             old_state.append(&mut new_state_result.clone());
           }
           new_state.push (new_state_result);
+          atom.reset_state_variables();
           atom_count+=1;
         }
         // Gets return values from the ALUs and inserts
@@ -106,6 +105,7 @@ impl PipelineStage {
         output_phv.set_state (output_state);
         output_phv
       }
+      
     }
     
   }

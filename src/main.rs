@@ -38,7 +38,17 @@ fn get_hole_cfgs (hole_cfgs_file : String) -> HashMap <String, i32> {
   }
   hole_cfgs_map
 }
-fn blue_increase (input_phv : &Phv <i32>) -> Phv <i32> {
+// Maintains the same assertions as the specification
+// for the simple.sk spec in Chipmunk
+fn simple (input_phv : Phv <i32>) -> Phv<i32>{
+
+    let mut new_phv : Phv<i32> = input_phv.clone();
+    new_phv[0].field_value = new_phv.get_state()[0][0]+1;
+    new_phv
+
+}
+
+fn blue_increase (input_phv : Phv <i32>) -> Phv <i32> {
   let mut result= input_phv.clone();
   result[1].field_value = result[0].get_value() - 1;
 
@@ -60,12 +70,13 @@ fn main() {
   assert!(args.len() == 4);
 
   // Parse returns a result so unwrap
-  let num_containers : i32 = 
+  let num_packets : i32 = 
     match args[2].parse::<i32>() {
 
-      Ok  (t_num_containers) => t_num_containers,
+      Ok  (t_num_packets) => t_num_packets,
       Err (_)         => panic!("Failure: Unable to unwrap num_containers"),
     };
+  assert!(num_packets <= prog_to_run::pipeline_width());
    let ticks : i32 = 
     match args[3].parse::<i32>() {
 
@@ -92,32 +103,32 @@ fn main() {
   for _t in 0..ticks {
     
     let mut packet : Phv<i32> = Phv::new();
-    /*
-        (0..num_containers)
+    
+        (0..num_packets)
                     // _s not used
             .for_each ( |_s| {
              packet.add_container_to_phv(PhvContainer {
-                 field_value :rand::thread_rng().gen_range(0,100),
+                 field_value : 89,
+  //               field_value :rand::thread_rng().gen_range(0,100),
              }); 
            });
-           */
-    
-    packet.add_container_to_phv(PhvContainer {
-        field_value : 89
-    });
-    packet.add_container_to_phv(PhvContainer {
-        field_value : 78
-    });
-    
+           
+    (num_packets..prog_to_run::pipeline_width())
+        .for_each( |_s| { 
+            packet.add_container_to_phv (PhvContainer{
+                field_value : 0,
+            });
+        });
+
     let mut state : Vec <Vec <i32> > = Vec::new();
     // _i not used
     for _i in 0..num_stateful_alus{
       let mut tmp_state_vec : Vec<i32> = Vec::new();
       // _j not used
       for _j in 0..num_state_values {
-//          tmp_state_vec.push(rand::thread_rng().gen_range(0,100));
-          tmp_state_vec.push(0);
-//          tmp_state_vec.push((_i+1) + _j + 10);
+          tmp_state_vec.push(32);
+ //         tmp_state_vec.push(rand::thread_rng().gen_range(0,100));
+//          tmp_state_vec.push(0);
            
       }
       state.push (tmp_state_vec);
@@ -132,8 +143,9 @@ fn main() {
   }
   for i in 0..output_phvs.len(){
     println!("Input: {}", input_phvs[i]);
-    println!("Expected: {}", blue_increase (&mut input_phvs[i].clone()));
+    println!("Expected: {}", simple (input_phvs[i].clone()));
     println!("Actual: {}\n", output_phvs[i]);
+ //   assert!(output_phvs[i][0].get_value() == input_phvs[i].get_state()[0][0]+1);
   }
 }
 #[cfg(test)]

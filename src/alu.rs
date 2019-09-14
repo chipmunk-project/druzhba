@@ -82,6 +82,11 @@ impl ALU {
     pub fn get_state_varables (&self) -> Vec <i32> {
         self.state_variables.clone()
     }
+    pub fn reset_state_variables (&mut self) {
+      for i in 0..self.state_variables.len() {
+        self.state_variables[i] = 0;
+      }
+    }
 }
 
 

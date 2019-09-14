@@ -5,6 +5,9 @@ use std::io::Write;
 use std::path::Path;
 use std::process::Command;
 
+// To add a new test to the test suite, insert the name
+// into test_case_names and fill out the necessary data
+// in dgen_data
 fn main() { 
     
   let out_dir = String::from("src/");;
@@ -12,8 +15,82 @@ fn main() {
   let mut test_file = File::create(&destination).unwrap();
 
   let test_case_names : Vec <String> = 
-      vec!["blue_increase_pair_stateless_alu_arith_4_2".to_string()];
+      vec![
+           "simple_raw_stateless_alu_2_2".to_string(),
+           "simple_raw_stateless_alu_arith_2_3".to_string(),
+           "simple_if_else_raw_stateless_alu_arith_rel_cond_bool_2_4".to_string(),
+           "simple_sub_stateless_alu_arith_rel_cond_2_3".to_string(),
+           "simple_nested_ifs_stateless_alu_arith_rel_2_2".to_string(),
+           "blue_increase_pair_stateless_alu_arith_4_2".to_string()];
   let dgen_data : Vec <Vec <String> > = vec![
+    // simple_raw_stateless_alu_2_2
+    vec! ["simple".to_string(),
+          "example_alus/stateful_alus/raw.alu".to_string(),
+          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
+          "2".to_string(), // Pipeline depth
+          "2".to_string(), // Pipeline width
+          "1".to_string(), // Stateful ALUs
+          "0,1,2,3".to_string(),
+          "1".to_string(), // Num packets
+          "1".to_string(), // State vars
+          "1".to_string(), // Stateful ALUs
+          "hole_configurations/simple_raw_stateless_alu_2_2_hole_cfgs.txt".to_string() // Hole config file
+        ],
+    // simple_raw_stateless_alu_arith_2_3
+    vec! ["simple".to_string(),
+          "example_alus/stateful_alus/raw.alu".to_string(),
+          "example_alus/stateless_alus/stateless_alu_arith.alu".to_string(),
+          "2".to_string(), // Pipeline depth
+          "3".to_string(), // Pipeline width
+          "1".to_string(), // Stateful ALUs
+          "0,1,2,3".to_string(),
+          "1".to_string(), // Num packets
+          "1".to_string(), // State vars
+          "1".to_string(), // Stateful ALUs
+          "hole_configurations/simple_raw_stateless_alu_arith_2_3_hole_cfgs.txt".to_string() // Hole config file
+        ],
+    // simple_if_else_raw_stateless_alu_arith_rel_cond_bool2_4
+    vec! ["simple".to_string(),
+          "example_alus/stateful_alus/if_else_raw.alu".to_string(),
+          "example_alus/stateless_alus/stateless_alu_arith_rel_cond_bool.alu".to_string(),
+          "2".to_string(), // Pipeline depth
+          "4".to_string(), // Pipeline width
+          "1".to_string(), // Stateful ALUs
+          "0,1,2,3".to_string(),
+          "1".to_string(), // Num packets
+          "1".to_string(), // State vars
+          "1".to_string(), // Stateful ALUs
+          "hole_configurations/simple_if_else_raw_stateless_alu_arith_rel_cond_bool_2_4_hole_cfgs.txt".to_string() // Hole config file
+        ],
+    // simple_sub_stateless_alu_arith_rel_cond_2_3
+        
+    vec! ["simple".to_string(),
+          "example_alus/stateful_alus/sub.alu".to_string(),
+          "example_alus/stateless_alus/stateless_alu_arith_rel_cond.alu".to_string(),
+          "2".to_string(), // Pipeline depth
+          "3".to_string(), // Pipeline width
+          "1".to_string(), // Stateful ALUs
+          "0,1,2,3".to_string(),
+          "1".to_string(), // Num packets
+          "1".to_string(), // State vars
+          "1".to_string(), // Stateful ALUs
+          "hole_configurations/simple_sub_stateless_alu_arith_rel_cond_2_3_hole_cfgs.txt".to_string() // Hole config file
+        ],
+    // simple_nested_ifs_stateless_alu_arith_rel_3_2
+        
+    vec! ["simple".to_string(),
+          "example_alus/stateful_alus/nested_ifs.alu".to_string(),
+          "example_alus/stateless_alus/stateless_alu_arith_rel.alu".to_string(),
+          "2".to_string(), // Pipeline depth
+          "2".to_string(), // Pipeline width
+          "1".to_string(), // Stateful ALUs
+          "0,1,2,3".to_string(),
+          "1".to_string(), // Num packets
+          "1".to_string(), // State vars
+          "1".to_string(), // Stateful ALUs
+          "hole_configurations/simple_nested_ifs_stateless_alu_arith_rel_2_2_hole_cfgs.txt".to_string() // Hole config file
+        ],
+    // blue_increase_pair_stateless_alu_arith_4_2
     vec! ["blue_increase".to_string(),
           "example_alus/stateful_alus/pair.alu".to_string(),
           "example_alus/stateless_alus/stateless_alu_arith.alu".to_string(),
@@ -21,7 +98,7 @@ fn main() {
           "2".to_string(),
           "2".to_string(),
           "0,1,2,3,6,4,5,9".to_string(),
-          "2".to_string(), // Containers
+          "2".to_string(), // Num packets
           "2".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
           "hole_configurations/blue_increase_pair_stateless_alu_arith_4_2_hole_cfgs.txt".to_string() // Hole config file
@@ -45,9 +122,11 @@ fn main() {
         Ok (f) => format!("{:?}", f.file_name()),
         Err (_)      => panic!("Unable to unwrap test file"),
       };
-      if file_name.contains ("mod.rs") {
+      if file_name.contains ("mod.rs") || index >= dgen_data.len() ||
+          index >= test_case_names.len(){
         continue;
       }
+
       println!("Index : {}", index);
       println!("{:?}", dgen_data[index]);
       
@@ -63,7 +142,6 @@ fn main() {
 fn run_dgen (test_case_names : &Vec<String>,
              dgen_args : &Vec <Vec<String>>)
 {
-
   Command::new("cp")
            .arg("dgen/target/debug/dgen")
            .arg("dgen_bin")
@@ -76,7 +154,7 @@ fn run_dgen (test_case_names : &Vec<String>,
            .expect("Adding execution permissions to dgen_bin failed");
   let mut index : usize = 0;
   for arg in dgen_args.iter(){
-     
+    
     Command::new("./dgen_bin")
              .arg(&arg[0]) // Name
              .arg(&arg[1]) // Stateful ALU
@@ -112,10 +190,10 @@ fn write_test(test_file: &mut File,
               dgen_data : &Vec <String>,
               test_name : String) {
 
-    println!("test name: {}", test_name);
     write!(test_file, include_str!("./test/test_template"),
                       name = format!("test_{}",test_name),
-                      num_containers = dgen_data[7], 
+                      num_packets = dgen_data[7],
+                      num_containers = dgen_data[4], 
                       num_state_vars = dgen_data[8],
                       num_stateful_alus = dgen_data[9],
                       hole_configurations = dgen_data[10],
