@@ -121,8 +121,7 @@ fn main() {
                     // _s not used
             .for_each ( |_s| {
              packet.add_container_to_phv(PhvContainer {
-                 field_value : 89,
-  //               field_value :rand::thread_rng().gen_range(0,100),
+                 field_value :rand::thread_rng().gen_range(0,100),
              }); 
            });
            
@@ -139,7 +138,6 @@ fn main() {
       let mut tmp_state_vec : Vec<i32> = Vec::new();
       // _j not used
       for _j in 0..num_state_values {
- //         tmp_state_vec.push(rand::thread_rng().gen_range(0,100));
           tmp_state_vec.push(0);
            
       }
