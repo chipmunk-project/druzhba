@@ -98,6 +98,19 @@ fn test_marple_new_flow (input_phvs : Vec <Phv <i32> >,
     }}
   }}
 }}
+fn test_marple_tcp_nmo (input_phvs : Vec <Phv <i32> >,
+                        output_phvs : Vec <Phv <i32> >) {{
+
+  for i in 0..output_phvs.len() {{
+    if input_phvs[i][0].get_value() < input_phvs[i].get_state()[1][0] {{
+      assert! (output_phvs[i].get_state()[0][0] == input_phvs[i].get_state()[0][0]+1);
+    }}
+    else{{
+      assert! (output_phvs[i].get_state()[1][0] == input_phvs[i][0].get_value());
+    }}
+  }}
+}}
+
 fn test_blue_increase (input_phvs : Vec <Phv <i32> >,
                        output_phvs : Vec <Phv <i32> >) {{
 
@@ -119,3 +132,30 @@ fn test_learn_filter (input_phvs : Vec <Phv <i32> >,
     assert!(output_phvs[i].get_state()[2][0] == 1);
   }}
 }}
+fn test_sampling  (input_phvs : Vec <Phv <i32> >,
+                   output_phvs : Vec <Phv <i32> >) {{
+  for i in 0..output_phvs.len() {{
+    if input_phvs[i].get_state()[0][0] == 3 - 1 {{
+      assert!(output_phvs[i][0].get_value() == 1);
+      assert!(output_phvs[i].get_state()[0][0] == 0);
+    }}
+    else {{
+      assert!(output_phvs[i][0].get_value() == 0);
+      assert!(output_phvs[i].get_state()[0][0] == input_phvs[i].get_state()[0][0]+1);
+    }}
+  }}
+}}
+fn test_rcp  (input_phvs : Vec <Phv <i32> >,
+              output_phvs : Vec <Phv <i32> >) {{
+  for i in 0..output_phvs.len() {{
+   
+    if input_phvs[i][1].get_value() < 2 {{
+      assert!(output_phvs[i].get_state()[1][0] == input_phvs[i].get_state()[1][0] + input_phvs[i][1].get_value());
+      assert!(output_phvs[i].get_state()[2][0] == input_phvs[i].get_state()[2][0]+1);
+    }}
+    else {{
+      assert!(output_phvs[i].get_state()[0][0] == input_phvs[i][0].get_value() + input_phvs[i].get_state()[0][0]);
+    }}
+  }}
+}}
+
