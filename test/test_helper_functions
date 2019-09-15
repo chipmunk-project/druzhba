@@ -159,3 +159,80 @@ fn test_rcp  (input_phvs : Vec <Phv <i32> >,
   }}
 }}
 
+fn test_times_two  (input_phvs : Vec <Phv <i32> >,
+                    output_phvs : Vec <Phv <i32> >) {{
+
+  for i in 0..output_phvs.len() {{
+    if input_phvs[i][0].get_value() * 2 == input_phvs[i][1].get_value(){{
+      assert!(output_phvs[i].get_state()[0][0]==1);
+    }}
+    else {{
+      assert!(output_phvs[i].get_state()[0][0]==0);
+    }}
+  }}
+}}
+
+fn test_test  (input_phvs : Vec <Phv <i32> >,
+               output_phvs : Vec <Phv <i32> >) {{
+
+  for i in 0..output_phvs.len() {{
+    assert!(output_phvs[i][1].get_value() == input_phvs[i][0].get_value() + 1 + input_phvs[i][1].get_value());
+
+    assert!(output_phvs[i].get_state()[0][0] == input_phvs[i].get_state()[0][0]+1);
+
+    assert!(output_phvs[i].get_state()[1][0] == output_phvs[i].get_state()[0][0] + input_phvs[i].get_state()[1][0]);
+
+    assert!(output_phvs[i][0].get_value() == output_phvs[i].get_state()[0][0] + output_phvs[i][1].get_value());
+
+    assert!(output_phvs[i][2].get_value() == output_phvs[i].get_state()[0][0] + output_phvs[i].get_state()[1][0]);
+  }}
+
+}}
+
+// TODO: Verify this is correct implementation
+fn test_snap_heavy_hitter  (input_phvs : Vec <Phv <i32> >,
+                            output_phvs : Vec <Phv <i32> >) {{
+
+  for i in 0..output_phvs.len() {{
+    
+    assert!(input_phvs[i][0].get_value() == output_phvs[i][0].get_value());
+    if input_phvs[i].get_state()[0][0] == 0 {{
+      assert!(output_phvs[i].get_state()[0][1] == input_phvs[i].get_state()[0][1]+1);
+      if output_phvs[i].get_state()[0][1] == 1000 {{
+        assert!(output_phvs[i].get_state()[0][0]==1);
+      }}
+    }}
+  }}
+
+}}
+// TODO: Verify this is correct implementation
+fn test_simplified_hull  (input_phvs : Vec <Phv <i32> >,
+                          output_phvs : Vec <Phv <i32> >) {{
+
+  for i in 0..output_phvs.len() {{
+    
+    let mut test_phv : Phv <i32> = input_phvs[i].clone();
+    let mut test_state = test_phv.get_state().clone();
+    test_state[0][0] = test_state[0][0] - (test_phv[0].get_value() - test_state[1][0]);
+    test_phv.set_state(test_state.clone());
+    if test_phv.get_state()[0][0] < 0 {{
+      test_state[0][0] = 0;
+      test_phv.set_state (test_state.clone());
+    }}
+    test_state[0][0] += test_phv[1].get_value();
+
+    test_phv.set_state (test_state.clone());
+    if test_state[0][0] > 20 {{
+      test_phv[2] = PhvContainer {{ field_value : 1 }};
+    }}
+    test_state[1][0] == test_phv[0].get_value();
+    test_phv.set_state(test_state.clone());
+    assert!(output_phvs[i].get_state()[0][0] == test_phv.get_state()[0][0]);
+    assert!(output_phvs[i].get_state()[1][0] == test_phv.get_state()[1][0]);
+    assert!(output_phvs[i][0].get_value() == test_phv[0].get_value());
+
+    assert!(output_phvs[i][1].get_value() == test_phv[1].get_value());
+    assert!(output_phvs[i][2].get_value() == test_phv[2].get_value());
+  }}
+
+}}

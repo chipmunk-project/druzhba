@@ -39,6 +39,10 @@ fn main() {
            "sampling_pair_stateless_alu_arith_rel_3_3".to_string(),
            "rcp_if_else_raw_stateless_alu_arith_rel_3_3".to_string(),
            "rcp_nested_ifs_stateless_alu_2_3".to_string(),
+           "times_two_sub_stateless_alu_arith_3_3".to_string(),
+           "times_two_if_else_raw_stateless_alu_arith_rel_4_2".to_string(),
+           "test_pred_raw_stateless_alu_arith_rel_cond_bool_3_3".to_string(),
+           "test_if_else_raw_stateless_alu_arith_rel_cond_4_4".to_string(),
       ];
   let dgen_data : Vec <Vec <String> > = vec![
     // simple_raw_stateless_alu_2_2
@@ -319,6 +323,60 @@ fn main() {
           "3".to_string(), // Stateful ALUs
           "hole_configurations/rcp_nested_ifs_stateless_alu_2_3_hole_cfgs.txt".to_string() // Hole config file
         ],
+     //times_two_sub_stateless_alu_arith_3_3 
+    vec! ["times_two".to_string(),
+          "example_alus/stateful_alus/sub.alu".to_string(),
+          "example_alus/stateless_alus/stateless_alu_arith.alu".to_string(),
+          "3".to_string(),
+          "3".to_string(),
+          "1".to_string(),
+          "0,1,2,3".to_string(),
+          "2".to_string(), // Num packets
+          "1".to_string(), // State vars
+          "1".to_string(), // Stateful ALUs
+          "hole_configurations/times_two_sub_stateless_alu_arith_3_3_hole_cfgs.txt".to_string() // Hole config file
+        ],
+     // times_two_if_else_raw_stateless_alu_arith_rel_4_2
+    vec! ["times_two".to_string(),
+          "example_alus/stateful_alus/if_else_raw.alu".to_string(),
+          "example_alus/stateless_alus/stateless_alu_arith_rel.alu".to_string(),
+          "4".to_string(),
+          "2".to_string(),
+          "1".to_string(),
+          "0,1,2,3".to_string(),
+          "2".to_string(), // Num packets
+          "1".to_string(), // State vars
+          "1".to_string(), // Stateful ALUs
+          "hole_configurations/times_two_if_else_raw_stateless_alu_arith_rel_4_2_hole_cfgs.txt".to_string() // Hole config file
+        ],
+
+     // test_pred_raw_stateless_alu_arith_rel_cond_bool_3_3
+    vec! ["test".to_string(),
+          "example_alus/stateful_alus/pred_raw.alu".to_string(),
+          "example_alus/stateless_alus/stateless_alu_arith_rel_cond_bool.alu".to_string(),
+          "3".to_string(),
+          "3".to_string(),
+          "2".to_string(),
+          "0,1,2,3".to_string(),
+          "3".to_string(), // Num packets
+          "1".to_string(), // State vars
+          "2".to_string(), // Stateful ALUs
+          "hole_configurations/test_pred_raw_stateless_alu_arith_rel_cond_bool_3_3_hole_cfgs.txt".to_string() // Hole config file
+        ],
+     // test_if_else_raw_stateless_alu_arith_rel_cond_4_4
+    vec! ["test".to_string(),
+          "example_alus/stateful_alus/if_else_raw.alu".to_string(),
+          "example_alus/stateless_alus/stateless_alu_arith_rel_cond.alu".to_string(),
+          "4".to_string(),
+          "4".to_string(),
+          "2".to_string(),
+          "0,1,2,3".to_string(),
+          "3".to_string(), // Num packets
+          "1".to_string(), // State vars
+          "2".to_string(), // Stateful ALUs
+          "hole_configurations/test_if_else_raw_stateless_alu_arith_rel_cond_4_4_hole_cfgs.txt".to_string() // Hole config file
+        ],
+
 
 
   ];
