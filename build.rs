@@ -43,6 +43,10 @@ fn main() {
            "times_two_if_else_raw_stateless_alu_arith_rel_4_2".to_string(),
            "test_pred_raw_stateless_alu_arith_rel_cond_bool_3_3".to_string(),
            "test_if_else_raw_stateless_alu_arith_rel_cond_4_4".to_string(),
+           "snap_heavy_hitter_pair_stateless_alu_2_3".to_string(),
+           "snap_heavy_hitter_pair_stateless_alu_arith_rel_2_2".to_string(),
+           "sampling_revised_nested_ifs_stateless_alu_arith_rel_cond_2_2".to_string(),
+           "sampling_revised_pair_stateless_alu_arith_rel_3_3".to_string(),
       ];
   let dgen_data : Vec <Vec <String> > = vec![
     // simple_raw_stateless_alu_2_2
@@ -51,7 +55,7 @@ fn main() {
           "example_alus/stateless_alus/stateless_alu.alu".to_string(),
           "2".to_string(), // Pipeline depth
           "2".to_string(), // Pipeline width
-          "1".to_string(), // Stateful ALUs
+          "1".to_string(), // Stateful ALUs (Depends on modified variables in the spec)
           "0,1,2,3".to_string(),
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
@@ -148,7 +152,7 @@ fn main() {
           "1".to_string(),
           "0,1,2,3".to_string(),
           "1".to_string(), // Num packets
-          "2".to_string(), // State vars
+          "2".to_string(), // State vars (always 2 for pair.alu)
           "1".to_string(), // Stateful ALUs 
           "hole_configurations/simple_pair_stateless_alu_arith_2_4_hole_cfgs.txt".to_string() // Hole config file
         ],
@@ -376,6 +380,60 @@ fn main() {
           "2".to_string(), // Stateful ALUs
           "hole_configurations/test_if_else_raw_stateless_alu_arith_rel_cond_4_4_hole_cfgs.txt".to_string() // Hole config file
         ],
+     // snap_heavy_hitter_pair_stateless_alu_2_3
+    vec! ["snap_heavy_hitter".to_string(),
+          "example_alus/stateful_alus/pair.alu".to_string(),
+          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
+          "2".to_string(),
+          "3".to_string(),
+          "1".to_string(),
+          "0,1,2,3,999,997,1002,1000,4".to_string(),
+          "1".to_string(), // Num packets
+          "2".to_string(), // State vars
+          "1".to_string(), // Stateful ALUs
+          "hole_configurations/snap_heavy_hitter_pair_stateless_alu_2_3_hole_cfgs.txt".to_string() // Hole config file
+        ],
+     //snap_heavy_hitter_pair_stateless_alu_arith_rel_2_2 
+    vec! ["snap_heavy_hitter".to_string(),
+          "example_alus/stateful_alus/pair.alu".to_string(),
+          "example_alus/stateless_alus/stateless_alu_arith_rel.alu".to_string(),
+          "2".to_string(),
+          "2".to_string(),
+          "1".to_string(),
+          "0,1,2,3,998,4,999".to_string(),
+          "1".to_string(), // Num packets
+          "2".to_string(), // State vars
+          "1".to_string(), // Stateful ALUs
+          "hole_configurations/snap_heavy_hitter_pair_stateless_alu_arith_rel_2_2_hole_cfgs.txt".to_string() // Hole config file
+        ],
+     //  sampling_revised_nested_ifs_stateless_alu_arith_rel_cond_2_2
+    vec! ["sampling_revised".to_string(),
+          "example_alus/stateful_alus/nested_ifs.alu".to_string(),
+          "example_alus/stateless_alus/stateless_alu_arith_rel_cond.alu".to_string(),
+          "2".to_string(),
+          "2".to_string(),
+          "1".to_string(),
+          "0,1,2,3,8,4,9,29,1023,5,31,33".to_string(),
+          "1".to_string(), // Num packets
+          "1".to_string(), // State vars
+          "1".to_string(), // Stateful ALUs
+          "hole_configurations/sampling_revised_nested_ifs_stateless_alu_arith_rel_cond_2_2_hole_cfgs.txt".to_string() // Hole config file
+        ],
+     // sampling_revised_pair_stateless_alu_arith_rel_3_3 
+    vec! ["sampling_revised".to_string(),
+          "example_alus/stateful_alus/pair.alu".to_string(),
+          "example_alus/stateless_alus/stateless_alu_arith_rel.alu".to_string(),
+          "3".to_string(),
+          "3".to_string(),
+          "1".to_string(),
+          "0,1,2,3,8,29,7,9,6,28,30,36".to_string(),
+          "1".to_string(), // Num packets
+          "2".to_string(), // State vars
+          "1".to_string(), // Stateful ALUs
+          "hole_configurations/sampling_revised_pair_stateless_alu_arith_rel_3_3_hole_cfgs.txt".to_string() // Hole config file
+        ],
+
+
 
 
 

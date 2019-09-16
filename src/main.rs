@@ -100,7 +100,7 @@ fn main() {
   let hole_cfgs : HashMap <String, i32> = get_hole_cfgs (hole_cfgs_file.clone());
   let num_stateful_alus = prog_to_run::num_stateful_alus();
   let num_state_values = prog_to_run::num_state_variables();
-  println!("{:?}", hole_cfgs);
+//  println!("{:?}", hole_cfgs);
   assert! (ticks >= 1);
   assert! (num_stateful_alus>=1);
   let mut pipeline : Pipeline = 

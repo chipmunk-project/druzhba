@@ -189,7 +189,6 @@ fn test_test  (input_phvs : Vec <Phv <i32> >,
 
 }}
 
-// TODO: Verify this is correct implementation
 fn test_snap_heavy_hitter  (input_phvs : Vec <Phv <i32> >,
                             output_phvs : Vec <Phv <i32> >) {{
 
@@ -205,6 +204,27 @@ fn test_snap_heavy_hitter  (input_phvs : Vec <Phv <i32> >,
   }}
 
 }}
+fn test_sampling_revised  (input_phvs : Vec <Phv <i32> >,
+                           output_phvs : Vec <Phv <i32> >) {{
+
+  for i in 0..output_phvs.len() {{
+    if input_phvs[i].get_state()[0][0] == 30 - 1 {{ 
+      assert!(output_phvs[i].get_state()[0][0] == 0);
+    }}
+    else {{
+      if input_phvs[i].get_state()[0][0] == 8 {{
+
+        assert!(output_phvs[i].get_state()[0][0]==2);
+      }}
+      else {{
+        assert!(output_phvs[i].get_state()[0][0]==1);
+      }}
+   
+    }}
+    assert!(output_phvs[i][0].get_value() == 1 );
+  }}
+}}
+
 // TODO: Verify this is correct implementation
 fn test_simplified_hull  (input_phvs : Vec <Phv <i32> >,
                           output_phvs : Vec <Phv <i32> >) {{
