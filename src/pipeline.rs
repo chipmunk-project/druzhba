@@ -44,7 +44,6 @@ impl Pipeline {
   }
   pub fn tick (&mut self, t_packet : Phv<i32>) -> Phv<i32> {
     if self.pipeline_stages.len() == 1{
-      assert!(self.old_phvs.len() == 0 && self.new_phvs.len() == 0);
       
       self.pipeline_stages[0].tick(t_packet)
     }
