@@ -100,7 +100,8 @@ fn main() {
   let hole_cfgs : HashMap <String, i32> = get_hole_cfgs (hole_cfgs_file.clone());
   let num_stateful_alus = prog_to_run::num_stateful_alus();
   let num_state_values = prog_to_run::num_state_variables();
-//  println!("{:?}", hole_cfgs);
+  println!("{:?}", hole_cfgs);
+  println!("Hole configurations successfully loaded");
   assert! (ticks >= 1);
   assert! (num_stateful_alus>=1);
   let mut pipeline : Pipeline = 
@@ -112,6 +113,7 @@ fn main() {
   // retrieve resulting packet.
   let mut input_phvs : Vec <Phv <i32> > = Vec::new();
   let mut output_phvs : Vec <Phv <i32> > = Vec::new();
+  println!("Beginning execution ... ");
   // _t not used
   for _t in 0..ticks {
     
@@ -139,7 +141,6 @@ fn main() {
       // _j not used
       for _j in 0..num_state_values {
         tmp_state_vec.push(rand :: thread_rng().gen_range(0,100));
-//          tmp_state_vec.push(0);
            
       }
       state.push (tmp_state_vec);
@@ -154,7 +155,7 @@ fn main() {
   }
   for i in 0..output_phvs.len(){
     println!("Input: {}", input_phvs[i]);
-    println!("Actual: {}\n", output_phvs[i]);
+    println!("Result: {}\n", output_phvs[i]);
   }
 }
 #[cfg(test)]

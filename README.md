@@ -8,7 +8,7 @@ which will allow the simulator to run.
 To execute dgen, run
 
     cd dgen
-    cargo build && cargo run <spec name> <stateful alu file> <stateless alu file> <pipeline depth> <pipeline width> <number of stateful ALUs> <Constant vector> <Output file?>
+    cargo build && cargo run <spec name> <stateful alu file> <stateless alu file> <pipeline depth> <pipeline width> <number of stateful ALUs> <constant vector> <output file?>
 
 Example:
 
@@ -19,17 +19,19 @@ With dgen's generated prog_to_run.rs file constructed,
 , run the following to execute Druzhba:
 
     cd ..
-    cargo build && cargo run <hole configuration file> <number of containers per phv> <ticks>
+    cargo build && cargo run <hole configuration file> <number of packets> <ticks>
 
 Example:
 
     cd ..
-    cargo build && cargo run hole_configurations/simple_raw_stateless_alu_2_2_hole_cfgs.txt 2 100
+    cargo build && cargo run hole_configurations/simple_raw_stateless_alu_2_2_hole_cfgs.txt 1 100
 
 
 Tests will ensure the druhzba pipeline is outputting
 the correct packets relative to the input packets
-given to the pipeline. 
+given to the pipeline. Run dgen first to get a 
+prog_to_run file in src first. Otherwise the simulator
+won't compile. 
 
 To run these tests:
 
