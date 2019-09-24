@@ -2,7 +2,9 @@ version: 1.0.{build}
 image: Ubuntu1604
 install:
 - sh: >-
-    curl https://sh.rustup.rs -sSf | sh -y
+    curl https://sh.rustup.rs -sSf > /tmp/sh.rustup.rs
+
+    sh /tmp/sh.rustup.rs -y
 
     rustup default nightly
 
