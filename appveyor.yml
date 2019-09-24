@@ -1,5 +1,10 @@
 version: 1.0.{build}
 image: Ubuntu1604
+branches:
+  # whitelist
+  only:
+    - master
+skip_branch_with_pr: true
 install:
 - sh: >-
     curl https://sh.rustup.rs -sSf > /tmp/sh.rustup.rs
