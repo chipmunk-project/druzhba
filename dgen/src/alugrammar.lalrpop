@@ -34,7 +34,26 @@ pub OptHeader : Box<OptHeader> = {
   "name" ":" <id:ID>
   "pipeline" "stage" ":" <n1:Num> 
   "alu" ":" <n2:Num>
-  => Box::new (OptHeader::Data (id, n1, n2))
+  "[" <n3:(<Num> ",")*> <n4:Num?> "]" => {
+    let constant_vec = match n4 {
+      Some (var) => {
+        let mut constant_vec_vars : Vec <String> = Vec::new();
+        for x in n3.iter(){
+          constant_vec_vars.push(x.to_string());
+        }
+        constant_vec_vars.push(var.to_string());
+        constant_vec_vars
+      }
+      None => {
+        let mut temp_vec : Vec <String> = Vec::new();
+        for x in n3.iter() {
+          temp_vec.push(x.to_string());
+        }
+        temp_vec
+      },
+    };
+    Box::new (OptHeader::Data (id, n1, n2, constant_vec))
+  }
 };
 // TODO: this is working for now but should refine later
 pub Comment : String = {

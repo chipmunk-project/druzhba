@@ -13,10 +13,16 @@ pub struct InputMux{
 impl InputMux{
 
     pub fn new(&self, input: Phv<i32>, hole_index : i32) -> Self {
-        InputMux {input_phv : input, index : hole_index }
+        InputMux {input_phv : input, index : hole_index}
     
     }
     pub fn output(&self) -> PhvContainer<i32> {
-        self.input_phv [self.index].clone()
+
+        if self.index >= self.input_phv.get_num_phv_containers() {
+          self.input_phv [self.input_phv.get_num_phv_containers()-1].clone()
+        }
+        else {
+          self.input_phv [self.index].clone()
+        }
     }
 }

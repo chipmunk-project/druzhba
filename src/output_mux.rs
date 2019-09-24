@@ -26,11 +26,18 @@ impl OutputMux{
      from a list of them */
 
     pub fn output(&self) -> PhvContainer<i32>{
-        if self.input_phv_containers.len() == 0{
-            panic!("Error: This output mux has no inputs");
+
+        // If mux ctrl exceeds highest index of mux inputs, just
+        // return the last value
+        if self.index as usize >= self.input_phv_containers.len() {
+            PhvContainer {
+              field_value : self.input_phv_containers[self.input_phv_containers.len()-1]
+            }
         }
-        PhvContainer {
-            field_value : self.input_phv_containers[self.index as usize].clone()
+        else {
+          PhvContainer {
+              field_value : self.input_phv_containers[self.index as usize].clone()
+          }
         }
     }
 }
