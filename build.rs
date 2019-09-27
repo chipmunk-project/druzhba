@@ -285,7 +285,6 @@ fn test_names () -> Vec <String> {
   "spam_detection_equivalent_10_canonicalizer_equivalent_1_pair_stateless_alu_1_1".to_string(),
   "stateful_fw_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5".to_string(),
   "stateful_fw_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5".to_string(),
-  "stateful_fw_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5".to_string(),
      ]
 
 }
@@ -2028,21 +2027,6 @@ fn test_configurations () -> Vec <Vec <String> > {
           "experiments/stateful_fw/stateful_fw4/stateful_fw_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
           "stateful_fw".to_string(),
         ],
-
-
-    vec! ["stateful_fw_equivalent_5_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "4".to_string(),
-          "5".to_string(),
-          "0,1,2,3,102,102,1,100,103,101,3".to_string(),
-          "4".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "experiments/stateful_fw/stateful_fw5/stateful_fw_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
-          "stateful_fw".to_string(),
-        ],
-
 
 
 
