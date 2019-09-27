@@ -1201,7 +1201,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
           "experiments/marple_tcp_nmo/marple_tcp_nmo7/marple_tcp_nmo_equivalent_7_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
-          "marple_tcp_nmo".to_string(),
+          "marple_tcp_nmo_7".to_string(),
         ],
 
     vec! ["marple_tcp_nmo_equivalent_8_canonicalizer_equivalent_0".to_string(),
