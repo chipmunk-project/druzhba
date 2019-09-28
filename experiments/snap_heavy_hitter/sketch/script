@@ -1,8 +1,0 @@
-#!/bin/sh
-if [ -z "$SKETCH_HOME" ];
-then
-echo "You need to set the \$SKETCH_HOME environment variable to be the path to the SKETCH distribution; This is needed to find the SKETCH header files needed to compile your program." >&2;
-exit 1;
-fi
-g++ -I "$SKETCH_HOME/include" -o snap_heavy_hitter_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_1_verify_iter_3 snap_heavy_hitter_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_1_verify_iter_3.cpp snap_heavy_hitter_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_1_verify_iter_3_test.cpp
-./snap_heavy_hitter_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_1_verify_iter_3

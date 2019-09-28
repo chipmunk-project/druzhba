@@ -1,8 +1,0 @@
-#!/bin/sh
-if [ -z "$SKETCH_HOME" ];
-then
-echo "You need to set the \$SKETCH_HOME environment variable to be the path to the SKETCH distribution; This is needed to find the SKETCH header files needed to compile your program." >&2;
-exit 1;
-fi
-g++ -I "$SKETCH_HOME/include" -o blue_decrease_equivalent_7_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_verify_iter_14 blue_decrease_equivalent_7_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_verify_iter_14.cpp blue_decrease_equivalent_7_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_verify_iter_14_test.cpp
-./blue_decrease_equivalent_7_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_verify_iter_14

@@ -697,7 +697,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/blue_increase/blue_increase_2/blue_increase_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/blue_increase_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
           "blue_increase".to_string(),
         ],
         
@@ -711,7 +711,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/blue_increase/blue_increase_4/blue_increase_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/blue_increase_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
           "blue_increase".to_string(),
         ],
 
@@ -725,7 +725,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/blue_increase/blue_increase_6/blue_increase_equivalent_6_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/blue_increase_equivalent_6_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
           "blue_increase".to_string(),
         ],
 
@@ -738,7 +738,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/blue_increase/blue_increase_7/blue_increase_equivalent_7_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/blue_increase_equivalent_7_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
           "blue_increase".to_string(),
         ],
 
@@ -752,7 +752,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/blue_increase/blue_increase_9/blue_increase_equivalent_9_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/blue_increase_equivalent_9_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
           "blue_increase".to_string(),
         ],
     vec! ["blue_increase_equivalent_10_canonicalizer_equivalent_0".to_string(),
@@ -764,7 +764,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/blue_increase/blue_increase_10/blue_increase_equivalent_10_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/blue_increase_equivalent_10_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
           "blue_increase".to_string(),
         ],
 
@@ -777,7 +777,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/blue_decrease/blue_decrease_1/blue_decrease_equivalent_1_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/blue_decrease_equivalent_1_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
           "blue_decrease".to_string(),
         ],
 
@@ -790,7 +790,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/blue_decrease/blue_decrease_2/blue_decrease_equivalent_2_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/blue_decrease_equivalent_2_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
           "blue_decrease".to_string(),
         ],
 
@@ -803,7 +803,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/blue_decrease/blue_decrease_3/blue_decrease_equivalent_3_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/blue_decrease_equivalent_3_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
           "blue_decrease".to_string(),
         ],
 
@@ -816,7 +816,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/blue_decrease/blue_decrease_4/blue_decrease_equivalent_4_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/blue_decrease_equivalent_4_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
           "blue_decrease".to_string(),
         ],
     vec! ["blue_decrease_equivalent_6_canonicalizer_equivalent_0".to_string(),
@@ -828,7 +828,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/blue_decrease/blue_decrease_6/blue_decrease_equivalent_6_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/blue_decrease_equivalent_6_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
           "blue_decrease".to_string(),
         ],
     vec! ["blue_decrease_equivalent_7_canonicalizer_equivalent_0".to_string(),
@@ -840,7 +840,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/blue_decrease/blue_decrease_7/blue_decrease_equivalent_7_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/blue_decrease_equivalent_7_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
           "blue_decrease".to_string(),
         ],
 
@@ -853,7 +853,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/blue_decrease/blue_decrease_8/blue_decrease_equivalent_8_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/blue_decrease_equivalent_8_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
           "blue_decrease".to_string(),
         ],
 
@@ -866,7 +866,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/blue_decrease/blue_decrease_9/blue_decrease_equivalent_9_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/blue_decrease_equivalent_9_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
           "blue_decrease".to_string(),
         ],
     vec! ["conga_equivalent_1_canonicalizer_equivalent_1".to_string(),
@@ -878,7 +878,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "5".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/conga/conga_1/conga_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/conga_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
           "conga".to_string(),
         ],
     vec! ["conga_equivalent_2_canonicalizer_equivalent_1".to_string(),
@@ -890,7 +890,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "5".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/conga/conga_2/conga_equivalent_2_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/conga_equivalent_2_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
           "conga".to_string(),
         ],
     vec! ["conga_equivalent_3_canonicalizer_equivalent_1".to_string(),
@@ -902,7 +902,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "5".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/conga/conga_3/conga_equivalent_3_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/conga_equivalent_3_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
           "conga".to_string(),
         ],
     vec! ["conga_equivalent_4_canonicalizer_equivalent_1".to_string(),
@@ -914,7 +914,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "5".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/conga/conga_4/conga_equivalent_4_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/conga_equivalent_4_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
           "conga".to_string(),
         ],
      vec! ["conga_equivalent_5_canonicalizer_equivalent_1".to_string(),
@@ -926,7 +926,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "5".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/conga/conga_5/conga_equivalent_5_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/conga_equivalent_5_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
           "conga".to_string(),
         ],
    vec! ["conga_equivalent_6_canonicalizer_equivalent_1".to_string(),
@@ -938,7 +938,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "5".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/conga/conga_6/conga_equivalent_6_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/conga_equivalent_6_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
           "conga".to_string(),
         ],
     vec! ["conga_equivalent_7_canonicalizer_equivalent_1".to_string(),
@@ -950,7 +950,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "5".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/conga/conga_7/conga_equivalent_7_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/conga_equivalent_7_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
           "conga".to_string(),
         ],
 
@@ -963,7 +963,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "5".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/conga/conga_8/conga_equivalent_8_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/conga_equivalent_8_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
           "conga".to_string(),
         ],
 
@@ -976,7 +976,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "5".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/conga/conga_9/conga_equivalent_9_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/conga_equivalent_9_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
           "conga".to_string(),
         ],
     vec! ["conga_equivalent_10_canonicalizer_equivalent_1".to_string(),
@@ -988,7 +988,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "5".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/conga/conga_10/conga_equivalent_10_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/conga_equivalent_10_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
           "conga".to_string(),
         ],
         
@@ -1001,7 +1001,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/marple_new_flow/marple_new_flow1/marple_new_flow_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/marple_new_flow_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
           "marple_new_flow".to_string(),
         ],
     vec! ["marple_new_flow_equivalent_2_canonicalizer_equivalent_0".to_string(),
@@ -1013,7 +1013,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/marple_new_flow/marple_new_flow2/marple_new_flow_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/marple_new_flow_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
           "marple_new_flow".to_string(),
         ],
     vec! ["marple_new_flow_equivalent_3_canonicalizer_equivalent_0".to_string(),
@@ -1025,7 +1025,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/marple_new_flow/marple_new_flow3/marple_new_flow_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/marple_new_flow_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
           "marple_new_flow".to_string(),
         ],
     vec! ["marple_new_flow_equivalent_4_canonicalizer_equivalent_0".to_string(),
@@ -1037,7 +1037,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/marple_new_flow/marple_new_flow4/marple_new_flow_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/marple_new_flow_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
           "marple_new_flow".to_string(),
         ],
     vec! ["marple_new_flow_equivalent_5_canonicalizer_equivalent_0".to_string(),
@@ -1049,7 +1049,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/marple_new_flow/marple_new_flow5/marple_new_flow_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/marple_new_flow_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
           "marple_new_flow".to_string(),
         ],
         
@@ -1062,7 +1062,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/marple_new_flow/marple_new_flow6/marple_new_flow_equivalent_6_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/marple_new_flow_equivalent_6_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
           "marple_new_flow".to_string(),
         ],
     vec! ["marple_new_flow_equivalent_7_canonicalizer_equivalent_0".to_string(),
@@ -1074,7 +1074,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/marple_new_flow/marple_new_flow7/marple_new_flow_equivalent_7_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/marple_new_flow_equivalent_7_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
           "marple_new_flow".to_string(),
         ],
     vec! ["marple_new_flow_equivalent_8_canonicalizer_equivalent_0".to_string(),
@@ -1086,7 +1086,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/marple_new_flow/marple_new_flow8/marple_new_flow_equivalent_8_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/marple_new_flow_equivalent_8_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
           "marple_new_flow".to_string(),
         ],
 
@@ -1099,7 +1099,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/marple_new_flow/marple_new_flow9/marple_new_flow_equivalent_9_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/marple_new_flow_equivalent_9_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
           "marple_new_flow".to_string(),
         ],
     vec! ["marple_new_flow_equivalent_10_canonicalizer_equivalent_0".to_string(),
@@ -1111,7 +1111,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/marple_new_flow/marple_new_flow10/marple_new_flow_equivalent_10_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/marple_new_flow_equivalent_10_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
           "marple_new_flow".to_string(),
         ],
     vec! ["marple_tcp_nmo_equivalent_1_canonicalizer_equivalent_0".to_string(),
@@ -1123,7 +1123,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/marple_tcp_nmo/marple_tcp_nmo1/marple_tcp_nmo_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/marple_tcp_nmo_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
           "marple_tcp_nmo".to_string(),
         ],
     vec! ["marple_tcp_nmo_equivalent_2_canonicalizer_equivalent_0".to_string(),
@@ -1135,7 +1135,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/marple_tcp_nmo/marple_tcp_nmo2/marple_tcp_nmo_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/marple_tcp_nmo_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
           "marple_tcp_nmo".to_string(),
         ],
 
@@ -1148,7 +1148,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/marple_tcp_nmo/marple_tcp_nmo3/marple_tcp_nmo_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/marple_tcp_nmo_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
           "marple_tcp_nmo".to_string(),
         ],
     vec! ["marple_tcp_nmo_equivalent_4_canonicalizer_equivalent_0".to_string(),
@@ -1160,7 +1160,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/marple_tcp_nmo/marple_tcp_nmo4/marple_tcp_nmo_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/marple_tcp_nmo_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
           "marple_tcp_nmo".to_string(),
         ],
 
@@ -1173,7 +1173,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/marple_tcp_nmo/marple_tcp_nmo5/marple_tcp_nmo_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/marple_tcp_nmo_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
           "marple_tcp_nmo".to_string(),
         ],
 
@@ -1186,7 +1186,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/marple_tcp_nmo/marple_tcp_nmo6/marple_tcp_nmo_equivalent_6_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/marple_tcp_nmo_equivalent_6_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
           "marple_tcp_nmo".to_string(),
         ],
 
@@ -1199,7 +1199,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/marple_tcp_nmo/marple_tcp_nmo7/marple_tcp_nmo_equivalent_7_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/marple_tcp_nmo_equivalent_7_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
           "marple_tcp_nmo_7".to_string(),
         ],
 
@@ -1212,7 +1212,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/marple_tcp_nmo/marple_tcp_nmo8/marple_tcp_nmo_equivalent_8_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/marple_tcp_nmo_equivalent_8_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
           "marple_tcp_nmo".to_string(),
         ],
 
@@ -1225,7 +1225,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/marple_tcp_nmo/marple_tcp_nmo9/marple_tcp_nmo_equivalent_9_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/marple_tcp_nmo_equivalent_9_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
           "marple_tcp_nmo".to_string(),
         ],
 
@@ -1238,7 +1238,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/marple_tcp_nmo/marple_tcp_nmo10/marple_tcp_nmo_equivalent_10_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/marple_tcp_nmo_equivalent_10_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
           "marple_tcp_nmo".to_string(),
         ],
 
@@ -1251,7 +1251,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "3".to_string(), // Stateful ALUs
-          "experiments/learn_filter/learn_filter1/learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
           "learn_filter".to_string(),
         ],
     vec! ["learn_filter_equivalent_2_canonicalizer_equivalent_0".to_string(),
@@ -1263,7 +1263,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "3".to_string(), // Stateful ALUs
-          "experiments/learn_filter/learn_filter2/learn_filter_equivalent_2_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/learn_filter_equivalent_2_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
           "learn_filter".to_string(),
         ],
 
@@ -1276,7 +1276,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "3".to_string(), // Stateful ALUs
-          "experiments/learn_filter/learn_filter3/learn_filter_equivalent_3_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/learn_filter_equivalent_3_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
           "learn_filter".to_string(),
         ],
 
@@ -1289,7 +1289,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "3".to_string(), // Stateful ALUs
-          "experiments/learn_filter/learn_filter4/learn_filter_equivalent_4_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/learn_filter_equivalent_4_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
           "learn_filter".to_string(),
         ],
 
@@ -1302,7 +1302,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "3".to_string(), // Stateful ALUs
-          "experiments/learn_filter/learn_filter5/learn_filter_equivalent_5_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/learn_filter_equivalent_5_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
           "learn_filter".to_string(),
         ],
 
@@ -1315,7 +1315,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "3".to_string(), // Stateful ALUs
-          "experiments/learn_filter/learn_filter6/learn_filter_equivalent_6_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/learn_filter_equivalent_6_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
           "learn_filter".to_string(),
         ],
 
@@ -1328,7 +1328,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "3".to_string(), // Stateful ALUs
-          "experiments/learn_filter/learn_filter7/learn_filter_equivalent_7_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/learn_filter_equivalent_7_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
           "learn_filter".to_string(),
         ],
 
@@ -1341,7 +1341,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "3".to_string(), // Stateful ALUs
-          "experiments/learn_filter/learn_filter8/learn_filter_equivalent_8_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/learn_filter_equivalent_8_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
           "learn_filter".to_string(),
         ],
 
@@ -1354,7 +1354,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "3".to_string(), // Stateful ALUs
-          "experiments/learn_filter/learn_filter9/learn_filter_equivalent_9_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/learn_filter_equivalent_9_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
           "learn_filter".to_string(),
         ],
 
@@ -1367,7 +1367,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "3".to_string(), // Stateful ALUs
-          "experiments/learn_filter/learn_filter10/learn_filter_equivalent_10_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/learn_filter_equivalent_10_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
           "learn_filter".to_string(),
         ],
     vec! ["flowlets_equivalent_1_canonicalizer_equivalent_0".to_string(),
@@ -1379,7 +1379,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "3".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/flowlets/flowlets_1/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
           "flowlets".to_string(),
         ],
     vec! ["flowlets_equivalent_2_canonicalizer_equivalent_0".to_string(),
@@ -1391,7 +1391,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "3".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/flowlets/flowlets_2/flowlets_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/flowlets_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
           "flowlets".to_string(),
         ],
     vec! ["flowlets_equivalent_3_canonicalizer_equivalent_0".to_string(),
@@ -1403,7 +1403,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "3".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/flowlets/flowlets_3/flowlets_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/flowlets_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
           "flowlets".to_string(),
         ],
     vec! ["flowlets_equivalent_4_canonicalizer_equivalent_0".to_string(),
@@ -1415,7 +1415,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "3".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/flowlets/flowlets_4/flowlets_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/flowlets_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
           "flowlets".to_string(),
         ],
     vec! ["flowlets_equivalent_5_canonicalizer_equivalent_0".to_string(),
@@ -1427,7 +1427,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "3".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/flowlets/flowlets_5/flowlets_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/flowlets_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
           "flowlets".to_string(),
         ],
     vec! ["flowlets_equivalent_6_canonicalizer_equivalent_0".to_string(),
@@ -1439,7 +1439,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "3".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/flowlets/flowlets_6/flowlets_equivalent_6_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/flowlets_equivalent_6_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
           "flowlets".to_string(),
         ],
     vec! ["flowlets_equivalent_7_canonicalizer_equivalent_0".to_string(),
@@ -1451,7 +1451,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "3".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/flowlets/flowlets_7/flowlets_equivalent_7_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/flowlets_equivalent_7_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
           "flowlets".to_string(),
         ],
     vec! ["flowlets_equivalent_8_canonicalizer_equivalent_0".to_string(),
@@ -1463,7 +1463,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "3".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/flowlets/flowlets_8/flowlets_equivalent_8_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/flowlets_equivalent_8_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
           "flowlets".to_string(),
         ],
     vec! ["flowlets_equivalent_9_canonicalizer_equivalent_0".to_string(),
@@ -1475,7 +1475,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "3".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/flowlets/flowlets_9/flowlets_equivalent_9_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/flowlets_equivalent_9_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
           "flowlets".to_string(),
         ],
     vec! ["flowlets_equivalent_10_canonicalizer_equivalent_0".to_string(),
@@ -1487,7 +1487,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "3".to_string(), // Num packets
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
-          "experiments/flowlets/flowlets_10/flowlets_equivalent_10_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/flowlets_equivalent_10_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
           "flowlets".to_string(),
         ],
 
@@ -1500,7 +1500,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "3".to_string(), // Stateful ALUs
-          "experiments/rcp/rcp1/rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
           "rcp".to_string(),
         ],
     vec! ["rcp_equivalent_2_canonicalizer_equivalent_0".to_string(),
@@ -1512,7 +1512,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "3".to_string(), // Stateful ALUs
-          "experiments/rcp/rcp2/rcp_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/rcp_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
           "rcp".to_string(),
         ],
 
@@ -1525,7 +1525,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "3".to_string(), // Stateful ALUs
-          "experiments/rcp/rcp3/rcp_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/rcp_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
           "rcp".to_string(),
         ],
 
@@ -1538,7 +1538,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "3".to_string(), // Stateful ALUs
-          "experiments/rcp/rcp4/rcp_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/rcp_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
           "rcp".to_string(),
         ],
 
@@ -1551,7 +1551,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "3".to_string(), // Stateful ALUs
-          "experiments/rcp/rcp5/rcp_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/rcp_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
           "rcp".to_string(),
         ],
 
@@ -1564,7 +1564,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "3".to_string(), // Stateful ALUs
-          "experiments/rcp/rcp6/rcp_equivalent_6_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/rcp_equivalent_6_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
           "rcp".to_string(),
         ],
 
@@ -1577,7 +1577,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "3".to_string(), // Stateful ALUs
-          "experiments/rcp/rcp7/rcp_equivalent_7_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/rcp_equivalent_7_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
           "rcp".to_string(),
         ],
 
@@ -1590,7 +1590,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "3".to_string(), // Stateful ALUs
-          "experiments/rcp/rcp8/rcp_equivalent_8_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/rcp_equivalent_8_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
           "rcp".to_string(),
         ],
     vec! ["rcp_equivalent_9_canonicalizer_equivalent_0".to_string(),
@@ -1602,7 +1602,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "3".to_string(), // Stateful ALUs
-          "experiments/rcp/rcp9/rcp_equivalent_9_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/rcp_equivalent_9_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
           "rcp".to_string(),
         ],
 
@@ -1615,7 +1615,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "2".to_string(), // Num packets
           "1".to_string(), // State vars
           "3".to_string(), // Stateful ALUs
-          "experiments/rcp/rcp10/rcp_equivalent_10_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/rcp_equivalent_10_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
           "rcp".to_string(),
         ],
 
@@ -1628,7 +1628,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/sampling/sampling1/sampling_equivalent_1_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/sampling_equivalent_1_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
           "sampling".to_string(),
         ],
 
@@ -1642,7 +1642,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/sampling/sampling2/sampling_equivalent_2_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/sampling_equivalent_2_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
           "sampling".to_string(),
         ],
     vec! ["sampling_equivalent_3_canonicalizer_equivalent_0".to_string(),
@@ -1654,7 +1654,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/sampling/sampling3/sampling_equivalent_3_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/sampling_equivalent_3_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
           "sampling".to_string(),
         ],
     vec! ["sampling_equivalent_4_canonicalizer_equivalent_0".to_string(),
@@ -1666,7 +1666,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/sampling/sampling4/sampling_equivalent_4_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/sampling_equivalent_4_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
           "sampling".to_string(),
         ],
     vec! ["sampling_equivalent_5_canonicalizer_equivalent_0".to_string(),
@@ -1678,7 +1678,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/sampling/sampling5/sampling_equivalent_5_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/sampling_equivalent_5_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
           "sampling".to_string(),
         ],
     vec! ["sampling_equivalent_6_canonicalizer_equivalent_0".to_string(),
@@ -1690,7 +1690,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/sampling/sampling6/sampling_equivalent_6_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/sampling_equivalent_6_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
           "sampling".to_string(),
         ],
     vec! ["sampling_equivalent_7_canonicalizer_equivalent_0".to_string(),
@@ -1702,7 +1702,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/sampling/sampling7/sampling_equivalent_7_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/sampling_equivalent_7_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
           "sampling".to_string(),
         ],
     vec! ["sampling_equivalent_8_canonicalizer_equivalent_0".to_string(),
@@ -1714,7 +1714,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/sampling/sampling8/sampling_equivalent_8_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/sampling_equivalent_8_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
           "sampling".to_string(),
         ],
     vec! ["sampling_equivalent_9_canonicalizer_equivalent_0".to_string(),
@@ -1726,7 +1726,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/sampling/sampling9/sampling_equivalent_9_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/sampling_equivalent_9_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
           "sampling".to_string(),
         ],
     vec! ["sampling_equivalent_10_canonicalizer_equivalent_0".to_string(),
@@ -1738,7 +1738,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/sampling/sampling10/sampling_equivalent_10_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/sampling_equivalent_10_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
           "sampling".to_string(),
         ],
 
@@ -1751,7 +1751,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/snap_heavy_hitter/snap_heavy_hitter1/snap_heavy_hitter_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/snap_heavy_hitter_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
           "snap_heavy_hitter".to_string(),
         ],
     vec! ["snap_heavy_hitter_equivalent_2_canonicalizer_equivalent_1".to_string(),
@@ -1763,7 +1763,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/snap_heavy_hitter/snap_heavy_hitter2/snap_heavy_hitter_equivalent_2_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/snap_heavy_hitter_equivalent_2_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
           "snap_heavy_hitter".to_string(),
         ],
 
@@ -1777,7 +1777,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/snap_heavy_hitter/snap_heavy_hitter3/snap_heavy_hitter_equivalent_3_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/snap_heavy_hitter_equivalent_3_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
           "snap_heavy_hitter".to_string(),
         ],
 
@@ -1791,7 +1791,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/snap_heavy_hitter/snap_heavy_hitter4/snap_heavy_hitter_equivalent_4_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/snap_heavy_hitter_equivalent_4_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
           "snap_heavy_hitter".to_string(),
         ],
 
@@ -1805,7 +1805,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/snap_heavy_hitter/snap_heavy_hitter5/snap_heavy_hitter_equivalent_5_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/snap_heavy_hitter_equivalent_5_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
           "snap_heavy_hitter".to_string(),
         ],
 
@@ -1819,7 +1819,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/snap_heavy_hitter/snap_heavy_hitter6/snap_heavy_hitter_equivalent_6_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/snap_heavy_hitter_equivalent_6_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
           "snap_heavy_hitter".to_string(),
         ],
 
@@ -1833,7 +1833,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/snap_heavy_hitter/snap_heavy_hitter7/snap_heavy_hitter_equivalent_7_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/snap_heavy_hitter_equivalent_7_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
           "snap_heavy_hitter".to_string(),
         ],
 
@@ -1847,7 +1847,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/snap_heavy_hitter/snap_heavy_hitter8/snap_heavy_hitter_equivalent_8_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/snap_heavy_hitter_equivalent_8_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
           "snap_heavy_hitter".to_string(),
         ],
 
@@ -1861,7 +1861,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/snap_heavy_hitter/snap_heavy_hitter9/snap_heavy_hitter_equivalent_9_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/snap_heavy_hitter_equivalent_9_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
           "snap_heavy_hitter".to_string(),
         ],
 
@@ -1875,7 +1875,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/snap_heavy_hitter/snap_heavy_hitter10/snap_heavy_hitter_equivalent_10_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/snap_heavy_hitter_equivalent_10_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
           "snap_heavy_hitter".to_string(),
         ],
 
@@ -1888,7 +1888,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/spam_detection/spam_detection1/spam_detection_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/spam_detection_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
           "spam_detection".to_string(),
         ],
     vec! ["spam_detection_equivalent_2_canonicalizer_equivalent_1".to_string(),
@@ -1900,7 +1900,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/spam_detection/spam_detection2/spam_detection_equivalent_2_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/spam_detection_equivalent_2_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
           "spam_detection".to_string(),
         ],
     vec! ["spam_detection_equivalent_3_canonicalizer_equivalent_1".to_string(),
@@ -1912,7 +1912,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/spam_detection/spam_detection3/spam_detection_equivalent_3_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/spam_detection_equivalent_3_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
           "spam_detection".to_string(),
         ],
     vec! ["spam_detection_equivalent_4_canonicalizer_equivalent_1".to_string(),
@@ -1924,7 +1924,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/spam_detection/spam_detection4/spam_detection_equivalent_4_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/spam_detection_equivalent_4_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
           "spam_detection".to_string(),
         ],
     vec! ["spam_detection_equivalent_5_canonicalizer_equivalent_1".to_string(),
@@ -1936,7 +1936,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/spam_detection/spam_detection5/spam_detection_equivalent_5_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/spam_detection_equivalent_5_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
           "spam_detection".to_string(),
         ],
     vec! ["spam_detection_equivalent_6_canonicalizer_equivalent_1".to_string(),
@@ -1948,7 +1948,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/spam_detection/spam_detection6/spam_detection_equivalent_6_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/spam_detection_equivalent_6_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
           "spam_detection".to_string(),
         ],
     vec! ["spam_detection_equivalent_7_canonicalizer_equivalent_1".to_string(),
@@ -1960,7 +1960,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/spam_detection/spam_detection7/spam_detection_equivalent_7_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/spam_detection_equivalent_7_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
           "spam_detection".to_string(),
         ],
     vec! ["spam_detection_equivalent_8_canonicalizer_equivalent_1".to_string(),
@@ -1972,7 +1972,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/spam_detection/spam_detection8/spam_detection_equivalent_8_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/spam_detection_equivalent_8_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
           "spam_detection".to_string(),
         ],
     vec! ["spam_detection_equivalent_9_canonicalizer_equivalent_1".to_string(),
@@ -1984,7 +1984,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/spam_detection/spam_detection9/spam_detection_equivalent_9_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/spam_detection_equivalent_9_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
           "spam_detection".to_string(),
         ],
     vec! ["spam_detection_equivalent_10_canonicalizer_equivalent_1".to_string(),
@@ -1996,7 +1996,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // Num packets
           "2".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/spam_detection/spam_detection10/spam_detection_equivalent_10_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/spam_detection_equivalent_10_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
           "spam_detection".to_string(),
         ],
 
@@ -2010,7 +2010,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "4".to_string(), // Num packets
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/stateful_fw/stateful_fw3/stateful_fw_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/stateful_fw_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
           "stateful_fw".to_string(),
         ],
 
@@ -2024,7 +2024,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "4".to_string(), // Num packets
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
-          "experiments/stateful_fw/stateful_fw4/stateful_fw_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
+          "hole_configurations/stateful_fw_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
           "stateful_fw".to_string(),
         ],
 

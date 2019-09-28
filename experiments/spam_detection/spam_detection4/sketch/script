@@ -1,8 +1,0 @@
-#!/bin/sh
-if [ -z "$SKETCH_HOME" ];
-then
-echo "You need to set the \$SKETCH_HOME environment variable to be the path to the SKETCH distribution; This is needed to find the SKETCH header files needed to compile your program." >&2;
-exit 1;
-fi
-g++ -I "$SKETCH_HOME/include" -o spam_detection_equivalent_4_canonicalizer_equivalent_1_pair_stateless_alu_1_1_verify_iter_5 spam_detection_equivalent_4_canonicalizer_equivalent_1_pair_stateless_alu_1_1_verify_iter_5.cpp spam_detection_equivalent_4_canonicalizer_equivalent_1_pair_stateless_alu_1_1_verify_iter_5_test.cpp
-./spam_detection_equivalent_4_canonicalizer_equivalent_1_pair_stateless_alu_1_1_verify_iter_5
