@@ -1,8 +1,0 @@
-#!/bin/sh
-if [ -z "$SKETCH_HOME" ];
-then
-echo "You need to set the \$SKETCH_HOME environment variable to be the path to the SKETCH distribution; This is needed to find the SKETCH header files needed to compile your program." >&2;
-exit 1;
-fi
-g++ -I "$SKETCH_HOME/include" -o stateful_fw_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_verify_iter_9 stateful_fw_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_verify_iter_9.cpp stateful_fw_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_verify_iter_9_test.cpp
-./stateful_fw_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_verify_iter_9
