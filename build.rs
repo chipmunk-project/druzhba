@@ -121,7 +121,7 @@ fn write_header(test_file: &mut File,
     test_case_imports.push_str (&format!("use tests::{};\n",
                                          n));
   }
-  let full_import_list : String = format!("extern crate druzhba;\nuse druzhba::output_mux::OutputMux;\nuse druzhba::input_mux::InputMux;\nuse druzhba::pipeline::Pipeline;\nuse druzhba::phv::Phv;\nuse druzhba::phv_container::PhvContainer;\nuse druzhba::pipeline_stage::PipelineStage;\nuse druzhba::alu::ALU;\nuse druzhba::alu::StateVar;\nuse rand::Rng;\nuse std::fs;\nuse std::collections::HashMap;\n{}", test_case_imports);
+  let full_import_list : String = format!("extern crate druzhba;\n\nuse druzhba::pipeline::Pipeline;\nuse druzhba::phv::Phv;\nuse druzhba::phv_container::PhvContainer;\nuse rand::Rng;\nuse std::fs;\nuse std::collections::HashMap;\n{}", test_case_imports);
 
 
   write!(test_file, "{}", full_import_list).expect("Error writing to test_with_chimunk.rs header");

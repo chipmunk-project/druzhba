@@ -38,44 +38,6 @@ fn get_hole_cfgs (hole_cfgs_file : String) -> HashMap <String, i32> {
   }
   hole_cfgs_map
 }
-// Maintains the same assertions as the specification
-// for the simple.sk spec in Chipmunk
-fn simple (input_phv : Phv <i32>) -> Phv<i32>{
-
-    let mut new_phv : Phv<i32> = input_phv.clone();
-    new_phv[0].field_value = new_phv.get_state()[0][0]+1;
-    new_phv
-
-}
-fn marple_new_flow (input_phv : Phv <i32>) -> Phv<i32>{
-
-    let mut new_phv : Phv<i32> = input_phv.clone();
-
-    let mut new_state : Vec <Vec <i32> > = new_phv.get_state().clone();
-    if new_state[0][0] == 0{
-      new_phv[0].field_value = 1;
-      new_state[0][0] = 1;
-      new_phv.set_state(new_state);
-    }
-    new_phv
-
-}
-
-fn blue_increase (input_phv : Phv <i32>) -> Phv <i32> {
-  let mut result= input_phv.clone();
-  result[1].field_value = result[0].get_value() - 1;
-
-  let mut new_state : Vec <Vec<i32>> = result.get_state().clone();
-  if result[1].get_value() > result.get_state()[1][0] {
-      let new_state_0_0 = result.get_state()[0][0]+1;
-      let new_state_1_0 = result[0].get_value();
-      new_state[0][0] = new_state_0_0;
-      new_state[1][0] = new_state_1_0;
-  }
-
-  result.set_state (new_state);
-  result
-}
 #[warn(unused_imports)]
 fn main() {
 

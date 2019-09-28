@@ -52,7 +52,14 @@ impl fmt::Display for Alu {
         }.expect ("Error: issue with match statement on OptHeader");
         // The function inside of the initialize ALU function that
         // will be returned
-        let inner_header : String = String::from ("    let alu = move |state_vec : &mut Vec <i32>, phv_containers : &Vec <PhvContainer <i32>>| -> (Vec <i32>, Vec <i32>){\n");
+        let inner_header : String = 
+
+            match FUNC_COUNT.read().unwrap()["state"] {
+                0 => String::from ("    let alu = move |state_vec : &mut Vec <i32>, phv_containers : &Vec <PhvContainer <i32>>| -> (Vec <i32>, Vec <i32>){\n"),
+                1 =>  String::from ("    // state_vec unused\n    let alu = move |_state_vec : &mut Vec <i32>, phv_containers : &Vec <PhvContainer <i32>>| -> (Vec <i32>, Vec <i32>){\n"),
+                _ => panic!("Error: invalid state indicator"),
+            };
+
         let temp_constant_vec : Vec <String> = CONSTANT_VEC.read()
                                                            .unwrap()
                                                            .clone();
@@ -323,14 +330,13 @@ impl fmt::Display for Expr {
               match HOLE_VAR_MAP.read().unwrap().get(&variable){
                 Some (_ind3) => {
                     let hole_name : String = generate_hole_name (variable.clone());
-                    let mut hole_var_access : String = String::from("");
+           
                     if hole_name.contains("immediate") {
-                      hole_var_access = format!("constant_vec[hole_vars[\"{}\"] as usize]", generate_hole_name (variable.clone()));
+                      format!("constant_vec[hole_vars[\"{}\"] as usize]", generate_hole_name (variable.clone()))
                     }
                     else {
-                      hole_var_access = format!("hole_vars[\"{}\"]", generate_hole_name (variable.clone()));
+                      format!("hole_vars[\"{}\"]", generate_hole_name (variable.clone()))
                     }
-                    hole_var_access
                 },
                 
                 _            => panic! ("Error: variable '{}' is undefined", variable),
