@@ -50,16 +50,7 @@ impl fmt::Display for Alu {
           Some (h) => write!(f, "{}", h),
           None     => write!(f, ""),
         }.expect ("Error: issue with match statement on OptHeader");
-        // The function inside of the initialize ALU function that
-        // will be returned
-        let inner_header : String = 
-
-            match FUNC_COUNT.read().unwrap()["state"] {
-                0 => String::from ("    let alu = move |state_vec : &mut Vec <i32>, phv_containers : &Vec <PhvContainer <i32>>| -> (Vec <i32>, Vec <i32>){\n"),
-                1 =>  String::from ("    // state_vec unused\n    let alu = move |_state_vec : &mut Vec <i32>, phv_containers : &Vec <PhvContainer <i32>>| -> (Vec <i32>, Vec <i32>){\n"),
-                _ => panic!("Error: invalid state indicator"),
-            };
-
+//        let inner_header : String =  String::from ("    let alu = move |state_vec : &mut Vec <i32>, phv_containers : &Vec <PhvContainer <i32>>| -> (Vec <i32>, Vec <i32>){\n");
         let temp_constant_vec : Vec <String> = CONSTANT_VEC.read()
                                                            .unwrap()
                                                            .clone();
@@ -92,6 +83,15 @@ impl fmt::Display for Alu {
                 *PIPELINE_STAGE.read().unwrap(),
                 *ALU_NUMBER.read().unwrap() );
 
+        // The function inside of the initialize ALU function that
+        // will be returned
+        let inner_header : String = 
+
+            match FUNC_COUNT.read().unwrap()["state"] {
+                0 => String::from ("    let alu = move |state_vec : &mut Vec <i32>, phv_containers : &Vec <PhvContainer <i32>>| -> (Vec <i32>, Vec <i32>){\n"),
+                1 =>  String::from ("    // state_vec unused\n    let alu = move |_state_vec : &mut Vec <i32>, phv_containers : &Vec <PhvContainer <i32>>| -> (Vec <i32>, Vec <i32>){\n"),
+                _ => panic!("Error: invalid state indicator"),
+            };
 
         let mut outer_header : String = String::from("pub fn ");
         outer_header.push_str (&init_name);
@@ -330,7 +330,6 @@ impl fmt::Display for Expr {
               match HOLE_VAR_MAP.read().unwrap().get(&variable){
                 Some (_ind3) => {
                     let hole_name : String = generate_hole_name (variable.clone());
-           
                     if hole_name.contains("immediate") {
                       format!("constant_vec[hole_vars[\"{}\"] as usize]", generate_hole_name (variable.clone()))
                     }
