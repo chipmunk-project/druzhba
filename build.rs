@@ -8,9 +8,10 @@ use std::process::Command;
 // To add a new test to the test suite, insert the name
 // into test_case_names and fill out the necessary data
 // in dgen_data
+
 fn main() { 
-    
-  let out_dir = String::from("src/");;
+   /* 
+  let out_dir = String::from("src/");
   let destination = Path::new(&out_dir).join("test_with_chipmunk.rs");
   let mut test_file = File::create(&destination).unwrap();
 
@@ -44,8 +45,32 @@ fn main() {
                test_case_names[index].clone());
     index+=1;
   }
+  // TODO: Once dgen is updated, make sure to create a function
+  // to keep creating the old benchmark files
+  */
+  copy_benchmark_files();
 }
 
+fn copy_benchmark_files ()
+{
+   Command::new("cp")
+           .arg("src/tests/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5.rs")
+           .arg("benches/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5.rs")
+           .output()
+           .expect("Could not copy to benches");
+
+   Command::new("cp")
+           .arg("src/tests/blue_increase_pair_stateless_alu_arith_4_2.rs")
+           .arg("benches/blue_increase_pair_stateless_alu_arith_4_2.rs")
+           .output()
+           .expect("Could not copy to benches");
+
+   Command::new("cp")
+           .arg("src/tests/learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3.rs")
+           .arg("benches/learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3.rs")
+           .output()
+           .expect("Could not copy to benches");
+}
 // Runs dgen multiple times to produce all of the prog_to_run.rs
 // files needed for the tests
 fn run_dgen (test_case_names : &Vec<String>,
