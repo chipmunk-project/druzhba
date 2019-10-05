@@ -9,6 +9,7 @@ pub struct AluParsingUtils {
   alu_body : String,
   is_stateful : bool,
   constant_vec : Vec<i32>,
+  hole_configs_file : String,
 }
 
 impl AluParsingUtils {
@@ -18,7 +19,8 @@ impl AluParsingUtils {
               t_name : String,
               t_alu_body : String,
               t_is_stateful : bool,
-              t_constant_vec : Vec <i32>) -> Self {
+              t_constant_vec : Vec <i32>,
+              t_hole_configs_file : String) -> Self {
     AluParsingUtils {
       pipeline_stage : t_pipeline_stage,
       alu_count : t_alu_count,
@@ -26,6 +28,7 @@ impl AluParsingUtils {
       alu_body : t_alu_body,
       is_stateful : t_is_stateful,
       constant_vec : t_constant_vec,
+      hole_configs_file : t_hole_configs_file
     }
   }
   
@@ -34,17 +37,23 @@ impl AluParsingUtils {
   pub fn prepend_opt_header_to_alu (&self) -> String{
     let name_header : String = 
         format! ("name : {}\n", self.name);
+    let hole_configs_header : String =
+        match self.hole_configs_file.is_empty() { 
+          true => String::from(""),
+          false => format! ("hole configs : {}\n", self.hole_configs_file),
+        };
     let pipeline_stage_header : String = 
         format! ("pipeline stage : {}\n", self.pipeline_stage);   
     let alu_count_header : String = 
         format! ("alu  : {}\n", self.alu_count);
     let constant_vec_header : String = 
         format!("{:?}\n", self.constant_vec);
-    format! ("{}{}{}{}{}", name_header, 
-                         pipeline_stage_header, 
-                         alu_count_header, 
-                         constant_vec_header,
-                         self.alu_body) 
+    format! ("{}{}{}{}{}{}", name_header, 
+                             hole_configs_header,
+                             pipeline_stage_header, 
+                             alu_count_header, 
+                             constant_vec_header,
+                             self.alu_body) 
   }
   pub fn get_number_of_operands (&mut self) -> i32{
     let alu_body_line : Vec<String> = self.alu_body

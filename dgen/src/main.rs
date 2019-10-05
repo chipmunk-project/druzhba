@@ -1,7 +1,6 @@
 pub mod alu_parsing_utils;
 pub mod alu_generation_utils;
 pub mod rust_code_generator;
-pub mod optimized_rust_code_generator;
 // Important: nightly must be enabled to work
 #[macro_use] extern crate lazy_static;
 #[macro_use] extern crate lalrpop_util;
@@ -77,7 +76,8 @@ fn main() {
                                            pipeline_width,
                                            num_stateful_alus,
                                            constant_vec,
-                                           file_path);
+                                           file_path,
+                                           "".to_string());
     }
     else {
 
@@ -89,7 +89,8 @@ fn main() {
                                            pipeline_width,
                                            num_stateful_alus,
                                            constant_vec,
-                                           file_path);
+                                           file_path,
+                                           hole_cfg_file);
     }
 }
 

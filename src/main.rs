@@ -15,7 +15,7 @@ use std::fs;
 // Opens hole configs file of hole variable assignments
 // and initializes a HashMap from hole vaiables to
 // i32s.
-fn get_hole_cfgs (hole_cfgs_file : String) -> HashMap <String, i32> {
+fn extract_hole_cfgs (hole_cfgs_file : String) -> HashMap <String, i32> {
 
   let mut hole_cfgs_map : HashMap <String, i32> = HashMap::new();
   let hole_cfgs_file_contents : String = fs::read_to_string(hole_cfgs_file).expect ("Error: Hole configs file could not be found");
@@ -59,7 +59,7 @@ fn main() {
       Err (_)         => panic!("Failure: Unable to unwrap ticks"),
     };
   let hole_cfgs_file : String = args[1].clone();
-  let hole_cfgs : HashMap <String, i32> = get_hole_cfgs (hole_cfgs_file.clone());
+  let hole_cfgs : HashMap <String, i32> = extract_hole_cfgs (hole_cfgs_file.clone());
   let num_stateful_alus = prog_to_run::num_stateful_alus();
   let num_state_values = prog_to_run::num_state_variables();
   println!("{:?}", hole_cfgs);

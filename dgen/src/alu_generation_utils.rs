@@ -1,9 +1,7 @@
-use std::env; 
 use std::fs;
 use alu_parsing_utils::AluParsingUtils;
 use alugrammar::*;
 use rust_code_generator::*;
-use optimized_rust_code_generator::*;
 
 pub fn generate_alus (name : String,
                       stateful_file : String,
@@ -12,28 +10,33 @@ pub fn generate_alus (name : String,
                       pipeline_width : i32,
                       num_stateful_alus : i32,
                       constant_vec : Vec<i32>,
-                      file_path : String)
+                      file_path : String,
+                      hole_configs_file : String)
 {
   // Stateful AluParsingUtils initialization
   let stateful_alu = fs::read_to_string(&stateful_file)
     .expect("Something went wrong reading the file");
   let mut full_stateful_alu : AluParsingUtils = 
-      AluParsingUtils::new(0, 0, 
-                      name.clone(), 
-                      stateful_alu,
-                      true,
-                      constant_vec.clone());
+      AluParsingUtils::new(0, 
+                           0, 
+                           name.clone(), 
+                           stateful_alu,
+                           true,
+                           constant_vec.clone(),
+                           hole_configs_file.clone());
 
   // Stateless AluParsingUtils initialization
   let stateless_alu = fs::read_to_string(&stateless_file)
     .expect("Something went wrong reading the file");
 
   let mut full_stateless_alu : AluParsingUtils = 
-      AluParsingUtils::new(0, 0, 
-                      name.clone(), 
-                      stateless_alu,
-                      false,
-                      constant_vec.clone());
+      AluParsingUtils::new(0, 
+                           0, 
+                           name.clone(), 
+                           stateless_alu,
+                           false,
+                           constant_vec.clone(),
+                           hole_configs_file.clone());
 
 
   let mut pipeline_alus_string : String = String::from("");

@@ -1,5 +1,6 @@
 use std::fmt;
 
+use std::fs;
 use std::collections::HashMap;
 use std::sync::RwLock;
 
@@ -9,6 +10,10 @@ lazy_static! {
   // rw lock provides the necessary synchronization
   static ref HELPER_STRING: RwLock<String> = 
     RwLock::new(String::from(""));
+  static ref HOLE_CONFIGS : RwLock <HashMap <String, i32>> =
+    RwLock::new(HashMap::new());
+  static ref OPTIMIZED : RwLock <bool> = 
+      RwLock::new(true);
   static ref STATE_VAR_MAP : RwLock <HashMap <String, i32>> =
     RwLock::new(HashMap::new());
   static ref HOLE_VAR_MAP : RwLock <HashMap <String, i32>> =
@@ -44,6 +49,7 @@ impl fmt::Display for Alu {
           NAME.write().unwrap().clear();
           FUNC_COUNT.write().unwrap().clear();
           CONSTANT_VEC.write().unwrap().clear();
+          HOLE_CONFIGS.write().unwrap().clear();
         }
         
         match opt_header {
@@ -107,6 +113,7 @@ impl fmt::Display for Alu {
 }
 pub enum OptHeader {
   Data (String,  // Sketch name
+        Option<String>,// Hole config file
         i32, // Pipeline stage
         i32, // ALU number
         Vec<String>)
@@ -116,12 +123,25 @@ impl fmt::Display for OptHeader {
 
   fn fmt (&self, f : &mut fmt::Formatter) -> fmt::Result {
     match *&self {
-      OptHeader::Data (name, stage, alu_num, constant_vec) => {
+      OptHeader::Data (name, hole_config_file,stage, alu_num, constant_vec) => {
           
         *NAME.write().unwrap() = name.to_string();
         *PIPELINE_STAGE.write().unwrap() = *stage;       
         *ALU_NUMBER.write().unwrap() = *alu_num;
         *CONSTANT_VEC.write().unwrap() = constant_vec.to_vec();
+        *HOLE_CONFIGS.write().unwrap() = 
+            match hole_config_file {
+              Some (f) => {
+                *OPTIMIZED.write().unwrap() = true;
+                extract_hole_cfgs(f.to_string())
+              },
+              _        => {
+
+                *OPTIMIZED.write().unwrap() = false;
+                HashMap::new()
+              },
+          };
+
         write!(f, "")
      }
     }
@@ -453,6 +473,32 @@ impl fmt::Display for Opcode {
       Opcode::And            => write!(f, "&&"), 
     }
   }
+}
+// Opens hole configs file of hole variable assignments
+// and initializes a HashMap from hole vaiables to
+// i32s.
+fn extract_hole_cfgs (hole_cfgs_file : String) -> HashMap <String, i32> {
+
+  let mut hole_cfgs_map : HashMap <String, i32> = HashMap::new();
+  let hole_cfgs_file_contents : String = fs::read_to_string(hole_cfgs_file).expect ("Error: Hole configs file could not be found");
+  let hole_cfgs_file_vec : Vec <String> = hole_cfgs_file_contents
+                                          .split ("\n")
+                                          .map (|s| s.to_string())
+                                          .collect();
+
+  for hole_var in hole_cfgs_file_vec {
+      let hole_entry : Vec <&str> = hole_var
+                                    .split("=")
+                                    .map(|s| s.trim())
+                                    .collect();
+      if hole_entry.len() < 2 {
+        continue;
+      }
+      hole_cfgs_map.insert (hole_entry[0].to_string(), 
+                            hole_entry[1].to_string().parse::<i32>()
+                                                     .expect ("Error: hole value set to non-integer value"));
+  }
+  hole_cfgs_map
 }
 
 // Generates helper code for ALU function by 
