@@ -8,9 +8,10 @@ use std::process::Command;
 // To add a new test to the test suite, insert the name
 // into test_case_names and fill out the necessary data
 // in dgen_data
+
 fn main() { 
     
-  let out_dir = String::from("src/");;
+  let out_dir = String::from("src/");
   let destination = Path::new(&out_dir).join("test_with_chipmunk.rs");
   let mut test_file = File::create(&destination).unwrap();
 
@@ -44,8 +45,65 @@ fn main() {
                test_case_names[index].clone());
     index+=1;
   }
+  // TODO: Once dgen is updated, make sure to create a function
+  // to keep creating the old benchmark files
+  
+  copy_benchmark_files();
 }
 
+fn copy_benchmark_files ()
+{
+
+   let blue_increase_file : String = 
+       String::from("benches/blue_increase_pair_stateless_alu_arith_4_2.rs");
+   Command::new("cp")
+           .arg("src/tests/blue_increase_pair_stateless_alu_arith_4_2.rs")
+           .arg("benches/blue_increase_pair_stateless_alu_arith_4_2.rs")
+           .output()
+           .expect("Could not copy to benches");
+
+   let blue_increase_contents : String = 
+       fs::read_to_string(&blue_increase_file).expect("Could not open blue increase file for benchmarks");
+
+   fs::write(blue_increase_file,
+             format!("{}{}",
+                     "extern crate druzhba;\n",
+                     blue_increase_contents))
+       .expect("Could not write to blue increase for benchmarks");
+
+   let flowlets_file : String = 
+       String::from("benches/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5.rs");
+
+   Command::new("cp")
+           .arg("src/tests/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5.rs")
+           .arg(&flowlets_file)
+           .output()
+           .expect("Could not copy to benches");
+
+   let flowlets_contents : String = 
+       fs::read_to_string(&flowlets_file).expect("Could not open flowlets file for benchmarks");
+   fs::write(flowlets_file,
+             format!("{}{}", 
+                     "extern crate druzhba;\n", 
+                     flowlets_contents))
+       .expect("Could not write to flowlets file for benchmarks");
+
+
+   let learn_filter_file : String = String::from("benches/learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3.rs");
+   Command::new("cp")
+           .arg("src/tests/learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3.rs")
+           .arg("benches/learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3.rs")
+           .output()
+           .expect("Could not copy to benches");
+   let learn_filter_contents : String = 
+       fs::read_to_string(&learn_filter_file)
+         .expect("Could not open learn filter for benchmarks");
+   fs::write(learn_filter_file,
+             format!("{}{}",
+                     "extern crate druzhba;\n",
+                     learn_filter_contents))
+       .expect("Could not write to learn filter file for benchmarks");
+}
 // Runs dgen multiple times to produce all of the prog_to_run.rs
 // files needed for the tests
 fn run_dgen (test_case_names : &Vec<String>,

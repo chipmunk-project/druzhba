@@ -27,4 +27,6 @@ build_script:
 
     cargo test
 
+    cargo bench
+
     echo "********ALL DONE*******"
