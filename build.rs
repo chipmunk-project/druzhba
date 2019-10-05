@@ -22,8 +22,11 @@ fn main() {
            .output()
            .expect("Could not create tests directory");
 
+  create_benchmark_files(&test_case_names,
+                         &dgen_data);
+  copy_benchmark_files();
   write_mod_file (&test_case_names);
-  run_dgen (&test_case_names, &dgen_data);
+  run_dgen (&test_case_names, &dgen_data, true);
    // write test file header, put `use`, `const` etc there
   write_header(&mut test_file, &test_case_names);
   let test_data_directory = read_dir("src/tests/").unwrap();
@@ -45,10 +48,22 @@ fn main() {
                test_case_names[index].clone());
     index+=1;
   }
-  // TODO: Once dgen is updated, make sure to create a function
-  // to keep creating the old benchmark files
-  
-  copy_benchmark_files();
+}
+fn create_benchmark_files (test_case_names : &Vec<String>,
+                           dgen_args : &Vec <Vec<String>>)
+{
+  let benchmark_test_names : Vec<String> = vec![
+      test_case_names[13].clone(), 
+      test_case_names[83].clone(), 
+      test_case_names[93].clone() ];
+  let benchmark_dgen_args : Vec <Vec<String>> = vec![
+      dgen_args[13].clone(), 
+      dgen_args[83].clone(), 
+      dgen_args[93].clone() ];
+  run_dgen (&benchmark_test_names,
+            &benchmark_dgen_args,
+            false);
+
 }
 
 fn copy_benchmark_files ()
@@ -107,7 +122,8 @@ fn copy_benchmark_files ()
 // Runs dgen multiple times to produce all of the prog_to_run.rs
 // files needed for the tests
 fn run_dgen (test_case_names : &Vec<String>,
-             dgen_args : &Vec <Vec<String>>)
+             dgen_args : &Vec <Vec<String>>,
+             optimized : bool)
 {
   Command::new("cp")
            .arg("dgen/target/debug/dgen")
@@ -122,18 +138,34 @@ fn run_dgen (test_case_names : &Vec<String>,
   let mut index : usize = 0;
   for arg in dgen_args.iter(){
     
-    let status = Command::new("./dgen_bin")
-                 .arg(&arg[0]) // Name
-                 .arg(&arg[1]) // Stateful ALU
-                 .arg(&arg[2]) // Stateless ALU
-                 .arg(&arg[3]) // Depth
-                 .arg(&arg[4]) // Width
-                 .arg(&arg[8]) // Stateful ALUs
-                 .arg(&arg[5]) // constant vec
-                 .arg(format!("src/tests/{}.rs", test_case_names[index]))
-                 .output()
-                 .expect("Error running dgen");
-    println!("{} status: {:?}\n", test_case_names[index], status);
+    if optimized {
+        Command::new("./dgen_bin")
+                    .arg(&arg[0]) // Name
+                    .arg(&arg[1]) // Stateful ALU
+                    .arg(&arg[2]) // Stateless ALU
+                    .arg(&arg[3]) // Depth
+                    .arg(&arg[4]) // Width
+                    .arg(&arg[8]) // Stateful ALUs
+                    .arg(&arg[5]) // constant vec
+                    .arg(format!("src/tests/{}.rs", test_case_names[index]))
+                    .arg(&arg[9])
+                    .output()
+                    .expect("Error running dgen");
+    }
+    else {
+        Command::new("./dgen_bin")
+                    .arg(&arg[0]) // Name
+                    .arg(&arg[1]) // Stateful ALU
+                    .arg(&arg[2]) // Stateless ALU
+                    .arg(&arg[3]) // Depth
+                    .arg(&arg[4]) // Width
+                    .arg(&arg[8]) // Stateful ALUs
+                    .arg(&arg[5]) // constant vec
+                    .arg(format!("src/tests/{}.rs", test_case_names[index]))
+                    .output()
+                    .expect("Error running dgen");
+    }
+
     index+=1;
   }
   // Cleanup

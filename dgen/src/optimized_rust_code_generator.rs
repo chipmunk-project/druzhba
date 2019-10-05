@@ -249,6 +249,7 @@ pub enum Expr {
   Num (i32),
   Var (String),
   Op (Box <Expr>, Opcode, Box<Expr> ),
+//  Mux3WithNum (Box <Expr>, Box<Expr>, Box<Expr> ),
   Mux3 (Box <Expr>, Box <Expr>, Box <Expr> ),
   Mux2 (Box <Expr>, Box <Expr>),
   Opt (Box <Expr>),
@@ -458,7 +459,7 @@ impl fmt::Display for Opcode {
 // Generates helper code for ALU function by 
 // using static variable HELPER_STRING. 
 
-pub fn get_generated_helper_string() -> String
+pub fn get_optimized_generated_helper_string() -> String
 {
   HELPER_STRING.read().unwrap().clone()
 }
