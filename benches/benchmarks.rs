@@ -173,7 +173,7 @@ fn run_blue_increase ()
 
 
 #[bench]
-fn bench_blue_increase (b : &mut Bencher)
+fn bench_blue_increase_dsim (b : &mut Bencher)
 {
     b.iter(||run_blue_increase());
 }
@@ -190,7 +190,7 @@ fn run_flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4
                                                      10000);
 }
 #[bench]
-fn bench_flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5(b : &mut Bencher) {
+fn bench_flowlets_dsim (b : &mut Bencher) {
     b.iter(|| run_flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5());
 }
 
@@ -209,7 +209,7 @@ fn run_learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_
 
 }
 #[bench]
-fn bench_learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3(b : &mut Bencher) {
+fn bench_learn_filter_dsim (b : &mut Bencher) {
     b.iter(|| run_learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3() );
 }
 
