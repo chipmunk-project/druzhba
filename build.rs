@@ -64,11 +64,13 @@ fn create_benchmark_files (test_case_names : &Vec<String>,
   let benchmark_test_names : Vec<String> = vec![
       test_case_names[13].clone(), 
       test_case_names[83].clone(), 
-      test_case_names[93].clone() ];
+      test_case_names[93].clone(),
+      test_case_names[103].clone()];
   let benchmark_dgen_args : Vec <Vec<String>> = vec![
       dgen_args[13].clone(), 
       dgen_args[83].clone(), 
-      dgen_args[93].clone() ];
+      dgen_args[93].clone(),
+      dgen_args[103].clone()];
   run_dgen (&benchmark_test_names,
             &benchmark_dgen_args,
             optimized);
@@ -143,7 +145,31 @@ fn copy_benchmark_files (optimized : bool)
                      "extern crate druzhba;\n",
                      learn_filter_contents))
        .expect("Could not write to learn filter file for benchmarks");
+
+   let rcp_file : String = 
+       match optimized {
+         false => String::from("benches/rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_old.rs"),
+
+         true => String::from("benches/rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3.rs"),
+       };
+
+   Command::new("cp")
+           .arg("src/tests/rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3.rs")
+           .arg(&rcp_file)
+           .output()
+           .expect("Could not copy to benches");
+
+   let rcp_contents : String = 
+       fs::read_to_string(&rcp_file)
+         .expect("Could not open learn filter for benchmarks");
+   fs::write(rcp_file,
+             format!("{}{}",
+                     "extern crate druzhba;\n",
+                     rcp_contents))
+       .expect("Could not write to learn filter file for benchmarks");
 }
+
+
 // Runs dgen multiple times to produce all of the prog_to_run.rs
 // files needed for the tests
 fn run_dgen (test_case_names : &Vec<String>,
