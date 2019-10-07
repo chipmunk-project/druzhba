@@ -4,7 +4,7 @@ use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 use std::process::Command;
-
+//fn main () {}
 // To add a new test to the test suite, insert the name
 // into test_case_names and fill out the necessary data
 // in dgen_data
@@ -23,8 +23,9 @@ fn main() {
            .expect("Could not create tests directory");
 
   create_benchmark_files(&test_case_names,
-                         &dgen_data);
-  copy_benchmark_files();
+                         &dgen_data,
+                         false);
+  copy_benchmark_files(false);
   write_mod_file (&test_case_names);
   run_dgen (&test_case_names, &dgen_data, true);
    // write test file header, put `use`, `const` etc there
@@ -48,9 +49,17 @@ fn main() {
                test_case_names[index].clone());
     index+=1;
   }
+  create_benchmark_files(&test_case_names,
+                         &dgen_data,
+                         true);
+
+  copy_benchmark_files(true);
+
 }
+// Create benchmark prog_to_run files
 fn create_benchmark_files (test_case_names : &Vec<String>,
-                           dgen_args : &Vec <Vec<String>>)
+                           dgen_args : &Vec <Vec<String>>,
+                           optimized : bool)
 {
   let benchmark_test_names : Vec<String> = vec![
       test_case_names[13].clone(), 
@@ -62,18 +71,23 @@ fn create_benchmark_files (test_case_names : &Vec<String>,
       dgen_args[93].clone() ];
   run_dgen (&benchmark_test_names,
             &benchmark_dgen_args,
-            false);
+            optimized);
 
 }
-
-fn copy_benchmark_files ()
+// Copies prog_to_run files from tests directory to
+// benches and adds "extern crate druzhba" to top 
+fn copy_benchmark_files (optimized : bool)
 {
 
    let blue_increase_file : String = 
-       String::from("benches/blue_increase_pair_stateless_alu_arith_4_2.rs");
+       match optimized {
+        false => String::from("benches/blue_increase_pair_stateless_alu_arith_4_2_old.rs"),
+        true => String::from("benches/blue_increase_pair_stateless_alu_arith_4_2.rs"),
+
+       };
    Command::new("cp")
            .arg("src/tests/blue_increase_pair_stateless_alu_arith_4_2.rs")
-           .arg("benches/blue_increase_pair_stateless_alu_arith_4_2.rs")
+           .arg(&blue_increase_file)
            .output()
            .expect("Could not copy to benches");
 
@@ -87,7 +101,11 @@ fn copy_benchmark_files ()
        .expect("Could not write to blue increase for benchmarks");
 
    let flowlets_file : String = 
-       String::from("benches/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5.rs");
+       match optimized {
+        false => String::from("benches/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_old.rs"),
+
+        true  => String::from("benches/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5.rs"),
+       };
 
    Command::new("cp")
            .arg("src/tests/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5.rs")
@@ -104,12 +122,19 @@ fn copy_benchmark_files ()
        .expect("Could not write to flowlets file for benchmarks");
 
 
-   let learn_filter_file : String = String::from("benches/learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3.rs");
+   let learn_filter_file : String = 
+       match optimized {
+         false => String::from("benches/learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3_old.rs"),
+
+         true => String::from("benches/learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3.rs"),
+       };
+
    Command::new("cp")
            .arg("src/tests/learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3.rs")
-           .arg("benches/learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3.rs")
+           .arg(&learn_filter_file)
            .output()
            .expect("Could not copy to benches");
+
    let learn_filter_contents : String = 
        fs::read_to_string(&learn_filter_file)
          .expect("Could not open learn filter for benchmarks");
@@ -125,6 +150,7 @@ fn run_dgen (test_case_names : &Vec<String>,
              dgen_args : &Vec <Vec<String>>,
              optimized : bool)
 {
+    println!("Run_dgen function");
   Command::new("cp")
            .arg("dgen/target/debug/dgen")
            .arg("dgen_bin")
@@ -139,6 +165,7 @@ fn run_dgen (test_case_names : &Vec<String>,
   for arg in dgen_args.iter(){
     
     if optimized {
+        println!("Running dgen");
         Command::new("./dgen_bin")
                     .arg(&arg[0]) // Name
                     .arg(&arg[1]) // Stateful ALU
@@ -148,7 +175,7 @@ fn run_dgen (test_case_names : &Vec<String>,
                     .arg(&arg[8]) // Stateful ALUs
                     .arg(&arg[5]) // constant vec
                     .arg(format!("src/tests/{}.rs", test_case_names[index]))
-                    .arg(&arg[9])
+                    .arg(&arg[9]) // Hole configs
                     .output()
                     .expect("Error running dgen");
     }
@@ -196,7 +223,6 @@ fn write_test(test_file: &mut File,
                       num_containers = dgen_data[4], 
                       num_state_vars = dgen_data[7],
                       num_stateful_alus = dgen_data[8],
-                      hole_configurations = dgen_data[9],
                       prog_to_run_file = test_name,
                       test_function = format!("test_{}",dgen_data[10])
                       ).expect("Error writing to test_with_chipmunk.rs");

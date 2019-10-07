@@ -82,6 +82,7 @@ fn main() {
     else {
 
       let hole_cfg_file : String = args[9].clone();
+      println!("hole_cfg_file: {}", hole_cfg_file);
       alu_generation_utils::generate_alus (name, 
                                            stateful_alu, 
                                            stateless_alu, 

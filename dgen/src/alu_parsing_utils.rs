@@ -39,7 +39,7 @@ impl AluParsingUtils {
         format! ("name : {}\n", self.name);
     let hole_configs_header : String =
         match self.hole_configs_file.is_empty() { 
-          true => String::from(""),
+          true => String::from("hole configs : \n"),
           false => format! ("hole configs : {}\n", self.hole_configs_file),
         };
     let pipeline_stage_header : String = 

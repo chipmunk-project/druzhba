@@ -12,10 +12,13 @@ use std::fs;
 use std::collections::HashMap;
 use test::Bencher;
 
+pub mod blue_increase_pair_stateless_alu_arith_4_2_old;
+pub mod flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_old;
+pub mod learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3_old;
+
 pub mod blue_increase_pair_stateless_alu_arith_4_2;
 pub mod flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5;
 pub mod learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3;
-
 /* Test helper functions */
 fn init_input_phvs (ticks : i32,
                    num_packets : i32,
@@ -156,7 +159,7 @@ fn bench_learn_filter_spec (b : &mut Bencher)
     }
   });
 }
-fn run_blue_increase ()
+fn run_blue_increase_old ()
 {
 
   let input_phvs : Vec <Phv <i32> > = init_input_phvs (10000, 2, 2, 2, 2);
@@ -164,7 +167,7 @@ fn run_blue_increase ()
   let hole_cfgs_map : HashMap <String, i32> = extract_hole_cfgs (hole_cfg_file);
 
   let pipeline : Pipeline = 
-    blue_increase_pair_stateless_alu_arith_4_2::init_pipeline (hole_cfgs_map.clone());
+    blue_increase_pair_stateless_alu_arith_4_2_old::init_pipeline (hole_cfgs_map.clone());
   let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
                                                      pipeline,
                                                      10000);
@@ -175,33 +178,33 @@ fn run_blue_increase ()
 #[bench]
 fn bench_blue_increase_dsim (b : &mut Bencher)
 {
-    b.iter(||run_blue_increase());
+    b.iter(||run_blue_increase_old());
 }
 
-fn run_flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5() {
+fn run_flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_old() {
   let input_phvs : Vec <Phv <i32> > = init_input_phvs (10000, 3, 5, 1, 2);
   let hole_cfg_file : String = String::from("hole_configurations/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt");
   let hole_cfgs_map : HashMap <String, i32> = extract_hole_cfgs (hole_cfg_file);
 
   let pipeline : Pipeline = 
-    flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5::init_pipeline (hole_cfgs_map.clone());
+    flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_old::init_pipeline (hole_cfgs_map.clone());
   let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
                                                      pipeline,
                                                      10000);
 }
 #[bench]
 fn bench_flowlets_dsim (b : &mut Bencher) {
-    b.iter(|| run_flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5());
+    b.iter(|| run_flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_old());
 }
 
-fn run_learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3 ()
+fn run_learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3_old ()
 {
   let input_phvs : Vec <Phv <i32> > = init_input_phvs (10000, 1, 3, 1, 3);
   let hole_cfg_file : String = String::from("hole_configurations/learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt");
   let hole_cfgs_map : HashMap <String, i32> = extract_hole_cfgs (hole_cfg_file);
 
   let pipeline : Pipeline = 
-    learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3::init_pipeline (hole_cfgs_map.clone());
+    learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3_old::init_pipeline (hole_cfgs_map.clone());
   let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
                                                      pipeline,
                                                      10000);
@@ -210,6 +213,62 @@ fn run_learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_
 }
 #[bench]
 fn bench_learn_filter_dsim (b : &mut Bencher) {
+    b.iter(|| run_learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3_old() );
+}
+
+
+// Same tests after optimization
+
+fn run_blue_increase_optimized ()
+{
+
+  let input_phvs : Vec <Phv <i32> > = init_input_phvs (10000, 2, 2, 2, 2);
+
+  let pipeline : Pipeline = 
+    blue_increase_pair_stateless_alu_arith_4_2::init_pipeline (HashMap::new());
+  let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
+                                                     pipeline,
+                                                     10000);
+ 
+}
+
+
+#[bench]
+fn bench_blue_increase_optimized (b : &mut Bencher)
+{
+    b.iter(||run_blue_increase_optimized());
+}
+
+fn run_flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5() {
+  let input_phvs : Vec <Phv <i32> > = init_input_phvs (10000, 3, 5, 1, 2);
+
+  let pipeline : Pipeline = 
+    flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5::init_pipeline (HashMap::new());
+  let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
+                                                     pipeline,
+                                                     10000);
+}
+#[bench]
+fn bench_flowlets_optimized(b : &mut Bencher) {
+    b.iter(|| run_flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5());
+}
+
+fn run_learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3 ()
+{
+  let input_phvs : Vec <Phv <i32> > = init_input_phvs (10000, 1, 3, 1, 3);
+
+  let pipeline : Pipeline = 
+    learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3::init_pipeline (HashMap::new());
+  let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
+                                                     pipeline,
+                                                     10000);
+
+
+}
+#[bench]
+fn bench_learn_filter_optimized(b : &mut Bencher) {
     b.iter(|| run_learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3() );
 }
+
+
 
