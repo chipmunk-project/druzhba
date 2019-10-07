@@ -22,10 +22,6 @@ fn main() {
            .output()
            .expect("Could not create tests directory");
 
-  create_benchmark_files(&test_case_names,
-                         &dgen_data,
-                         false);
-  copy_benchmark_files(false);
   write_mod_file (&test_case_names);
   run_dgen (&test_case_names, &dgen_data, true);
    // write test file header, put `use`, `const` etc there
@@ -49,6 +45,8 @@ fn main() {
                test_case_names[index].clone());
     index+=1;
   }
+
+  copy_benchmark_files(false);
   create_benchmark_files(&test_case_names,
                          &dgen_data,
                          true);
