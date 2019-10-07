@@ -52,6 +52,10 @@ fn main() {
                          false);
 
   copy_benchmark_files(false);
+  create_benchmark_files(&test_case_names,
+                         &dgen_data,
+                         true);
+
 
 }
 // Create benchmark prog_to_run files
