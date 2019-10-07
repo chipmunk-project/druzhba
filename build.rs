@@ -46,12 +46,12 @@ fn main() {
     index+=1;
   }
 
-  copy_benchmark_files(false);
+  copy_benchmark_files(true);
   create_benchmark_files(&test_case_names,
                          &dgen_data,
-                         true);
+                         false);
 
-  copy_benchmark_files(true);
+  copy_benchmark_files(false);
 
 }
 // Create benchmark prog_to_run files
