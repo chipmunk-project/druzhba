@@ -245,7 +245,7 @@ fn run_rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_ol
   let hole_cfgs_map : HashMap <String, i32> = extract_hole_cfgs (hole_cfg_file);
 
   let pipeline : Pipeline = 
-    rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3::init_pipeline (hole_cfgs_map.clone());
+    rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_old::init_pipeline (hole_cfgs_map.clone());
   let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
                                                      pipeline,
                                                      10000);
