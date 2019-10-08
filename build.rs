@@ -52,9 +52,11 @@ fn main() {
                          false);
 
   copy_benchmark_files(false);
+  
   create_benchmark_files(&test_case_names,
                          &dgen_data,
                          true);
+                         
 
 
 }
@@ -65,13 +67,13 @@ fn create_benchmark_files (test_case_names : &Vec<String>,
 {
   let benchmark_test_names : Vec<String> = vec![
       test_case_names[13].clone(), 
+      test_case_names[82].clone(),
       test_case_names[83].clone(), 
-      test_case_names[93].clone(),
       test_case_names[103].clone()];
   let benchmark_dgen_args : Vec <Vec<String>> = vec![
       dgen_args[13].clone(), 
+      dgen_args[82].clone(),
       dgen_args[83].clone(), 
-      dgen_args[93].clone(),
       dgen_args[103].clone()];
   run_dgen (&benchmark_test_names,
             &benchmark_dgen_args,
@@ -83,6 +85,7 @@ fn create_benchmark_files (test_case_names : &Vec<String>,
 fn copy_benchmark_files (optimized : bool)
 {
 
+    // Blue increase benchmark
    let blue_increase_file : String = 
        match optimized {
         false => String::from("benches/blue_increase_pair_stateless_alu_arith_4_2_old.rs"),
@@ -104,6 +107,7 @@ fn copy_benchmark_files (optimized : bool)
                      blue_increase_contents))
        .expect("Could not write to blue increase for benchmarks");
 
+   // Flowlets benchmark
    let flowlets_file : String = 
        match optimized {
         false => String::from("benches/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_old.rs"),
@@ -125,28 +129,27 @@ fn copy_benchmark_files (optimized : bool)
                      flowlets_contents))
        .expect("Could not write to flowlets file for benchmarks");
 
-
+   // Learn filter benchmark
    let learn_filter_file : String = 
        match optimized {
-         false => String::from("benches/learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3_old.rs"),
+        false => String::from("benches/learn_filter_equivalent_10_canonicalizer_equivalent_0_raw_stateless_alu_5_3_old.rs"),
 
-         true => String::from("benches/learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3.rs"),
+        true  => String::from("benches/learn_filter_equivalent_10_canonicalizer_equivalent_0_raw_stateless_alu_5_3.rs"),
        };
 
    Command::new("cp")
-           .arg("src/tests/learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3.rs")
+           .arg("src/tests/learn_filter_equivalent_10_canonicalizer_equivalent_0_raw_stateless_alu_5_3.rs")
            .arg(&learn_filter_file)
            .output()
            .expect("Could not copy to benches");
-
    let learn_filter_contents : String = 
-       fs::read_to_string(&learn_filter_file)
-         .expect("Could not open learn filter for benchmarks");
+       fs::read_to_string(&learn_filter_file).expect("Could not open flowlets file for benchmarks");
+
    fs::write(learn_filter_file,
-             format!("{}{}",
-                     "extern crate druzhba;\n",
+             format!("{}{}", 
+                     "extern crate druzhba;\n", 
                      learn_filter_contents))
-       .expect("Could not write to learn filter file for benchmarks");
+       .expect("Could not write to flowlets file for benchmarks");
 
    let rcp_file : String = 
        match optimized {
@@ -193,7 +196,6 @@ fn run_dgen (test_case_names : &Vec<String>,
   for arg in dgen_args.iter(){
     
     if optimized {
-        println!("Running dgen");
         Command::new("./dgen_bin")
                     .arg(&arg[0]) // Name
                     .arg(&arg[1]) // Stateful ALU
