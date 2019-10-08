@@ -52,7 +52,7 @@ fn main() {
                          false);
 
   copy_benchmark_files(false);
-  
+
   create_benchmark_files(&test_case_names,
                          &dgen_data,
                          true);
@@ -69,12 +69,13 @@ fn create_benchmark_files (test_case_names : &Vec<String>,
       test_case_names[13].clone(), 
       test_case_names[82].clone(),
       test_case_names[83].clone(), 
-      test_case_names[103].clone()];
+      test_case_names[93].clone()];
   let benchmark_dgen_args : Vec <Vec<String>> = vec![
       dgen_args[13].clone(), 
       dgen_args[82].clone(),
       dgen_args[83].clone(), 
-      dgen_args[103].clone()];
+      dgen_args[93].clone()];
+  
   run_dgen (&benchmark_test_names,
             &benchmark_dgen_args,
             optimized);
@@ -151,6 +152,7 @@ fn copy_benchmark_files (optimized : bool)
                      learn_filter_contents))
        .expect("Could not write to flowlets file for benchmarks");
 
+   // Rcp benchmark
    let rcp_file : String = 
        match optimized {
          false => String::from("benches/rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_old.rs"),
@@ -181,7 +183,6 @@ fn run_dgen (test_case_names : &Vec<String>,
              dgen_args : &Vec <Vec<String>>,
              optimized : bool)
 {
-    println!("Run_dgen function");
   Command::new("cp")
            .arg("dgen/target/debug/dgen")
            .arg("dgen_bin")
@@ -194,7 +195,6 @@ fn run_dgen (test_case_names : &Vec<String>,
            .expect("Adding execution permissions to dgen_bin failed");
   let mut index : usize = 0;
   for arg in dgen_args.iter(){
-    
     if optimized {
         Command::new("./dgen_bin")
                     .arg(&arg[0]) // Name
