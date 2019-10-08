@@ -89,8 +89,8 @@ fn copy_benchmark_files (optimized : bool)
     // Blue increase benchmark
    let blue_increase_file : String = 
        match optimized {
-        false => String::from("benches/blue_increase_pair_stateless_alu_arith_4_2_old.rs"),
-        true => String::from("benches/blue_increase_pair_stateless_alu_arith_4_2.rs"),
+        false => String::from("benches/blue_increase_unoptimized.rs"),
+        true => String::from("benches/blue_increase_optimized.rs"),
 
        };
    Command::new("cp")
@@ -111,9 +111,9 @@ fn copy_benchmark_files (optimized : bool)
    // Flowlets benchmark
    let flowlets_file : String = 
        match optimized {
-        false => String::from("benches/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_old.rs"),
+        false => String::from("benches/flowlets_unoptimized.rs"),
 
-        true  => String::from("benches/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5.rs"),
+        true  => String::from("benches/flowlets_optimized.rs"),
        };
 
    Command::new("cp")
@@ -133,9 +133,9 @@ fn copy_benchmark_files (optimized : bool)
    // Learn filter benchmark
    let learn_filter_file : String = 
        match optimized {
-        false => String::from("benches/learn_filter_equivalent_10_canonicalizer_equivalent_0_raw_stateless_alu_5_3_old.rs"),
+        false => String::from("benches/learn_filter_unoptimized.rs"),
 
-        true  => String::from("benches/learn_filter_equivalent_10_canonicalizer_equivalent_0_raw_stateless_alu_5_3.rs"),
+        true  => String::from("benches/learn_filter_optimized.rs"),
        };
 
    Command::new("cp")
@@ -155,9 +155,9 @@ fn copy_benchmark_files (optimized : bool)
    // Rcp benchmark
    let rcp_file : String = 
        match optimized {
-         false => String::from("benches/rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_old.rs"),
+         false => String::from("benches/rcp_unoptimized.rs"),
 
-         true => String::from("benches/rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3.rs"),
+         true => String::from("benches/rcp_optimized.rs"),
        };
 
    Command::new("cp")
