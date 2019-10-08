@@ -3,7 +3,6 @@ extern crate druzhba;
 
 mod prog_to_run;
 mod tests;
-
 use druzhba::pipeline::Pipeline;
 use druzhba::phv::Phv;
 use druzhba::phv_container::PhvContainer;
@@ -15,7 +14,7 @@ use std::fs;
 // Opens hole configs file of hole variable assignments
 // and initializes a HashMap from hole vaiables to
 // i32s.
-fn get_hole_cfgs (hole_cfgs_file : String) -> HashMap <String, i32> {
+fn extract_hole_cfgs (hole_cfgs_file : String) -> HashMap <String, i32> {
 
   let mut hole_cfgs_map : HashMap <String, i32> = HashMap::new();
   let hole_cfgs_file_contents : String = fs::read_to_string(hole_cfgs_file).expect ("Error: Hole configs file could not be found");
@@ -42,32 +41,53 @@ fn get_hole_cfgs (hole_cfgs_file : String) -> HashMap <String, i32> {
 fn main() {
 
   let args : Vec<String> = env::args().collect();
-  assert!(args.len() == 4);
+  assert!(args.len() == 4 || args.len() == 3);
 
   // Parse returns a result so unwrap
-  let num_packets : i32 = 
-    match args[2].parse::<i32>() {
 
-      Ok  (t_num_packets) => t_num_packets,
-      Err (_)         => panic!("Failure: Unable to unwrap num_containers"),
-    };
-  assert!(num_packets <= prog_to_run::pipeline_width());
-   let ticks : i32 = 
-    match args[3].parse::<i32>() {
-
-      Ok  (t_ticks) => t_ticks,
-      Err (_)         => panic!("Failure: Unable to unwrap ticks"),
-    };
-  let hole_cfgs_file : String = args[1].clone();
-  let hole_cfgs : HashMap <String, i32> = get_hole_cfgs (hole_cfgs_file.clone());
   let num_stateful_alus = prog_to_run::num_stateful_alus();
   let num_state_values = prog_to_run::num_state_variables();
-  println!("{:?}", hole_cfgs);
-  println!("Hole configurations successfully loaded");
-  assert! (ticks >= 1);
+//  println!("{:?}", hole_cfgs);
   assert! (num_stateful_alus>=1);
+  let num_packets : i32 = 
+      match args.len() == 4 {
+        true =>  match args[2].parse::<i32>() {
+
+          Ok  (t_pkts) => t_pkts,
+          Err (_)         => panic!("Failure: Unable to unwrap ticks"),
+        },
+        false => match args[1].parse::<i32>() {
+
+          Ok  (t_pkts) => t_pkts,
+          Err (_)         => panic!("Failure: Unable to unwrap ticks"),
+        },
+
+    };
+
+  assert!(num_packets <= prog_to_run::pipeline_width());
+  let ticks : i32 = 
+      match args.len() == 4 {
+        true =>  match args[3].parse::<i32>() {
+
+          Ok  (t_ticks) => t_ticks,
+          Err (_)         => panic!("Failure: Unable to unwrap ticks"),
+        },
+        false => match args[2].parse::<i32>() {
+
+          Ok  (t_ticks) => t_ticks,
+          Err (_)         => panic!("Failure: Unable to unwrap ticks"),
+        },
+
+    };
+
+  assert! (ticks >= 1);
+      
   let mut pipeline : Pipeline = 
-      prog_to_run::init_pipeline(hole_cfgs.clone());
+      match args.len() == 4 {
+        true  => prog_to_run::init_pipeline(extract_hole_cfgs(args[1].clone())),
+        // TODO: REmove hashmap argument when possible
+        false => prog_to_run::init_pipeline(HashMap::new()),
+      };
 
   // For every tick create a new packet with the 
   // specified input fields set to random values from

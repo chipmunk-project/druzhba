@@ -2,11 +2,9 @@
 #[test]
 fn {name}() {{
   let input_phvs : Vec <Phv <i32> > = init_input_phvs (10000, {num_packets}, {num_containers}, {num_state_vars}, {num_stateful_alus});
-  let hole_cfg_file : String = String::from("{hole_configurations}");
-  let hole_cfgs_map : HashMap <String, i32> = extract_hole_cfgs (hole_cfg_file);
 
   let pipeline : Pipeline = 
-    {prog_to_run_file}::init_pipeline (hole_cfgs_map.clone());
+    {prog_to_run_file}::init_pipeline (HashMap::new());
   let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
                                                      pipeline,
                                                      10000);

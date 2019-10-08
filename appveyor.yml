@@ -7,6 +7,8 @@ branches:
 skip_branch_with_pr: true
 install:
 - sh: >-
+    set -e
+
     curl https://sh.rustup.rs -sSf > /tmp/sh.rustup.rs
 
     sh /tmp/sh.rustup.rs -y
@@ -19,14 +21,18 @@ install:
 
 build_script:
 - sh: >-
+    set -e
+
     cd dgen
 
     cargo build && cargo run simple ../example_alus/stateful_alus/raw.alu ../example_alus/stateless_alus/stateless_alu.alu 2 2 1 "0,1,2,3" ../src/prog_to_run.rs
+    
+    cargo test # Test ALU grammar
 
     cd ..
 
     cargo test
 
-    cargo bench
+    cargo bench # Test Druzhba
 
     echo "********ALL DONE*******"

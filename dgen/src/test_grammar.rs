@@ -102,10 +102,13 @@ pub fn test_alugrammar ()
 #[test]
 pub fn test_optheader ()
 {
+    
   assert! (alugrammar::AluParser::new().parse(
           " name : times_two_if_else_raw_3_3
+            hole configs : ../hole_configurations/hole_cfgs.txt
             pipeline stage : 2
             alu : 0
+            [4,5,12,502]
             type : stateful
             state variables : {state_0}
             hole variables : {}
@@ -114,11 +117,14 @@ pub fn test_optheader ()
             state_0 = 0;
             
             ").is_ok());
+            
 
   assert! (alugrammar::AluParser::new().parse(
           " name : times_two_if_else_raw_3_3
+            hole configs :
             pipeline stage : 2
             alu : 0
+            [0,1,2,3]
             type : stateless
             state variables : {}
             hole variables : {opcode, immediate_operand}

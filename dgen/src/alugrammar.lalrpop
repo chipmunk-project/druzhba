@@ -32,6 +32,7 @@ pub Alu : Box <Alu> = {
 pub OptHeader : Box<OptHeader> = {
 
   "name" ":" <id:ID>
+  "hole configs" ":" <holes:ID?>
   "pipeline" "stage" ":" <n1:Num> 
   "alu" ":" <n2:Num>
   "[" <n3:(<Num> ",")*> <n4:Num?> "]" => {
@@ -52,7 +53,7 @@ pub OptHeader : Box<OptHeader> = {
         temp_vec
       },
     };
-    Box::new (OptHeader::Data (id, n1, n2, constant_vec))
+    Box::new (OptHeader::Data (id, holes, n1, n2, constant_vec))
   }
 };
 // TODO: this is working for now but should refine later
@@ -185,5 +186,5 @@ Num: i32 = {
 };
 
 ID: String =  {
-  <s:r"[a-zA-Z][a-zA-Z0-9_]*"> => s.to_string()
+  <s:r"[a-zA-Z_/.][a-zA-Z0-9_/.]*"> => s.to_string()
 };
