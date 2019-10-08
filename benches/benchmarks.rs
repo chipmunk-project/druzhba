@@ -329,7 +329,7 @@ fn run_rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3()
 }
 #[bench]
 fn bench_rcp_optimized(b : &mut Bencher) {
-    b.iter(|| run_learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3() );
+    b.iter(|| run_rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3() );
 }
 
 
