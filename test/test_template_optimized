@@ -1,7 +1,7 @@
 
 #[test]
 fn {name}() {{
-  let input_phvs : Vec <Phv <i32> > = init_input_phvs (10000, {num_packets}, {num_containers}, {num_state_vars}, {num_stateful_alus});
+  let input_phvs : Vec <Phv <i32> > = create_random_phvs (10000, {num_packets}, {num_containers}, {num_state_vars}, {num_stateful_alus});
 
   let pipeline : Pipeline = 
     {prog_to_run_file}::init_pipeline (HashMap::new());

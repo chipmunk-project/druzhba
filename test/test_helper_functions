@@ -1,6 +1,6 @@
 
 /* Test helper functions */
-fn init_input_phvs (ticks : i32,
+fn create_random_phvs (ticks : i32,
                    num_packets : i32,
                    pipeline_width : i32,
                    num_state_vars : i32,

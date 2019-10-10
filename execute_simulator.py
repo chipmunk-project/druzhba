@@ -2,8 +2,30 @@
 import argparse
 import sys
 import subprocess
+def run_dgen_unoptimized (args):
+    subprocess.run(['cp',
+                    'dgen/target/debug/dgen',
+                    'dgen_bin'])
+    subprocess.run(['./dgen_bin',
+                    args[0], # Program name
+                    args[1], # Stateful ALU
+                    args[2], # Stateless ALU
+                    args[3], # Pipeline depth
+                    args[4], # Pipeline width
+                    args[5], # Stateful ALUs per stage
+                    args[6], # Constant vec
+                    'src/prog_to_run.rs', # Output prog_to_run
+                    ])
+    subprocess.run(['rm',
+                    'dgen_bin'])
 
-def run_dgen (args):
+def run_druzhba_unoptimized (args):
+    subprocess.run(['cargo',
+                    'run',
+                    args[7],
+                    args[8],
+                    args[9]])
+def run_dgen_optimized (args):
     subprocess.run(['cp',
                     'dgen/target/debug/dgen',
                     'dgen_bin'])
@@ -21,7 +43,7 @@ def run_dgen (args):
     subprocess.run(['rm',
                     'dgen_bin'])
 
-def run_druzhba (args):
+def run_druzhba_optimized (args):
     subprocess.run(['cargo',
                     'run',
                     args[8],
@@ -70,6 +92,10 @@ def main ():
             'ticks',
             type=int,
             help='Number of ticks')
+    parser.add_argument(
+            'opt_level',
+            type=int,
+            help='Number corresponding to optimization level (0 for unoptimized, 1 for optimized)')
 
 
     raw_args = parser.parse_args(argv[1:])
@@ -84,9 +110,16 @@ def main ():
     args.append(raw_args.hole_configs)
     args.append(str(raw_args.num_packets))
     args.append(str(raw_args.ticks))
+    opt_level = raw_args.opt_level
+    if opt_level == 0:
 
-    run_dgen(args)
-    run_druzhba(args)
+        run_dgen_unoptimized(args)
+        run_druzhba_unoptimized(args)
+
+    else:
+        run_dgen_optimized(args)
+        run_druzhba_optimized(args)
+
 
 if __name__== "__main__":
     main()

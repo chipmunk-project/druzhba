@@ -11,11 +11,11 @@ which will allow the simulator to run.
 
 Running dgen/dsim:
 
-    python3 execute_simulator.py <program name> <stateful ALU> <stateless ALU> <pipeline depth> <pipieline width> <stateful ALUs per stage> <constant set> <hole configurations> <packets> <ticks>
+    python3 execute_simulator.py <program name> <stateful ALU> <stateless ALU> <pipeline depth> <pipieline width> <stateful ALUs per stage> <constant set> <hole configurations> <packets> <ticks> <optimization level>
 
 Example:
 
-    python3 execute_simulator.py simple example_alus/stateful_alus/raw.alu example_alus/stateless_alus/stateless_alu.alu 2 2 1 "0,1,2,3" hole_configurations/simple_raw_stateless_alu_2_2_hole_cfgs.txt 1 100
+    python3 execute_simulator.py simple example_alus/stateful_alus/raw.alu example_alus/stateless_alus/stateless_alu.alu 2 2 1 "0,1,2,3" hole_configurations/simple_raw_stateless_alu_2_2_hole_cfgs.txt 1 100 1
 
 Tests will ensure the druhzba pipeline is outputting
 the correct packets relative to the input packets
