@@ -46,7 +46,6 @@ pub fn generate_alus (name : String,
   for _i in 0..pipeline_depth {
     for _j in 0..num_stateful_alus {
        
-        println!("{}", full_stateful_alu.prepend_opt_header_to_alu());
       let stateful_alu_string : String = 
         match AluParser::new().parse(
             &full_stateful_alu.prepend_opt_header_to_alu()){
@@ -315,7 +314,7 @@ fn generate_optimized_init_pipeline (name : String,
   // The parameter is needed to satisfy the compiler when running 
   // druzhba 
   let mut pipeline : String = String::from
-      ("pub fn init_pipeline (h : HashMap <String, i32>) -> Pipeline { \n");
+      ("//_h not used\npub fn init_pipeline (_h : HashMap <String, i32>) -> Pipeline { \n");
   pipeline.push_str 
       ("  let mut pipeline_stages : Vec<PipelineStage> = Vec::new();\n");
   for i in 0..pipeline_depth {
