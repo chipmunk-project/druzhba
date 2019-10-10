@@ -58,7 +58,6 @@ impl fmt::Display for Alu {
           Some (h) => write!(f, "{}", h),
           None     => write!(f, ""),
         }.expect ("Error: issue with match statement on OptHeader");
-       println!("OPTIMIZED: {}", *OPTIMIZED.read().unwrap());
         let constant_vec_string : String = 
             match *OPTIMIZED.read().unwrap(){
                 false => {
@@ -76,7 +75,6 @@ impl fmt::Display for Alu {
                 },
                 true => String::from(""),
             };
-        println!("constatn_vec_string: {}", constant_vec_string);
         let body : String = String::from(&format!("{}{}", header, stmt));
         let state_var_length = STATE_VAR_MAP.read().unwrap().len();
         let mut end : String = String::from("");
@@ -88,7 +86,6 @@ impl fmt::Display for Alu {
           end.push_str("    (old_state, state_vec.clone())\n    };\n    Box::new(alu)\n}\n");
         }
 
-        println!("OPTIMIZED later: {}", *OPTIMIZED.read().unwrap());
         // Function name to initialize ALU function
         let init_name : String = 
             format! ("init_{}_{}_{}_{}", 
@@ -113,7 +110,12 @@ impl fmt::Display for Alu {
 
         let mut outer_header : String = String::from("pub fn ");
         outer_header.push_str (&init_name);
-        outer_header.push_str ("(hole_vars : HashMap <String, i32>) -> Box <dyn Fn (&mut Vec <i32>, &Vec <PhvContainer <i32>>) -> (Vec <i32>, Vec <i32> ) >{\n");
+        outer_header.push_str (
+            match *OPTIMIZED.read().unwrap(){
+              false => "(hole_vars : HashMap <String, i32>) -> Box <dyn Fn (&mut Vec <i32>, &Vec <PhvContainer <i32>>) -> (Vec <i32>, Vec <i32> ) >{\n",
+              true => "(_hole_vars : HashMap <String, i32>) -> Box <dyn Fn (&mut Vec <i32>, &Vec <PhvContainer <i32>>) -> (Vec <i32>, Vec <i32> ) >{\n",
+            });
+
         
         write!(f, "{}{}{}{}{}", outer_header, 
                                 inner_header, 
