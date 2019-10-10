@@ -111,14 +111,14 @@ def main ():
     args.append(str(raw_args.num_packets))
     args.append(str(raw_args.ticks))
     opt_level = raw_args.opt_level
-    if opt_level == 0:
+    if opt_level == 1:
 
-        run_dgen_unoptimized(args)
-        run_druzhba_unoptimized(args)
-
-    else:
         run_dgen_optimized(args)
         run_druzhba_optimized(args)
+
+    else:
+        run_dgen_unoptimized(args)
+        run_druzhba_unoptimized(args)
 
 
 if __name__== "__main__":

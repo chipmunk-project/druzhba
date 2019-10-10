@@ -45,8 +45,6 @@ fn main() {
                                    })
                                     .collect();
     let file_path : String = args[8].clone();
-    
-    println!("Constant set: {:?}", constant_vec);
 
     let stateful_alu_split : Vec <String>= stateful_alu.split("/")
                                                        .map (|s| s.to_string())
@@ -82,7 +80,6 @@ fn main() {
     else {
 
       let hole_cfg_file : String = args[9].clone();
-      println!("hole_cfg_file: {}", hole_cfg_file);
       alu_generation_utils::generate_alus (name, 
                                            stateful_alu, 
                                            stateless_alu, 

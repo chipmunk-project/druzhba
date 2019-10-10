@@ -21,12 +21,15 @@ fn main() {
            .expect("Could not create tests directory");
 
   write_mod_file (&test_case_names);
+  // Runs dgen to produce all prog_to_run files
   run_dgen (&test_case_names, &dgen_data);
    // write test file header, put `use`, `const` etc there
   write_header(&mut test_file, &test_case_names);
   let test_data_directory = read_dir("src/tests/").unwrap();
   let mut index : usize = 0;
 
+  // Generate unit test for every prog_to_run file to test
+  // and put it in test_with_chipmunk.rs
   for dgen_output_file in test_data_directory {
 
       let file_name = match dgen_output_file {
@@ -43,17 +46,16 @@ fn main() {
                test_case_names[index].clone());
     index+=1;
   }
+  // Copies benchmark prog_to_run files to benches dir
   copy_benchmark_files();
 
 
 }
 
 // Copies prog_to_run files from tests directory to
-// benches and adds "extern crate druzhba" to top 
+// benches directory to be used in benchmarks 
 fn copy_benchmark_files ()
 {
-
-
    copy_benchmark_file("src/tests/blue_increase_pair_stateless_alu_arith_4_2.rs",
                        "benches/blue_increase_unoptimized.rs");
 
@@ -75,10 +77,11 @@ fn copy_benchmark_files ()
    copy_benchmark_file("src/tests/rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_optimized.rs",
                        "benches/rcp_optimized.rs");
 
-
-
 }
 
+// Copies a single benchmark from src directory to destination
+// and adds "extern crate druzhba" at the top to be used for
+// benchmarks
 fn copy_benchmark_file (source : &str,
                         destination : &str) {
    
