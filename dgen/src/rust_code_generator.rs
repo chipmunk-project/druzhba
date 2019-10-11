@@ -304,8 +304,7 @@ impl fmt::Display for Stmt {
                 found_branch = true;
               }
               let mut index : i32 = 1;
-              // _expr unused
-              for (_expr, stmts) in elif_block {
+              for (_, stmts) in elif_block {
                 if opcode == index {
                   for stmt in stmts {
                     elif_bodies.push_str(&stmt.to_string());
@@ -429,7 +428,10 @@ impl fmt::Display for Expr {
                       if hole_name.contains("immediate") {
                         if optimize == 0 {
                           format!("constant_vec[hole_vars[\"{}\"] as usize]", generate_hole_name (variable.clone()))
+                        
                         }
+                        // Replace immediate with correct constant
+                        // vector value in stateless ALU
                         else {
                           let name : String = generate_hole_name (variable.clone());
                           let hole_val : i32 = 
@@ -471,25 +473,47 @@ impl fmt::Display for Expr {
               generate_hole_name ("Mux3".to_string());
           let mux3_name : String =
               generate_helper_name ("Mux3".to_string());
-          if optimize == 0{
+
+          //println!("Mux 3. Hole: {}", mux3_hole_name);
+          // Unoptimized case: generate function call
+          // and use generate_mux3 to generate the mux3
+          // function
+          if optimize == 0 {
             generate_mux3(mux3_name.clone());
             write! (f, "{}({}, {}, {}, hole_vars[\"{}\"])",
                     mux3_name,
                     e1, e2, e3, mux3_hole_name)
 
           }
-          else if optimize == 1{
+          else if optimize > 0 {
             let opcode : i32 = 
                 match HOLE_VALS.read().unwrap().get(&mux3_hole_name){
                    Some (num) => *num,
                    _          => panic!("Error: Could not access mux3 hole variable by hole name"),
                 };
-            generate_mux3_optimized(mux3_name.clone(),
-                                    opcode);
-            write! (f, "{}({}, {}, {})",
-                    mux3_name,
-                    e1, e2, e3)
+            // Optimize the mux3 function using the hole variable
+            if optimize == 1 {
+                generate_mux3_optimized(mux3_name.clone(),
+                                        opcode);
+                write! (f, "{}({}, {}, {})",
+                        mux3_name,
+                        e1, e2, e3)
+            }
+            // Get rid of the mux3 function altogether
+            // and replace the funcion call with the
+            // original mux3 function body using in-lining
+            else {
+                let s1 : String = format!("{}", e1);
+                let s2 : String = format!("{}", e2);
+                let s3 : String = format!("{}", e3);
+                match opcode {
+                    0 => write!(f, "{}", s1),
+                    1 => write!(f, "{}", s2),
+                    _ => write!(f, "{}", s3)
+                }
+            }
           }
+
           else {
             panic!("Error: Optimization level is invalid");
           }
@@ -500,23 +524,35 @@ impl fmt::Display for Expr {
 
           let mux2_name : String = 
               generate_helper_name ("Mux2".to_string());
-          if optimize == 0{
+
+          if optimize == 0 {
             generate_mux2(mux2_name.clone());
             write! (f, "{}({}, {}, hole_vars[\"{}\"])", 
                     mux2_name,
                     e1, e2, mux2_hole_name)
           }
-          else if optimize == 1{
+          else if optimize > 0{
             let opcode : i32 = 
                 match HOLE_VALS.read().unwrap().get(&mux2_hole_name){
                    Some (num) => *num,
                    _          => panic!("Error: Could not access mux 2 hole variable by hole name"),
                 };
-            generate_mux2_optimized(mux2_name.clone(),
-                                    opcode);
-            write! (f, "{}({}, {})",
-                    mux2_name,
-                    e1, e2)
+            if optimize == 1 {
+                generate_mux2_optimized(mux2_name.clone(),
+                                        opcode);
+                write! (f, "{}({}, {})",
+                        mux2_name,
+                        e1, e2)
+            }
+            else {
+                let s1 : String = format!("{}", e1);
+                let s2 : String = format!("{}", e2);
+
+                match opcode {
+                    0 => write!(f, "{}", s1),
+                    _ => write!(f, "{}", s2),
+                }
+            }
 
           }
           else { 
@@ -529,23 +565,31 @@ impl fmt::Display for Expr {
               generate_hole_name ("Opt".to_string());
           let opt_name : String = 
               generate_helper_name ("Opt".to_string());
-          if optimize == 0{
+          if optimize == 0 {
             generate_opt(opt_name.clone());
             write! (f, "{}({}, hole_vars[\"{}\"])", 
                   opt_name,
                   e, opt_hole_name)
           }
-          else if optimize == 1 {
+          else if optimize > 0 {
              let opcode : i32 = 
                 match HOLE_VALS.read().unwrap().get(&opt_hole_name){
                    Some (num) => *num,
                    _          => panic!("Error: Could not access opt hole variable by hole name {}", opt_hole_name),
                 };
-            generate_opt_optimized(opt_name.clone(),
-                                   opcode);
-            write! (f, "{}({})",
-                    opt_name,
-                    e)
+            if optimize == 1 {
+                generate_opt_optimized(opt_name.clone(),
+                                       opcode);
+                write! (f, "{}({})",
+                        opt_name,
+                        e)
+            }
+            else {
+                match opcode {
+                    0 => write!(f, "{}", e),
+                    _ => write!(f, "0"),
+                }
+            }
            
           }
           else { 
@@ -565,17 +609,26 @@ impl fmt::Display for Expr {
                   arith_op_name,
                   e1, e2, arith_op_hole_name)
         }
-        else if optimize == 1{
+        else if optimize > 0{
            let opcode : i32 = 
               match HOLE_VALS.read().unwrap().get(&arith_op_hole_name){
                  Some (num) => *num,
                  _          => panic!("Error: Could not access arith op hole variable by hole name"),
               };
-          generate_arith_op_optimized(arith_op_name.clone(),
-                                      opcode);
-          write! (f, "{}({}, {})",
-                  arith_op_name,
-                  e1, e2)
+           if optimize == 1 {
+             generate_arith_op_optimized(arith_op_name.clone(),
+                                         opcode);
+             write! (f, "{}({}, {})",
+                     arith_op_name,
+                     e1, e2)
+           }
+           else {
+             match opcode {
+                0 => write!(f, "({} + {})", e1, e2),
+                _ => write!(f, "({} - {})", e1, e2),
+
+             }
+           }
         }
         else { 
           panic!("Error: Optimization level is invalid");
@@ -596,17 +649,27 @@ impl fmt::Display for Expr {
                   rel_op_name,
                   e1, e2, rel_op_hole_name)
         }
-        else if optimize == 1{
+        else if optimize > 0{
            let opcode : i32 = 
               match HOLE_VALS.read().unwrap().get(&rel_op_hole_name){
                  Some (num) => *num,
                  _          => panic!("Error: Could not access rel op hole variable by hole name"),
               };
-          generate_rel_op_optimized(rel_op_name.clone(),
-                                    opcode);
-          write! (f, "{}({}, {})",
-                  rel_op_name,
-                  e1, e2)
+           if optimize == 1 {
+              generate_rel_op_optimized(rel_op_name.clone(),
+                                        opcode);
+              write! (f, "{}({}, {})",
+                      rel_op_name,
+                      e1, e2)
+           }
+           else {
+              match opcode {
+                0 => write!(f, "(({} != {}) as i32)", e1, e2),
+                1 => write!(f, "(({} < {}) as i32)", e1, e2),
+                2 => write!(f, "(({} > {}) as i32)", e1, e2),
+                _ => write!(f, "(({} == {}) as i32)", e1, e2),
+              }
+           }
         }
         else { 
           panic!("Error: Optimization level is invalid");
@@ -620,22 +683,43 @@ impl fmt::Display for Expr {
 
         let constant_name : String = 
             generate_helper_name ("const".to_string());
+        println!("Constant. hole: {}", constant_hole_name);
         if optimize == 0{
             generate_constant(constant_name.clone());
             write!(f, "{}(hole_vars[\"{}\"])", 
                    constant_name,
                    constant_hole_name)
         }
-        else if optimize == 1{
+        else if optimize > 0{
            let opcode : i32 = 
               match HOLE_VALS.read().unwrap().get(&constant_hole_name){
                  Some (num) => *num,
                  _          => panic!("Error: Could not access constant hole variable by hole name"),
               };
-            generate_constant_optimized(constant_name.clone(),
-                                        opcode);
-            write! (f, "{}()",
-                  constant_name)
+            if optimize == 1 { 
+                generate_constant_optimized(constant_name.clone(),
+                                            opcode);
+                write! (f, "{}()",
+                      constant_name)
+            }
+            else {
+                let temp_constant_vec : Vec <String> = CONSTANT_VEC
+                                                       .read()
+                                                       .unwrap()
+                                                       .clone();
+
+                println!("{:?}", temp_constant_vec);
+                println!("Choosing index {}\n", opcode);
+               match opcode >= temp_constant_vec.len() as i32 {
+                  true => write!(f, 
+                                 "{}",
+                                 temp_constant_vec[temp_constant_vec.len()-1]),
+                  false => write!(f, 
+                                  "{}", 
+                                  temp_constant_vec[opcode as usize]),
+
+                }
+            }
         }
         else { 
           panic!("Error: Optimization level is invalid");
@@ -867,6 +951,8 @@ fn generate_constant_optimized (constant_name : String,
   let temp_constant_vec : Vec <String> = CONSTANT_VEC.read()
                                                      .unwrap()
                                                      .clone();
+  println!("{:?}", temp_constant_vec);
+  println!("Choosing index {}\n", opcode);
 
   let fn_body : String = 
       match opcode >= temp_constant_vec.len() as i32 {

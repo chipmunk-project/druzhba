@@ -4,7 +4,7 @@ fn {name}() {{
   let hole_cfg_file : String = String::from("{hole_configurations}");
   let hole_cfgs_map : HashMap <String, i32> = extract_hole_cfgs (hole_cfg_file);
 
-  let mut pipeline : Pipeline = 
+  let pipeline : Pipeline = 
     {prog_to_run_file}::init_pipeline (hole_cfgs_map.clone());
   let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
                                                      pipeline,

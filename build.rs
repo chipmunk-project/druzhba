@@ -48,8 +48,6 @@ fn main() {
   }
   // Copies benchmark prog_to_run files to benches dir
   copy_benchmark_files();
-
-
 }
 
 // Copies prog_to_run files from tests directory to
@@ -58,24 +56,33 @@ fn copy_benchmark_files ()
 {
    copy_benchmark_file("src/tests/blue_increase_pair_stateless_alu_arith_4_2.rs",
                        "benches/blue_increase_unoptimized.rs");
+   copy_benchmark_file("src/tests/blue_increase_pair_stateless_alu_arith_4_2_optimized_1.rs",
+                       "benches/blue_increase_optimized_1.rs");
+   copy_benchmark_file("src/tests/blue_increase_pair_stateless_alu_arith_4_2_optimized_2.rs",
+                       "benches/blue_increase_optimized_2.rs");
 
-   copy_benchmark_file("src/tests/blue_increase_pair_stateless_alu_arith_4_2_optimized.rs",
-                       "benches/blue_increase_optimized.rs");
 
    copy_benchmark_file("src/tests/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5.rs",
                        "benches/flowlets_unoptimized.rs");
-   copy_benchmark_file("src/tests/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_optimized.rs",
-                       "benches/flowlets_optimized.rs");
+   copy_benchmark_file("src/tests/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_optimized_1.rs",
+                       "benches/flowlets_optimized_1.rs");
+   copy_benchmark_file("src/tests/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_optimized_2.rs",
+                       "benches/flowlets_optimized_2.rs");
 
-   copy_benchmark_file("src/tests/learn_filter_equivalent_10_canonicalizer_equivalent_0_raw_stateless_alu_5_3_optimized.rs",
-                       "benches/learn_filter_optimized.rs");
    copy_benchmark_file("src/tests/learn_filter_equivalent_10_canonicalizer_equivalent_0_raw_stateless_alu_5_3.rs",
                        "benches/learn_filter_unoptimized.rs");
+   copy_benchmark_file("src/tests/learn_filter_equivalent_10_canonicalizer_equivalent_0_raw_stateless_alu_5_3_optimized_1.rs",
+                       "benches/learn_filter_optimized_1.rs");
+copy_benchmark_file("src/tests/learn_filter_equivalent_10_canonicalizer_equivalent_0_raw_stateless_alu_5_3_optimized_2.rs",
+                       "benches/learn_filter_optimized_2.rs");
 
    copy_benchmark_file("src/tests/rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3.rs",
                        "benches/rcp_unoptimized.rs");
-   copy_benchmark_file("src/tests/rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_optimized.rs",
-                       "benches/rcp_optimized.rs");
+   copy_benchmark_file("src/tests/rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_optimized_1.rs",
+                       "benches/rcp_optimized_1.rs");
+   copy_benchmark_file("src/tests/rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_optimized_2.rs",
+                       "benches/rcp_optimized_2.rs");
+
 
 }
 
@@ -93,6 +100,7 @@ fn copy_benchmark_file (source : &str,
    let contents : String = 
        fs::read_to_string(destination)
          .expect("Could not open for benchmarks");
+
    fs::write(destination,
              format!("{}{}",
                      "extern crate druzhba;\n",
@@ -118,6 +126,7 @@ fn run_dgen (test_case_names : &Vec<String>,
            .expect("Adding execution permissions to dgen_bin failed");
   let mut index : usize = 0;
   for arg in dgen_args.iter(){
+    // Optimization level 1
     Command::new("./dgen_bin")
                 .arg(&arg[0]) // Name
                 .arg(&arg[1]) // Stateful ALU
@@ -126,11 +135,27 @@ fn run_dgen (test_case_names : &Vec<String>,
                 .arg(&arg[4]) // Width
                 .arg(&arg[8]) // Stateful ALUs
                 .arg(&arg[5]) // constant vec
-                .arg(format!("src/tests/{}_optimized.rs", test_case_names[index]))
+                .arg(format!("src/tests/{}_optimized_1.rs", test_case_names[index]))
                 .arg(&arg[9]) // Hole configs
+                .arg("1") // Optimization
                 .output()
                 .expect("Error running dgen");
-    
+
+    // Optimization level 2
+     Command::new("./dgen_bin")
+                .arg(&arg[0]) // Name
+                .arg(&arg[1]) // Stateful ALU
+                .arg(&arg[2]) // Stateless ALU
+                .arg(&arg[3]) // Depth
+                .arg(&arg[4]) // Width
+                .arg(&arg[8]) // Stateful ALUs
+                .arg(&arg[5]) // constant vec
+                .arg(format!("src/tests/{}_optimized_2.rs", test_case_names[index]))
+                .arg(&arg[9]) // Hole configs
+                .arg("2") // Optimization
+                .output()
+                .expect("Error running dgen");
+    // No optimization (level 0)
     Command::new("./dgen_bin")
                 .arg(&arg[0]) // Name
                 .arg(&arg[1]) // Stateful ALU
@@ -159,7 +184,9 @@ fn write_mod_file (test_case_names : &Vec<String>){
   for n in test_case_names.iter(){
     declaration_list.push_str (&format!("pub mod {};\n",n));
 
-    declaration_list.push_str (&format!("pub mod {}_optimized;\n",n));
+    declaration_list.push_str (&format!("pub mod {}_optimized_1;\n",n));
+
+    declaration_list.push_str (&format!("pub mod {}_optimized_2;\n",n));
                              
   }
   fs::write("src/tests/mod.rs", declaration_list)
@@ -171,15 +198,28 @@ fn write_test(test_file: &mut File,
               test_name : String) {
 
 
+    // Optimization level 1
     write!(test_file, include_str!("./test/test_template_optimized"),
-                      name = format!("test_{}_optimized",test_name),
+                      name = format!("test_{}_optimized_1",test_name),
                       num_packets = dgen_data[6],
                       num_containers = dgen_data[4], 
                       num_state_vars = dgen_data[7],
                       num_stateful_alus = dgen_data[8],
-                      prog_to_run_file = format!("{}_optimized", test_name),
+                      prog_to_run_file = format!("{}_optimized_1", test_name),
                       test_function = format!("test_{}",dgen_data[10])
                       ).expect("Error writing to test_with_chipmunk.rs");
+    // Optimization level 2
+    write!(test_file, include_str!("./test/test_template_optimized"),
+                      name = format!("test_{}_optimized_2",test_name),
+                      num_packets = dgen_data[6],
+                      num_containers = dgen_data[4], 
+                      num_state_vars = dgen_data[7],
+                      num_stateful_alus = dgen_data[8],
+                      prog_to_run_file = format!("{}_optimized_2", test_name),
+                      test_function = format!("test_{}",dgen_data[10])
+                      ).expect("Error writing to test_with_chipmunk.rs");
+
+    // No optimization (level 0)
     write!(test_file, include_str!("./test/test_template_unoptimized"),
                       name = format!("test_{}",test_name),
                       num_packets = dgen_data[6],
@@ -199,7 +239,9 @@ fn write_header(test_file: &mut File,
 
   let mut test_case_imports : String = String::from("");
   for n in test_case_names.iter(){
-    test_case_imports.push_str (&format!("use tests::{}_optimized;\n", n));
+    test_case_imports.push_str (&format!("use tests::{}_optimized_1;\n", n));
+
+    test_case_imports.push_str (&format!("use tests::{}_optimized_2;\n", n));
 
     test_case_imports.push_str (&format!("use tests::{};\n", n));
   }

@@ -17,10 +17,16 @@ pub mod flowlets_unoptimized;
 pub mod learn_filter_unoptimized;
 pub mod rcp_unoptimized;
 
-pub mod blue_increase_optimized;
-pub mod flowlets_optimized;
-pub mod learn_filter_optimized;
-pub mod rcp_optimized;
+pub mod blue_increase_optimized_1;
+pub mod flowlets_optimized_1;
+pub mod learn_filter_optimized_1;
+pub mod rcp_optimized_1;
+
+pub mod blue_increase_optimized_2;
+pub mod flowlets_optimized_2;
+pub mod learn_filter_optimized_2;
+pub mod rcp_optimized_2;
+
 /* Test helper functions */
 fn create_random_phvs (ticks : i32,
                    num_packets : i32,
@@ -248,17 +254,17 @@ fn bench_rcp_dsim_unoptimized (b : &mut Bencher) {
 }
 
 
-// Same tests after optimization
+// Same tests after optimization (level 1)
 
 
 #[bench]
-fn bench_blue_increase_dsim_optimized (b : &mut Bencher)
+fn bench_blue_increase_dsim_optimized_1 (b : &mut Bencher)
 {
     b.iter(||{
       let input_phvs : Vec <Phv <i32> > = create_random_phvs (10000, 2, 2, 2, 2);
 
       let pipeline : Pipeline = 
-        blue_increase_optimized::init_pipeline (HashMap::new());
+        blue_increase_optimized_1::init_pipeline (HashMap::new());
       let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
                                                          pipeline,
                                                          10000);
@@ -267,12 +273,12 @@ fn bench_blue_increase_dsim_optimized (b : &mut Bencher)
 }
 
 #[bench]
-fn bench_flowlets_dsim_optimized(b : &mut Bencher) {
+fn bench_flowlets_dsim_optimized_1(b : &mut Bencher) {
     b.iter(|| {
       let input_phvs : Vec <Phv <i32> > = create_random_phvs (10000, 3, 5, 1, 2);
 
       let pipeline : Pipeline = 
-        flowlets_optimized::init_pipeline (HashMap::new());
+        flowlets_optimized_1::init_pipeline (HashMap::new());
       let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
                                                      pipeline,
                                                      10000);
@@ -281,12 +287,12 @@ fn bench_flowlets_dsim_optimized(b : &mut Bencher) {
 }
 
 #[bench]
-fn bench_learn_filter_dsim_optimized(b : &mut Bencher) {
+fn bench_learn_filter_dsim_optimized_1(b : &mut Bencher) {
     b.iter(|| {
       let input_phvs : Vec <Phv <i32> > = create_random_phvs (10000, 1, 3, 1, 3);
 
       let pipeline : Pipeline = 
-        learn_filter_optimized::init_pipeline (HashMap::new());
+        learn_filter_optimized_1::init_pipeline (HashMap::new());
       let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
                                                          pipeline,
                                                          10000);
@@ -294,12 +300,12 @@ fn bench_learn_filter_dsim_optimized(b : &mut Bencher) {
 }
 
 #[bench]
-fn bench_rcp_optimized(b : &mut Bencher) {
+fn bench_rcp_optimized_1(b : &mut Bencher) {
     b.iter(|| {
       let input_phvs : Vec <Phv <i32> > = create_random_phvs (10000, 1, 3, 1, 3);
 
       let pipeline : Pipeline = 
-        rcp_optimized::init_pipeline (HashMap::new());
+        rcp_optimized_1::init_pipeline (HashMap::new());
       let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
                                                          pipeline,
                                                          10000);
@@ -307,5 +313,64 @@ fn bench_rcp_optimized(b : &mut Bencher) {
     });
 }
 
+
+// Same tests after optimization (level 2)
+
+
+#[bench]
+fn bench_blue_increase_dsim_optimized_2 (b : &mut Bencher)
+{
+    b.iter(||{
+      let input_phvs : Vec <Phv <i32> > = create_random_phvs (10000, 2, 2, 2, 2);
+
+      let pipeline : Pipeline = 
+        blue_increase_optimized_2::init_pipeline (HashMap::new());
+      let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
+                                                         pipeline,
+                                                         10000);
+
+    });
+}
+
+#[bench]
+fn bench_flowlets_dsim_optimized_2(b : &mut Bencher) {
+    b.iter(|| {
+      let input_phvs : Vec <Phv <i32> > = create_random_phvs (10000, 3, 5, 1, 2);
+
+      let pipeline : Pipeline = 
+        flowlets_optimized_2::init_pipeline (HashMap::new());
+      let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
+                                                     pipeline,
+                                                     10000);
+
+    });
+}
+
+#[bench]
+fn bench_learn_filter_dsim_optimized_2(b : &mut Bencher) {
+    b.iter(|| {
+      let input_phvs : Vec <Phv <i32> > = create_random_phvs (10000, 1, 3, 1, 3);
+
+      let pipeline : Pipeline = 
+        learn_filter_optimized_2::init_pipeline (HashMap::new());
+      let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
+                                                         pipeline,
+                                                         10000);
+    });
+}
+
+#[bench]
+fn bench_rcp_optimized_2(b : &mut Bencher) {
+    b.iter(|| {
+      let input_phvs : Vec <Phv <i32> > = create_random_phvs (10000, 1, 3, 1, 3);
+
+      let pipeline : Pipeline = 
+        rcp_optimized_2::init_pipeline (HashMap::new());
+      let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
+                                                         pipeline,
+                                                         10000);
+
+    });
+}
 
 
