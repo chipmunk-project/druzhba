@@ -15,6 +15,7 @@ fn main() {
 
   let test_case_names : Vec <String> = test_names();
   let dgen_data : Vec <Vec <String> > = test_configurations();
+
    Command::new("mkdir")
            .arg("src/tests")
            .output()
