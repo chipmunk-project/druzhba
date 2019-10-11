@@ -12,8 +12,8 @@ lazy_static! {
     RwLock::new(String::from(""));
   static ref HOLE_VALS : RwLock <HashMap <String, i32>> =
     RwLock::new(HashMap::new());
-  static ref OPTIMIZED : RwLock <bool> = 
-      RwLock::new(true);
+  static ref OPTIMIZED : RwLock <i32> = 
+      RwLock::new(0);
   static ref STATE_VAR_MAP : RwLock <HashMap <String, i32>> =
     RwLock::new(HashMap::new());
   static ref HOLE_VAR_MAP : RwLock <HashMap <String, i32>> =
@@ -50,7 +50,7 @@ impl fmt::Display for Alu {
           FUNC_COUNT.write().unwrap().clear();
           CONSTANT_VEC.write().unwrap().clear();
           HOLE_VALS.write().unwrap().clear();
-          *OPTIMIZED.write().unwrap() = false;
+          *OPTIMIZED.write().unwrap() = 0;
     
         }
         
@@ -60,7 +60,7 @@ impl fmt::Display for Alu {
         }.expect ("Error: issue with match statement on OptHeader");
         let constant_vec_string : String = 
             match *OPTIMIZED.read().unwrap(){
-                false => {
+                0 => {
                     let temp_constant_vec : Vec <String> = CONSTANT_VEC.read()
                                                                        .unwrap()
                                                                        .clone();
@@ -73,7 +73,7 @@ impl fmt::Display for Alu {
                     format!("    let constant_vec : Vec <i32> = vec!{:?};\n",
                                             constant_vec)
                 },
-                true => String::from(""),
+                _ => String::from(""),
             };
         let body : String = String::from(&format!("{}{}", header, stmt));
         let state_var_length = STATE_VAR_MAP.read().unwrap().len();
@@ -112,8 +112,8 @@ impl fmt::Display for Alu {
         outer_header.push_str (&init_name);
         outer_header.push_str (
             match *OPTIMIZED.read().unwrap(){
-              false => "(hole_vars : HashMap <String, i32>) -> Box <dyn Fn (&mut Vec <i32>, &Vec <PhvContainer <i32>>) -> (Vec <i32>, Vec <i32> ) >{\n",
-              true => "(_hole_vars : HashMap <String, i32>) -> Box <dyn Fn (&mut Vec <i32>, &Vec <PhvContainer <i32>>) -> (Vec <i32>, Vec <i32> ) >{\n",
+              0 => "(hole_vars : HashMap <String, i32>) -> Box <dyn Fn (&mut Vec <i32>, &Vec <PhvContainer <i32>>) -> (Vec <i32>, Vec <i32> ) >{\n",
+              _ => "(_hole_vars : HashMap <String, i32>) -> Box <dyn Fn (&mut Vec <i32>, &Vec <PhvContainer <i32>>) -> (Vec <i32>, Vec <i32> ) >{\n",
             });
 
         
@@ -131,6 +131,7 @@ pub enum OptHeader {
         Option<String>,// Hole config file
         i32, // Pipeline stage
         i32, // ALU number
+        i32, // opt_level
         Vec<String>)
 }
 
@@ -138,21 +139,27 @@ impl fmt::Display for OptHeader {
 
   fn fmt (&self, f : &mut fmt::Formatter) -> fmt::Result {
     match *&self {
-      OptHeader::Data (name, hole_config_file,stage, alu_num, constant_vec) => {
+      OptHeader::Data (name, 
+                       hole_config_file,
+                       stage, 
+                       alu_num, 
+                       opt_level,
+                       constant_vec) => {
           
         *NAME.write().unwrap() = name.to_string();
         *PIPELINE_STAGE.write().unwrap() = *stage;       
         *ALU_NUMBER.write().unwrap() = *alu_num;
         *CONSTANT_VEC.write().unwrap() = constant_vec.to_vec();
+        *OPTIMIZED.write().unwrap() = *opt_level;
         *HOLE_VALS.write().unwrap() = 
             match hole_config_file {
               Some (f) => {
-                *OPTIMIZED.write().unwrap() = true;
+                assert!(*opt_level != 0);
                 extract_hole_cfgs(f.to_string())
               },
               _        => {
 
-                *OPTIMIZED.write().unwrap() = false;
+                assert!(*opt_level == 0);
                 HashMap::new()
               },
           };
@@ -249,8 +256,8 @@ impl fmt::Display for Stmt {
           };
 
           let expr : &str = &format!("{}",e1);
-          let optimize = *OPTIMIZED.read().unwrap();
-          if is_stateful || !optimize  || !(expr.contains("opcode") && expr.contains("hole_vars")) {
+          let optimize : i32 = *OPTIMIZED.read().unwrap();
+          if is_stateful || optimize == 0  || !(expr.contains("opcode") && expr.contains("hole_vars")) {
               if_body.push_str (&format!("      if {} {}{{\n", expr, 
                                          opt_inequality));
               for stmt in if_block{
@@ -409,7 +416,7 @@ impl fmt::Display for Expr {
     // variable corresponds to. The same is done with phv_containers.
     // For hole variables, make a call to generate_hole_name
     let find_var_name = | variable : String| -> String {
-      let optimize : bool = *OPTIMIZED.read().unwrap();
+      let optimize : i32 = *OPTIMIZED.read().unwrap();
       match STATE_VAR_MAP.read().unwrap().get(&variable){
         Some (ind1) => format!("state_vec[{}]",ind1),
         _           => {
@@ -419,9 +426,8 @@ impl fmt::Display for Expr {
               match HOLE_VAR_MAP.read().unwrap().get(&variable){
                 Some (_ind3) => {
                     let hole_name : String = generate_hole_name (variable.clone());
-                    //if !optimize {
                       if hole_name.contains("immediate") {
-                        if !optimize {
+                        if optimize == 0 {
                           format!("constant_vec[hole_vars[\"{}\"] as usize]", generate_hole_name (variable.clone()))
                         }
                         else {
@@ -449,7 +455,7 @@ impl fmt::Display for Expr {
         },
       }
     };
-    let optimize : bool = *OPTIMIZED.read().unwrap();
+    let optimize : i32 = *OPTIMIZED.read().unwrap();
     match &*self{
       Expr::ExprWithParen (e) => 
           write!(f, "({})",e),
@@ -465,14 +471,14 @@ impl fmt::Display for Expr {
               generate_hole_name ("Mux3".to_string());
           let mux3_name : String =
               generate_helper_name ("Mux3".to_string());
-          if !optimize {
+          if optimize == 0{
             generate_mux3(mux3_name.clone());
             write! (f, "{}({}, {}, {}, hole_vars[\"{}\"])",
                     mux3_name,
                     e1, e2, e3, mux3_hole_name)
 
           }
-          else {
+          else if optimize == 1{
             let opcode : i32 = 
                 match HOLE_VALS.read().unwrap().get(&mux3_hole_name){
                    Some (num) => *num,
@@ -484,6 +490,9 @@ impl fmt::Display for Expr {
                     mux3_name,
                     e1, e2, e3)
           }
+          else {
+            panic!("Error: Optimization level is invalid");
+          }
       },
       Expr::Mux2 (e1, e2) => {
           let mux2_hole_name : String = 
@@ -491,13 +500,13 @@ impl fmt::Display for Expr {
 
           let mux2_name : String = 
               generate_helper_name ("Mux2".to_string());
-          if !optimize {
+          if optimize == 0{
             generate_mux2(mux2_name.clone());
             write! (f, "{}({}, {}, hole_vars[\"{}\"])", 
                     mux2_name,
                     e1, e2, mux2_hole_name)
           }
-          else {
+          else if optimize == 1{
             let opcode : i32 = 
                 match HOLE_VALS.read().unwrap().get(&mux2_hole_name){
                    Some (num) => *num,
@@ -510,6 +519,9 @@ impl fmt::Display for Expr {
                     e1, e2)
 
           }
+          else { 
+            panic!("Error: Optimization level is invalid");
+          }
 
       },
       Expr::Opt (e) => {
@@ -517,13 +529,13 @@ impl fmt::Display for Expr {
               generate_hole_name ("Opt".to_string());
           let opt_name : String = 
               generate_helper_name ("Opt".to_string());
-          if !optimize {
+          if optimize == 0{
             generate_opt(opt_name.clone());
             write! (f, "{}({}, hole_vars[\"{}\"])", 
                   opt_name,
                   e, opt_hole_name)
           }
-          else {
+          else if optimize == 1 {
              let opcode : i32 = 
                 match HOLE_VALS.read().unwrap().get(&opt_hole_name){
                    Some (num) => *num,
@@ -536,6 +548,10 @@ impl fmt::Display for Expr {
                     e)
            
           }
+          else { 
+            panic!("Error: Optimization level is invalid");
+          }
+
       },
       Expr::ArithOp (e1, e2) => {
           let arith_op_hole_name : String = 
@@ -543,13 +559,13 @@ impl fmt::Display for Expr {
 
         let arith_op_name : String = 
             generate_helper_name ("arith_op".to_string());
-        if !optimize {
+        if optimize == 0{
           generate_arith_op(arith_op_name.clone());
           write! (f, "{} ({}, {}, hole_vars[\"{}\"])", 
                   arith_op_name,
                   e1, e2, arith_op_hole_name)
         }
-        else{
+        else if optimize == 1{
            let opcode : i32 = 
               match HOLE_VALS.read().unwrap().get(&arith_op_hole_name){
                  Some (num) => *num,
@@ -561,6 +577,11 @@ impl fmt::Display for Expr {
                   arith_op_name,
                   e1, e2)
         }
+        else { 
+          panic!("Error: Optimization level is invalid");
+        }
+
+
 
       },
       Expr::Relop (e1, e2) => {
@@ -569,13 +590,13 @@ impl fmt::Display for Expr {
 
         let rel_op_name : String = 
             generate_helper_name ("rel_op".to_string());
-        if !optimize {
+        if optimize == 0{
           generate_rel_op(rel_op_name.clone());
           write! (f, "{}({}, {}, hole_vars[\"{}\"])", 
                   rel_op_name,
                   e1, e2, rel_op_hole_name)
         }
-        else{
+        else if optimize == 1{
            let opcode : i32 = 
               match HOLE_VALS.read().unwrap().get(&rel_op_hole_name){
                  Some (num) => *num,
@@ -587,6 +608,10 @@ impl fmt::Display for Expr {
                   rel_op_name,
                   e1, e2)
         }
+        else { 
+          panic!("Error: Optimization level is invalid");
+        }
+
 
       },
       Expr::Constant => {
@@ -595,13 +620,13 @@ impl fmt::Display for Expr {
 
         let constant_name : String = 
             generate_helper_name ("const".to_string());
-        if !optimize {
+        if optimize == 0{
             generate_constant(constant_name.clone());
             write!(f, "{}(hole_vars[\"{}\"])", 
                    constant_name,
                    constant_hole_name)
         }
-        else{
+        else if optimize == 1{
            let opcode : i32 = 
               match HOLE_VALS.read().unwrap().get(&constant_hole_name){
                  Some (num) => *num,
@@ -612,6 +637,10 @@ impl fmt::Display for Expr {
             write! (f, "{}()",
                   constant_name)
         }
+        else { 
+          panic!("Error: Optimization level is invalid");
+        }
+
 
       },
     }

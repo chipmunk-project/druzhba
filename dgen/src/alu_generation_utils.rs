@@ -12,7 +12,8 @@ pub fn generate_alus (name : String,
                       num_stateful_alus : i32,
                       constant_vec : Vec<i32>,
                       file_path : String,
-                      hole_configs_file : String)
+                      hole_configs_file : String,
+                      opt_level : i32)
 {
   // Stateful AluParsingUtils initialization
   let stateful_alu = fs::read_to_string(&stateful_file)
@@ -24,7 +25,8 @@ pub fn generate_alus (name : String,
                            stateful_alu,
                            true,
                            constant_vec.clone(),
-                           hole_configs_file.clone());
+                           hole_configs_file.clone(),
+                           opt_level);
 
   // Stateless AluParsingUtils initialization
   let stateless_alu = fs::read_to_string(&stateless_file)
@@ -37,7 +39,8 @@ pub fn generate_alus (name : String,
                            stateless_alu,
                            false,
                            constant_vec.clone(),
-                           hole_configs_file.clone());
+                           hole_configs_file.clone(),
+                           opt_level);
 
 
   let mut pipeline_alus_string : String = String::from("");
