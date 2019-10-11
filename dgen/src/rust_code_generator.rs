@@ -474,7 +474,6 @@ impl fmt::Display for Expr {
           let mux3_name : String =
               generate_helper_name ("Mux3".to_string());
 
-          //println!("Mux 3. Hole: {}", mux3_hole_name);
           // Unoptimized case: generate function call
           // and use generate_mux3 to generate the mux3
           // function
@@ -683,7 +682,6 @@ impl fmt::Display for Expr {
 
         let constant_name : String = 
             generate_helper_name ("const".to_string());
-        println!("Constant. hole: {}", constant_hole_name);
         if optimize == 0{
             generate_constant(constant_name.clone());
             write!(f, "{}(hole_vars[\"{}\"])", 
@@ -708,8 +706,6 @@ impl fmt::Display for Expr {
                                                        .unwrap()
                                                        .clone();
 
-                println!("{:?}", temp_constant_vec);
-                println!("Choosing index {}\n", opcode);
                match opcode >= temp_constant_vec.len() as i32 {
                   true => write!(f, 
                                  "{}",
@@ -951,8 +947,6 @@ fn generate_constant_optimized (constant_name : String,
   let temp_constant_vec : Vec <String> = CONSTANT_VEC.read()
                                                      .unwrap()
                                                      .clone();
-  println!("{:?}", temp_constant_vec);
-  println!("Choosing index {}\n", opcode);
 
   let fn_body : String = 
       match opcode >= temp_constant_vec.len() as i32 {
