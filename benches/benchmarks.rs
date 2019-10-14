@@ -91,7 +91,7 @@ fn extract_hole_cfgs (hole_cfgs_file : String) -> HashMap <String, i32 > {
 }
 
 fn run_pipeline (input_phvs : Vec <Phv <i32> >,
-                 mut pipeline : Pipeline,
+                 pipeline : &mut Pipeline,
                  ticks : i32) -> Vec <Phv <i32 > > {
   let mut output_phvs : Vec <Phv <i32> > = Vec::new();
   for t in 0..ticks {
@@ -109,11 +109,13 @@ fn run_pipeline (input_phvs : Vec <Phv <i32> >,
 #[bench]
 fn bench_blue_increase_spec (b : &mut Bencher)
 {
+  let num_ticks : i32 = 10000;
+
+  let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 2, 2, 2, 2);
   b.iter(|| {
 
-    let input_phvs : Vec <Phv <i32> > = create_random_phvs (20000, 2, 2, 2, 2);
-    for i in 0..input_phvs.len() {
-      let mut expected : Phv <i32> = input_phvs[i].clone();
+    for i in 0..num_ticks {
+      let mut expected : Phv <i32> = input_phvs[i as usize].clone();
       let mut state = expected.get_state();
       expected[1].field_value = expected[0].field_value - 1;
       if expected[1].field_value > state[1][0] {
@@ -129,11 +131,12 @@ fn bench_blue_increase_spec (b : &mut Bencher)
 #[bench]
 fn bench_flowlets_spec (b : &mut Bencher)
 {
+  let num_ticks : i32 = 10000;
+  let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 3, 5, 1, 2);
   b.iter(|| {
 
-    let input_phvs : Vec <Phv <i32> > = create_random_phvs (20000, 3, 5, 1, 2);
-    for i in 0..input_phvs.len() {
-      let mut expected : Phv <i32> = input_phvs[i].clone();
+    for i in 0..num_ticks {
+      let mut expected : Phv <i32> = input_phvs[i as usize].clone();
       let mut state = expected.get_state();
       if expected[1].field_value - state[1][0] > 5 {
         state[0][0] = expected[0].field_value;
@@ -151,11 +154,12 @@ fn bench_flowlets_spec (b : &mut Bencher)
 #[bench]
 fn bench_learn_filter_spec (b : &mut Bencher)
 {
+  let num_ticks : i32 = 10000;
+  let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 1, 3, 1, 3);
   b.iter(|| {
 
-    let input_phvs : Vec <Phv <i32> > = create_random_phvs (20000, 1, 3, 1, 3);
-    for i in 0..input_phvs.len() {
-      let mut expected : Phv <i32> = input_phvs[i].clone();
+    for i in 0..num_ticks {
+      let mut expected : Phv <i32> = input_phvs[i as usize].clone();
       let mut state = expected.get_state();
       if state[2][0] != 0 && state[1][0] != 0 && state[0][0] != 0 {
         expected[0].field_value = 1;
@@ -170,12 +174,14 @@ fn bench_learn_filter_spec (b : &mut Bencher)
 
 #[bench]
 fn bench_rcp_spec  (b : &mut Bencher){
+
+  let num_ticks : i32 = 10000;
+  let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 2, 3, 1, 3);
   b.iter(|| { 
-    let input_phvs : Vec <Phv <i32> > = create_random_phvs (20000, 2, 3, 1, 3);
-    for i in 0..input_phvs.len() {
-      let mut expected : Phv <i32> = input_phvs[i].clone();
+    for i in 0..num_ticks {
+      let mut expected : Phv <i32> = input_phvs[i as usize].clone();
       let mut state = expected.get_state();
-      if input_phvs[i][1].get_value() < 2 {
+      if expected[1].get_value() < 2 {
         state[1][0] = state[1][0] + expected[1].get_value();
         state[2][0] = state[2][0] + 1;
       }
@@ -191,64 +197,72 @@ fn bench_rcp_spec  (b : &mut Bencher){
 #[bench]
 fn bench_blue_increase_dsim_unoptimized (b : &mut Bencher)
 {
-    b.iter(||{
-      let input_phvs : Vec <Phv <i32> > = create_random_phvs (20000, 2, 2, 2, 2);
-      let hole_cfg_file : String = String::from("hole_configurations/blue_increase_pair_stateless_alu_arith_4_2_hole_cfgs.txt");
-      let hole_cfgs_map : HashMap <String, i32> = extract_hole_cfgs (hole_cfg_file);
+    let num_ticks : i32 = 10000;
+    let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 2, 2, 2, 2);
+    let hole_cfg_file : String = String::from("hole_configurations/blue_increase_pair_stateless_alu_arith_4_2_hole_cfgs.txt");
+    let hole_cfgs_map : HashMap <String, i32> = extract_hole_cfgs (hole_cfg_file);
 
-      let pipeline : Pipeline = 
-        blue_increase_unoptimized::init_pipeline (hole_cfgs_map.clone());
+    let mut pipeline : Pipeline = 
+      blue_increase_unoptimized::init_pipeline (hole_cfgs_map.clone());
+    b.iter(||{
+
       let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                         pipeline,
-                                                         20000);
+                                                         &mut pipeline,
+                                                         num_ticks);
 
     });
 }
 
 #[bench]
 fn bench_flowlets_dsim_unoptimized (b : &mut Bencher) {
-    b.iter(||{
-      let input_phvs : Vec <Phv <i32> > = create_random_phvs (20000, 3, 5, 1, 2);
-      let hole_cfg_file : String = String::from("hole_configurations/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt");
-      let hole_cfgs_map : HashMap <String, i32> = extract_hole_cfgs (hole_cfg_file);
+    let num_ticks : i32 = 10000;
+    let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 3, 5, 1, 2);
+    let hole_cfg_file : String = String::from("hole_configurations/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt");
+    let hole_cfgs_map : HashMap <String, i32> = extract_hole_cfgs (hole_cfg_file);
 
-      let pipeline : Pipeline = 
+    let mut pipeline : Pipeline = 
         flowlets_unoptimized::init_pipeline (hole_cfgs_map.clone());
+    b.iter(||{
+
       let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                         pipeline,
-                                                         20000);
+                                                         &mut pipeline,
+                                                         num_ticks);
 
     });
 }
 
 #[bench]
 fn bench_learn_filter_dsim_unoptimized (b : &mut Bencher) {
-    b.iter(|| {
-      let input_phvs : Vec <Phv <i32> > = create_random_phvs (20000, 1, 3, 1, 3);
-      let hole_cfg_file : String = String::from("hole_configurations/learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt");
-      let hole_cfgs_map : HashMap <String, i32> = extract_hole_cfgs (hole_cfg_file);
+    let num_ticks : i32 = 10000;
+    let input_phvs : Vec <Phv <i32> > = create_random_phvs (20000, 1, 3, 1, 3);
+    let hole_cfg_file : String = String::from("hole_configurations/learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt");
+    let hole_cfgs_map : HashMap <String, i32> = extract_hole_cfgs (hole_cfg_file);
 
-      let pipeline : Pipeline = 
-        learn_filter_unoptimized::init_pipeline (hole_cfgs_map.clone());
+    let mut pipeline : Pipeline = 
+      learn_filter_unoptimized::init_pipeline (hole_cfgs_map.clone());
+    b.iter(|| {
+
       let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                         pipeline,
-                                                         20000);
+                                                         &mut pipeline,
+                                                         num_ticks);
 
     });
 }
 
 #[bench]
 fn bench_rcp_dsim_unoptimized (b : &mut Bencher) {
-    b.iter(|| {
-      let input_phvs : Vec <Phv <i32> > = create_random_phvs (20000, 1, 3, 1, 3);
-      let hole_cfg_file : String = String::from("hole_configurations/rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt");
-      let hole_cfgs_map : HashMap <String, i32> = extract_hole_cfgs (hole_cfg_file);
+    let num_ticks : i32 = 10000;
+    let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 1, 3, 1, 3);
+    let hole_cfg_file : String = String::from("hole_configurations/rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt");
+    let hole_cfgs_map : HashMap <String, i32> = extract_hole_cfgs (hole_cfg_file);
 
-      let pipeline : Pipeline = 
-        rcp_unoptimized::init_pipeline (hole_cfgs_map.clone());
+    let mut pipeline : Pipeline = 
+      rcp_unoptimized::init_pipeline (hole_cfgs_map.clone());
+
+    b.iter(|| {
       let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                         pipeline,
-                                                         20000);
+                                                         &mut pipeline,
+                                                         num_ticks);
 
     });
 }
@@ -260,55 +274,63 @@ fn bench_rcp_dsim_unoptimized (b : &mut Bencher) {
 #[bench]
 fn bench_blue_increase_dsim_optimized_1 (b : &mut Bencher)
 {
-    b.iter(||{
-      let input_phvs : Vec <Phv <i32> > = create_random_phvs (20000, 2, 2, 2, 2);
+    let num_ticks : i32 = 10000;
+    let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 2, 2, 2, 2);
 
-      let pipeline : Pipeline = 
-        blue_increase_optimized_1::init_pipeline (HashMap::new());
+    let mut pipeline : Pipeline = 
+      blue_increase_optimized_1::init_pipeline (HashMap::new());
+    b.iter(||{
+
       let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                         pipeline,
-                                                         20000);
+                                                         &mut pipeline,
+                                                         num_ticks);
 
     });
 }
 
 #[bench]
 fn bench_flowlets_dsim_optimized_1(b : &mut Bencher) {
-    b.iter(|| {
-      let input_phvs : Vec <Phv <i32> > = create_random_phvs (20000, 3, 5, 1, 2);
+    let num_ticks : i32 = 10000;
+    let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 3, 5, 1, 2);
 
-      let pipeline : Pipeline = 
-        flowlets_optimized_1::init_pipeline (HashMap::new());
+    let mut pipeline : Pipeline = 
+      flowlets_optimized_1::init_pipeline (HashMap::new());
+    b.iter(|| {
+
       let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                     pipeline,
-                                                     20000);
+                                                         &mut pipeline,
+                                                         num_ticks);
 
     });
 }
 
 #[bench]
 fn bench_learn_filter_dsim_optimized_1(b : &mut Bencher) {
-    b.iter(|| {
-      let input_phvs : Vec <Phv <i32> > = create_random_phvs (20000, 1, 3, 1, 3);
+    let num_ticks : i32 = 10000;
+    let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 1, 3, 1, 3);
 
-      let pipeline : Pipeline = 
-        learn_filter_optimized_1::init_pipeline (HashMap::new());
+    let mut pipeline : Pipeline = 
+      learn_filter_optimized_1::init_pipeline (HashMap::new());
+    b.iter(|| {
+
       let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                         pipeline,
-                                                         20000);
+                                                         &mut pipeline,
+                                                         num_ticks);
     });
 }
 
 #[bench]
 fn bench_rcp_optimized_1(b : &mut Bencher) {
-    b.iter(|| {
-      let input_phvs : Vec <Phv <i32> > = create_random_phvs (20000, 1, 3, 1, 3);
+    let num_ticks : i32 = 10000;
+    let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 1, 3, 1, 3);
 
-      let pipeline : Pipeline = 
-        rcp_optimized_1::init_pipeline (HashMap::new());
+    let mut pipeline : Pipeline = 
+      rcp_optimized_1::init_pipeline (HashMap::new());
+    b.iter(|| {
+
       let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                         pipeline,
-                                                         20000);
+                                                         &mut pipeline,
+                                                         num_ticks);
 
     });
 }
@@ -320,56 +342,63 @@ fn bench_rcp_optimized_1(b : &mut Bencher) {
 #[bench]
 fn bench_blue_increase_dsim_optimized_2 (b : &mut Bencher)
 {
-    b.iter(||{
-      let input_phvs : Vec <Phv <i32> > = create_random_phvs (20000, 2, 2, 2, 2);
+    let num_ticks : i32 = 10000;
+    let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 2, 2, 2, 2);
 
-      let pipeline : Pipeline = 
-        blue_increase_optimized_2::init_pipeline (HashMap::new());
+    let mut pipeline : Pipeline = 
+      blue_increase_optimized_2::init_pipeline (HashMap::new());
+    b.iter(||{
+
       let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                         pipeline,
-                                                         20000);
+                                                         &mut pipeline,
+                                                         num_ticks);
 
     });
 }
 
 #[bench]
 fn bench_flowlets_dsim_optimized_2(b : &mut Bencher) {
-    b.iter(|| {
-      let input_phvs : Vec <Phv <i32> > = create_random_phvs (20000, 3, 5, 1, 2);
+    let num_ticks : i32 = 10000;
+    let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 3, 5, 1, 2);
 
-      let pipeline : Pipeline = 
-        flowlets_optimized_2::init_pipeline (HashMap::new());
+    let mut pipeline : Pipeline = 
+      flowlets_optimized_2::init_pipeline (HashMap::new());
+
+    b.iter(|| {
       let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                     pipeline,
-                                                     20000);
+                                                     &mut pipeline,
+                                                     num_ticks);
 
     });
 }
 
 #[bench]
 fn bench_learn_filter_dsim_optimized_2(b : &mut Bencher) {
-    b.iter(|| {
-      let input_phvs : Vec <Phv <i32> > = create_random_phvs (20000, 1, 3, 1, 3);
+    let num_ticks : i32 = 10000;
+    let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 1, 3, 1, 3);
 
-      let pipeline : Pipeline = 
-        learn_filter_optimized_2::init_pipeline (HashMap::new());
+    let mut pipeline : Pipeline = 
+      learn_filter_optimized_2::init_pipeline (HashMap::new());
+
+    b.iter(|| {
       let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                         pipeline,
-                                                         20000);
+                                                         &mut pipeline,
+                                                         num_ticks);
     });
 }
 
 #[bench]
 fn bench_rcp_optimized_2(b : &mut Bencher) {
-    b.iter(|| {
-      let input_phvs : Vec <Phv <i32> > = create_random_phvs (20000, 1, 3, 1, 3);
+    let num_ticks : i32 = 10000;
+    let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 1, 3, 1, 3);
 
-      let pipeline : Pipeline = 
+    let mut pipeline : Pipeline = 
         rcp_optimized_2::init_pipeline (HashMap::new());
-      let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                         pipeline,
-                                                         20000);
 
+    b.iter(|| {
+      let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
+                                                         &mut pipeline,
+                                                         num_ticks);
     });
 }
 
