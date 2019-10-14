@@ -13,7 +13,8 @@ fn main() {
     let args : Vec<String> = env::args().collect();
     // Make room for optional hole configs
     assert! (args.len() == 9 || 
-             args.len() == 10);
+             args.len() == 10 ||
+             args.len() == 11);
 
     let spec_name : String = args[1].clone();
     let stateful_alu : String = 
@@ -66,7 +67,20 @@ fn main() {
                                 pipeline_depth,
                                 pipeline_width);
 
-    if args.len() <= 9 {
+    let opt_level : i32 = 
+        match args.len() {
+          // 11 args means hole configs and optimzation level supplied
+          11  => match args[10].parse::<i32>() {
+            Ok (t_opt_level) => t_opt_level,
+            Err (_)          => panic!("Failure: Unable to unwrap optimization level"),
+          },
+          // 10 args means hole configs supplied but no optimization
+          // level so set it to 1 by default
+          10 => 1,
+          _  => 0,
+
+      };
+    if opt_level == 0{
       alu_generation_utils::generate_alus (name, 
                                            stateful_alu, 
                                            stateless_alu, 
@@ -75,7 +89,8 @@ fn main() {
                                            num_stateful_alus,
                                            constant_vec,
                                            file_path,
-                                           "".to_string());
+                                           "".to_string(),
+                                           0);
     }
     else {
 
@@ -88,8 +103,10 @@ fn main() {
                                            num_stateful_alus,
                                            constant_vec,
                                            file_path,
-                                           hole_cfg_file);
+                                           hole_cfg_file,
+                                           opt_level);
     }
+    println!("dgen completed");
 }
 
 #[cfg(test)]

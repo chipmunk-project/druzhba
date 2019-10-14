@@ -38,7 +38,8 @@ def run_dgen_optimized (args):
                     args[5], # Stateful ALUs per stage
                     args[6], # Constant vec
                     'src/prog_to_run.rs', # Output prog_to_run
-                    args[7] # Hole configurations
+                    args[7], # Hole configurations
+                    args[10] # Optimization level
                     ])
     subprocess.run(['rm',
                     'dgen_bin'])
@@ -111,14 +112,15 @@ def main ():
     args.append(str(raw_args.num_packets))
     args.append(str(raw_args.ticks))
     opt_level = raw_args.opt_level
-    if opt_level == 1:
+    args.append(str(opt_level))
+    if opt_level == 0:
 
-        run_dgen_optimized(args)
-        run_druzhba_optimized(args)
-
-    else:
         run_dgen_unoptimized(args)
         run_druzhba_unoptimized(args)
+
+    else:
+        run_dgen_optimized(args)
+        run_druzhba_optimized(args)
 
 
 if __name__== "__main__":

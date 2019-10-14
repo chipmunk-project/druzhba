@@ -108,6 +108,7 @@ pub fn test_optheader ()
             hole configs : ../hole_configurations/hole_cfgs.txt
             pipeline stage : 2
             alu : 0
+            opt level : 0
             [4,5,12,502]
             type : stateful
             state variables : {state_0}
@@ -124,6 +125,7 @@ pub fn test_optheader ()
             hole configs :
             pipeline stage : 2
             alu : 0
+            opt level : 1
             [0,1,2,3]
             type : stateless
             state variables : {}
@@ -164,7 +166,8 @@ pub fn test_stateless_alu ()
     .expect("Something went wrong reading the file");
 
   assert! (alugrammar::AluParser::new().parse(&alu).is_ok());
-  let result : Box <rust_code_generator::Alu> = match alugrammar::AluParser::new().parse(&alu){
+  // _result not used
+  let _result : Box <rust_code_generator::Alu> = match alugrammar::AluParser::new().parse(&alu){
     Ok (s) => s,
     _      => panic! ("Parsing stateless ALU failed"),
   };

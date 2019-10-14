@@ -15,6 +15,7 @@ fn main() {
 
   let test_case_names : Vec <String> = test_names();
   let dgen_data : Vec <Vec <String> > = test_configurations();
+
    Command::new("mkdir")
            .arg("src/tests")
            .output()
@@ -48,8 +49,6 @@ fn main() {
   }
   // Copies benchmark prog_to_run files to benches dir
   copy_benchmark_files();
-
-
 }
 
 // Copies prog_to_run files from tests directory to
@@ -58,24 +57,33 @@ fn copy_benchmark_files ()
 {
    copy_benchmark_file("src/tests/blue_increase_pair_stateless_alu_arith_4_2.rs",
                        "benches/blue_increase_unoptimized.rs");
+   copy_benchmark_file("src/tests/blue_increase_pair_stateless_alu_arith_4_2_optimized_1.rs",
+                       "benches/blue_increase_optimized_1.rs");
+   copy_benchmark_file("src/tests/blue_increase_pair_stateless_alu_arith_4_2_optimized_2.rs",
+                       "benches/blue_increase_optimized_2.rs");
 
-   copy_benchmark_file("src/tests/blue_increase_pair_stateless_alu_arith_4_2_optimized.rs",
-                       "benches/blue_increase_optimized.rs");
 
    copy_benchmark_file("src/tests/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5.rs",
                        "benches/flowlets_unoptimized.rs");
-   copy_benchmark_file("src/tests/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_optimized.rs",
-                       "benches/flowlets_optimized.rs");
+   copy_benchmark_file("src/tests/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_optimized_1.rs",
+                       "benches/flowlets_optimized_1.rs");
+   copy_benchmark_file("src/tests/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_optimized_2.rs",
+                       "benches/flowlets_optimized_2.rs");
 
-   copy_benchmark_file("src/tests/learn_filter_equivalent_10_canonicalizer_equivalent_0_raw_stateless_alu_5_3_optimized.rs",
-                       "benches/learn_filter_optimized.rs");
-   copy_benchmark_file("src/tests/learn_filter_equivalent_10_canonicalizer_equivalent_0_raw_stateless_alu_5_3.rs",
+   copy_benchmark_file("src/tests/learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3.rs",
                        "benches/learn_filter_unoptimized.rs");
+   copy_benchmark_file("src/tests/learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3_optimized_1.rs",
+                       "benches/learn_filter_optimized_1.rs");
+copy_benchmark_file("src/tests/learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3_optimized_2.rs",
+                       "benches/learn_filter_optimized_2.rs");
 
    copy_benchmark_file("src/tests/rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3.rs",
                        "benches/rcp_unoptimized.rs");
-   copy_benchmark_file("src/tests/rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_optimized.rs",
-                       "benches/rcp_optimized.rs");
+   copy_benchmark_file("src/tests/rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_optimized_1.rs",
+                       "benches/rcp_optimized_1.rs");
+   copy_benchmark_file("src/tests/rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_optimized_2.rs",
+                       "benches/rcp_optimized_2.rs");
+
 
 }
 
@@ -93,6 +101,7 @@ fn copy_benchmark_file (source : &str,
    let contents : String = 
        fs::read_to_string(destination)
          .expect("Could not open for benchmarks");
+
    fs::write(destination,
              format!("{}{}",
                      "extern crate druzhba;\n",
@@ -118,6 +127,7 @@ fn run_dgen (test_case_names : &Vec<String>,
            .expect("Adding execution permissions to dgen_bin failed");
   let mut index : usize = 0;
   for arg in dgen_args.iter(){
+    // Optimization level 1
     Command::new("./dgen_bin")
                 .arg(&arg[0]) // Name
                 .arg(&arg[1]) // Stateful ALU
@@ -126,11 +136,27 @@ fn run_dgen (test_case_names : &Vec<String>,
                 .arg(&arg[4]) // Width
                 .arg(&arg[8]) // Stateful ALUs
                 .arg(&arg[5]) // constant vec
-                .arg(format!("src/tests/{}_optimized.rs", test_case_names[index]))
+                .arg(format!("src/tests/{}_optimized_1.rs", test_case_names[index]))
                 .arg(&arg[9]) // Hole configs
+                .arg("1") // Optimization
                 .output()
                 .expect("Error running dgen");
-    
+
+    // Optimization level 2
+     Command::new("./dgen_bin")
+                .arg(&arg[0]) // Name
+                .arg(&arg[1]) // Stateful ALU
+                .arg(&arg[2]) // Stateless ALU
+                .arg(&arg[3]) // Depth
+                .arg(&arg[4]) // Width
+                .arg(&arg[8]) // Stateful ALUs
+                .arg(&arg[5]) // constant vec
+                .arg(format!("src/tests/{}_optimized_2.rs", test_case_names[index]))
+                .arg(&arg[9]) // Hole configs
+                .arg("2") // Optimization
+                .output()
+                .expect("Error running dgen");
+    // No optimization (level 0)
     Command::new("./dgen_bin")
                 .arg(&arg[0]) // Name
                 .arg(&arg[1]) // Stateful ALU
@@ -159,7 +185,9 @@ fn write_mod_file (test_case_names : &Vec<String>){
   for n in test_case_names.iter(){
     declaration_list.push_str (&format!("pub mod {};\n",n));
 
-    declaration_list.push_str (&format!("pub mod {}_optimized;\n",n));
+    declaration_list.push_str (&format!("pub mod {}_optimized_1;\n",n));
+
+    declaration_list.push_str (&format!("pub mod {}_optimized_2;\n",n));
                              
   }
   fs::write("src/tests/mod.rs", declaration_list)
@@ -171,15 +199,28 @@ fn write_test(test_file: &mut File,
               test_name : String) {
 
 
+    // Optimization level 1
     write!(test_file, include_str!("./test/test_template_optimized"),
-                      name = format!("test_{}_optimized",test_name),
+                      name = format!("test_{}_optimized_1",test_name),
                       num_packets = dgen_data[6],
                       num_containers = dgen_data[4], 
                       num_state_vars = dgen_data[7],
                       num_stateful_alus = dgen_data[8],
-                      prog_to_run_file = format!("{}_optimized", test_name),
+                      prog_to_run_file = format!("{}_optimized_1", test_name),
                       test_function = format!("test_{}",dgen_data[10])
                       ).expect("Error writing to test_with_chipmunk.rs");
+    // Optimization level 2
+    write!(test_file, include_str!("./test/test_template_optimized"),
+                      name = format!("test_{}_optimized_2",test_name),
+                      num_packets = dgen_data[6],
+                      num_containers = dgen_data[4], 
+                      num_state_vars = dgen_data[7],
+                      num_stateful_alus = dgen_data[8],
+                      prog_to_run_file = format!("{}_optimized_2", test_name),
+                      test_function = format!("test_{}",dgen_data[10])
+                      ).expect("Error writing to test_with_chipmunk.rs");
+
+    // No optimization (level 0)
     write!(test_file, include_str!("./test/test_template_unoptimized"),
                       name = format!("test_{}",test_name),
                       num_packets = dgen_data[6],
@@ -199,7 +240,9 @@ fn write_header(test_file: &mut File,
 
   let mut test_case_imports : String = String::from("");
   for n in test_case_names.iter(){
-    test_case_imports.push_str (&format!("use tests::{}_optimized;\n", n));
+    test_case_imports.push_str (&format!("use tests::{}_optimized_1;\n", n));
+
+    test_case_imports.push_str (&format!("use tests::{}_optimized_2;\n", n));
 
     test_case_imports.push_str (&format!("use tests::{};\n", n));
   }
@@ -215,28 +258,13 @@ fn write_header(test_file: &mut File,
 fn test_names () -> Vec <String> {
   vec![
   "simple_raw_stateless_alu_2_2".to_string(),
-  "simple_raw_stateless_alu_arith_3_4".to_string(),
-  "simple_raw_stateless_alu_arith_2_3".to_string(),
-  "simple_if_else_raw_stateless_alu_arith_rel_cond_2_2".to_string(),
   "simple_if_else_raw_stateless_alu_arith_rel_cond_bool_2_4".to_string(),
   "simple_sub_stateless_alu_arith_rel_cond_2_3".to_string(),
   "simple_nested_ifs_stateless_alu_arith_rel_2_2".to_string(),
 
   "simple_pair_stateless_alu_arith_2_4".to_string(),
-  "marple_new_flow_pred_raw_stateless_alu_arith_rel_cond_3_2".to_string(),
-  "marple_new_flow_sub_stateless_alu_arith_rel_cond_bool_2_3".to_string(),
-  "marple_new_flow_pair_stateless_alu_2_4".to_string(),
-  "marple_tcp_nmo_if_else_raw_stateless_alu_4_2".to_string(),
-  "marple_tcp_nmo_nested_ifs_stateless_alu_arith_rel_3_2".to_string(),
   "blue_increase_pair_stateless_alu_arith_4_2".to_string(),
 
-  "learn_filter_pred_raw_stateless_alu_arith_rel_2_3".to_string(),
-  "learn_filter_if_else_raw_stateless_alu_2_3".to_string(),
-  "learn_filter_sub_stateless_alu_arith_rel_cond_2_3".to_string(),
-  "sampling_sub_stateless_alu_3_3".to_string(),
-  "sampling_pair_stateless_alu_arith_rel_3_3".to_string(),
-  "rcp_if_else_raw_stateless_alu_arith_rel_3_3".to_string(),
-  "rcp_nested_ifs_stateless_alu_2_3".to_string(),
   "times_two_sub_stateless_alu_arith_3_3".to_string(),
   "times_two_if_else_raw_stateless_alu_arith_rel_4_2".to_string(),
   "test_pred_raw_stateless_alu_arith_rel_cond_bool_3_3".to_string(),
@@ -249,29 +277,16 @@ fn test_names () -> Vec <String> {
   "blue_increase_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2".to_string(),
   "blue_increase_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2".to_string(),
 
-   "blue_increase_equivalent_6_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2".to_string(),
-  "blue_increase_equivalent_7_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2".to_string(),
- "blue_increase_equivalent_9_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2".to_string(),
-  "blue_increase_equivalent_10_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2".to_string(),
   "blue_decrease_equivalent_1_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2".to_string(),
   "blue_decrease_equivalent_2_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2".to_string(),
   "blue_decrease_equivalent_3_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2".to_string(),
    "blue_decrease_equivalent_4_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2".to_string(),
-  "blue_decrease_equivalent_6_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2".to_string(),
-  "blue_decrease_equivalent_7_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2".to_string(),
-  "blue_decrease_equivalent_8_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2".to_string(),
-  "blue_decrease_equivalent_9_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2".to_string(),
 
   "conga_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_5".to_string(),
   "conga_equivalent_2_canonicalizer_equivalent_1_pair_stateless_alu_1_5".to_string(),
   "conga_equivalent_3_canonicalizer_equivalent_1_pair_stateless_alu_1_5".to_string(),
   "conga_equivalent_4_canonicalizer_equivalent_1_pair_stateless_alu_1_5".to_string(),
   "conga_equivalent_5_canonicalizer_equivalent_1_pair_stateless_alu_1_5".to_string(),
-  "conga_equivalent_6_canonicalizer_equivalent_1_pair_stateless_alu_1_5".to_string(),
-  "conga_equivalent_7_canonicalizer_equivalent_1_pair_stateless_alu_1_5".to_string(),
-  "conga_equivalent_8_canonicalizer_equivalent_1_pair_stateless_alu_1_5".to_string(),
-  "conga_equivalent_9_canonicalizer_equivalent_1_pair_stateless_alu_1_5".to_string(),
-  "conga_equivalent_10_canonicalizer_equivalent_1_pair_stateless_alu_1_5".to_string(),
   
   "marple_new_flow_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2".to_string(),
 
@@ -280,12 +295,7 @@ fn test_names () -> Vec <String> {
   "marple_new_flow_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2".to_string(),
   "marple_new_flow_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2".to_string(),
   
-  "marple_new_flow_equivalent_6_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2".to_string(),
-  "marple_new_flow_equivalent_7_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2".to_string(),
-  "marple_new_flow_equivalent_8_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2".to_string(),
-  "marple_new_flow_equivalent_9_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2".to_string(),
 
-  "marple_new_flow_equivalent_10_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2".to_string(),
   "marple_tcp_nmo_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2".to_string(),
 
   "marple_tcp_nmo_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2".to_string(),
@@ -293,43 +303,23 @@ fn test_names () -> Vec <String> {
 
   "marple_tcp_nmo_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2".to_string(),
   "marple_tcp_nmo_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2".to_string(),
-  "marple_tcp_nmo_equivalent_6_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2".to_string(),
-  "marple_tcp_nmo_equivalent_7_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2".to_string(),
   
-  "marple_tcp_nmo_equivalent_8_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2".to_string(),
-  "marple_tcp_nmo_equivalent_9_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2".to_string(),
-  "marple_tcp_nmo_equivalent_10_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2".to_string(),
 "learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3".to_string(),
 
   "learn_filter_equivalent_2_canonicalizer_equivalent_0_raw_stateless_alu_5_3".to_string(),
   "learn_filter_equivalent_3_canonicalizer_equivalent_0_raw_stateless_alu_5_3".to_string(),
   "learn_filter_equivalent_4_canonicalizer_equivalent_0_raw_stateless_alu_5_3".to_string(),
   "learn_filter_equivalent_5_canonicalizer_equivalent_0_raw_stateless_alu_5_3".to_string(),
-  "learn_filter_equivalent_6_canonicalizer_equivalent_0_raw_stateless_alu_5_3".to_string(),
-  "learn_filter_equivalent_7_canonicalizer_equivalent_0_raw_stateless_alu_5_3".to_string(),
-  "learn_filter_equivalent_8_canonicalizer_equivalent_0_raw_stateless_alu_5_3".to_string(),
-  "learn_filter_equivalent_9_canonicalizer_equivalent_0_raw_stateless_alu_5_3".to_string(),
-  "learn_filter_equivalent_10_canonicalizer_equivalent_0_raw_stateless_alu_5_3".to_string(),
   "flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5".to_string(),
   "flowlets_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5".to_string(),
   "flowlets_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5".to_string(),
   "flowlets_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5".to_string(),
   "flowlets_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5".to_string(),
-  "flowlets_equivalent_6_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5".to_string(),
-  "flowlets_equivalent_7_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5".to_string(),
-  "flowlets_equivalent_8_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5".to_string(),
-  "flowlets_equivalent_9_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5".to_string(),
-  "flowlets_equivalent_10_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5".to_string(),
   "rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3".to_string(),
   "rcp_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3".to_string(),
   "rcp_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3".to_string(),
   "rcp_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3".to_string(),
   "rcp_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3".to_string(),
-  "rcp_equivalent_6_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3".to_string(),
-  "rcp_equivalent_7_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3".to_string(),
-  "rcp_equivalent_8_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3".to_string(),
-  "rcp_equivalent_9_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3".to_string(),
-  "rcp_equivalent_10_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3".to_string(),
 
   "sampling_equivalent_1_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1".to_string(),
 
@@ -337,22 +327,12 @@ fn test_names () -> Vec <String> {
   "sampling_equivalent_3_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1".to_string(),
   "sampling_equivalent_4_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1".to_string(),
   "sampling_equivalent_5_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1".to_string(),
-  "sampling_equivalent_6_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1".to_string(),
-  "sampling_equivalent_7_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1".to_string(),
-  "sampling_equivalent_8_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1".to_string(),
-  "sampling_equivalent_9_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1".to_string(),
-  "sampling_equivalent_10_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1".to_string(),
   "snap_heavy_hitter_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_1".to_string(),
 
   "snap_heavy_hitter_equivalent_2_canonicalizer_equivalent_1_pair_stateless_alu_1_1".to_string(),
   "snap_heavy_hitter_equivalent_3_canonicalizer_equivalent_1_pair_stateless_alu_1_1".to_string(),
   "snap_heavy_hitter_equivalent_4_canonicalizer_equivalent_1_pair_stateless_alu_1_1".to_string(),
   "snap_heavy_hitter_equivalent_5_canonicalizer_equivalent_1_pair_stateless_alu_1_1".to_string(),
-  "snap_heavy_hitter_equivalent_6_canonicalizer_equivalent_1_pair_stateless_alu_1_1".to_string(),
-  "snap_heavy_hitter_equivalent_7_canonicalizer_equivalent_1_pair_stateless_alu_1_1".to_string(),
-  "snap_heavy_hitter_equivalent_8_canonicalizer_equivalent_1_pair_stateless_alu_1_1".to_string(),
-  "snap_heavy_hitter_equivalent_9_canonicalizer_equivalent_1_pair_stateless_alu_1_1".to_string(),
-  "snap_heavy_hitter_equivalent_10_canonicalizer_equivalent_1_pair_stateless_alu_1_1".to_string(),
 
   "spam_detection_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_1".to_string(),
 
@@ -360,11 +340,6 @@ fn test_names () -> Vec <String> {
   "spam_detection_equivalent_3_canonicalizer_equivalent_1_pair_stateless_alu_1_1".to_string(),
   "spam_detection_equivalent_4_canonicalizer_equivalent_1_pair_stateless_alu_1_1".to_string(),
   "spam_detection_equivalent_5_canonicalizer_equivalent_1_pair_stateless_alu_1_1".to_string(),
-  "spam_detection_equivalent_6_canonicalizer_equivalent_1_pair_stateless_alu_1_1".to_string(),
-  "spam_detection_equivalent_7_canonicalizer_equivalent_1_pair_stateless_alu_1_1".to_string(),
-  "spam_detection_equivalent_8_canonicalizer_equivalent_1_pair_stateless_alu_1_1".to_string(),
-  "spam_detection_equivalent_9_canonicalizer_equivalent_1_pair_stateless_alu_1_1".to_string(),
-  "spam_detection_equivalent_10_canonicalizer_equivalent_1_pair_stateless_alu_1_1".to_string(),
   "stateful_fw_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5".to_string(),
   "stateful_fw_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5".to_string(),
      ]
@@ -385,48 +360,6 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // State vars
           "1".to_string(), // Stateful ALUs
           "hole_configurations/simple_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
-          "simple".to_string(),
-        ],
-    // simple_raw_stateless_alu_arith_3_4
-    vec! ["simple".to_string(),
-          "example_alus/stateful_alus/raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu_arith.alu".to_string(),
-          "3".to_string(), // Pipeline depth
-          "4".to_string(), // Pipeline width
-          "0,1,2,3".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/simple_raw_stateless_alu_arith_3_4_hole_cfgs.txt".to_string(), // Hole config file
-
-          "simple".to_string(),
-        ],
-    // simple_raw_stateless_alu_arith_2_3
-    vec! ["simple".to_string(),
-          "example_alus/stateful_alus/raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu_arith.alu".to_string(),
-          "2".to_string(), // Pipeline depth
-          "3".to_string(), // Pipeline width
-          "0,1,2,3".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/simple_raw_stateless_alu_arith_2_3_hole_cfgs.txt".to_string(), // Hole config file
-
-          "simple".to_string(),
-        ],
-    // simple_if_else_raw_stateless_alu_arith_rel_cond_2_2
-    vec! ["simple".to_string(),
-          "example_alus/stateful_alus/if_else_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu_arith_rel_cond.alu".to_string(),
-          "2".to_string(), // Pipeline depth
-          "2".to_string(), // Pipeline width
-          "3,2,0,1,4".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/simple_if_else_raw_stateless_alu_arith_rel_cond_2_2_hole_cfgs.txt".to_string(), // Hole config file
-
           "simple".to_string(),
         ],
 
@@ -488,71 +421,6 @@ fn test_configurations () -> Vec <Vec <String> > {
 
           "simple".to_string(),
         ],
-    vec! ["marple_new_flow".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu_arith_rel_cond.alu".to_string(),
-          "3".to_string(), // Pipeline depth
-          "2".to_string(), // Pipeline width
-          "0,1,2,3".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/marple_new_flow_pred_raw_stateless_alu_arith_rel_cond_3_2_hole_cfgs.txt".to_string(), // Hole config file
-          "marple_new_flow".to_string(),
-        ],
-    vec! ["marple_new_flow".to_string(),
-          "example_alus/stateful_alus/sub.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu_arith_rel_cond_bool.alu".to_string(),
-          "2".to_string(), // Pipeline depth
-          "3".to_string(), // Pipeline width
-          "1,2,3,0,4".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/marple_new_flow_sub_stateless_alu_arith_rel_cond_bool_2_3_hole_cfgs.txt".to_string(), // Hole config file
-          "marple_new_flow".to_string(),
-        ],
-    // marple_new_flow_pair_stateless_alu_2_4
-    vec! ["marple_new_flow".to_string(),
-          "example_alus/stateful_alus/pair.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "2".to_string(), // Pipeline depth
-          "4".to_string(), // Pipeline width
-          "0,1,2,3".to_string(),
-          "1".to_string(), // Num packets
-          "2".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/marple_new_flow_pair_stateless_alu_2_4_hole_cfgs.txt".to_string(), // Hole config file
-          "marple_new_flow".to_string(),
-
-        ],
-    // marple_tcp_nmo_if_else_raw_stateless_alu_4_2
-    vec! ["marple_tcp_nmo".to_string(),
-          "example_alus/stateful_alus/if_else_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "4".to_string(), // Pipeline depth
-          "2".to_string(), // Pipeline width
-          "0,1,2,3".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "2".to_string(), // Stateful ALUs
-          "hole_configurations/marple_tcp_nmo_if_else_raw_stateless_alu_4_2_hole_cfgs.txt".to_string(), // Hole config file
-          "marple_tcp_nmo_old".to_string(),
-        ],
-    // marple_tcp_nmo_nested_ifs_stateless_alu_arith_rel_3_2
-    vec! ["marple_tcp_nmo".to_string(),
-          "example_alus/stateful_alus/nested_ifs.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu_arith_rel.alu".to_string(),
-          "3".to_string(), // Pipeline depth
-          "2".to_string(), // Pipeline width
-          "0,1,2,3".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "2".to_string(), // Stateful ALUs
-          "hole_configurations/marple_tcp_nmo_nested_ifs_stateless_alu_arith_rel_3_2_hole_cfgs.txt".to_string(), // Hole config file
-          "marple_tcp_nmo_old".to_string(),
-        ],
-
     // blue_increase_pair_stateless_alu_arith_4_2
     vec! ["blue_increase".to_string(),
           "example_alus/stateful_alus/pair.alu".to_string(),
@@ -567,100 +435,8 @@ fn test_configurations () -> Vec <Vec <String> > {
 
           "blue_increase_old".to_string(),
         ],
-    // learn_filter_pred_raw_stateless_alu_arith_rel_2_3
-    vec! ["learn_filter".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu_arith_rel.alu".to_string(),
-          "2".to_string(),
-          "3".to_string(),
-          "4,3,0,5,1,2".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "3".to_string(), // Stateful ALUs
-          "hole_configurations/learn_filter_pred_raw_stateless_alu_arith_rel_2_3_hole_cfgs.txt".to_string(), // Hole config file
-          "learn_filter_old".to_string(),
-    ],
-    // learn_filter_if_else_raw_stateless_alu_2_2
-    vec! ["learn_filter".to_string(),
-          "example_alus/stateful_alus/if_else_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "2".to_string(),
-          "3".to_string(),
-          "0,1,2,3".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "3".to_string(), // Stateful ALUs
-          "hole_configurations/learn_filter_if_else_raw_stateless_alu_2_3_hole_cfgs.txt".to_string(), // Hole config file
-          "learn_filter_old".to_string(),
-        ],
-    // learn_filter_sub_stateless_alu_arith_rel_cond_2_3 
-    vec! ["learn_filter".to_string(),
-          "example_alus/stateful_alus/sub.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu_arith_rel_cond.alu".to_string(),
-          "2".to_string(),
-          "3".to_string(),
-          "0,1,2,3,4,5".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "3".to_string(), // Stateful ALUs
-          "hole_configurations/learn_filter_sub_stateless_alu_arith_rel_cond_2_3_hole_cfgs.txt".to_string(), // Hole config file
-          "learn_filter_old".to_string(),
-        ],
 
-     //sampling_sub_stateless_alu_3_3 
-    vec! ["sampling".to_string(),
-          "example_alus/stateful_alus/sub.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "3".to_string(),
-          "3".to_string(),
-          "0,1,2,3".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/sampling_sub_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
-           "sampling_old".to_string(),
-        ],
 
-     // sampling_pair_stateless_alu_arith_rel_3_3
-    vec! ["sampling".to_string(),
-          "example_alus/stateful_alus/pair.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu_arith_rel.alu".to_string(),
-          "3".to_string(),
-          "3".to_string(),
-          "1,2,0,4,3".to_string(),
-          "1".to_string(), // Num packets
-          "2".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/sampling_pair_stateless_alu_arith_rel_3_3_hole_cfgs.txt".to_string(), // Hole config file
-          "sampling_old".to_string(),
-        ],
-
-     // rcp_if_else_raw_stateless_alu_arith_rel_3_3
-    vec! ["rcp".to_string(),
-          "example_alus/stateful_alus/if_else_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu_arith_rel.alu".to_string(),
-          "3".to_string(),
-          "3".to_string(),
-          "0,1,2,3".to_string(),
-          "2".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "3".to_string(), // Stateful ALUs
-          "hole_configurations/rcp_if_else_raw_stateless_alu_arith_rel_3_3_hole_cfgs.txt".to_string(), // Hole config file
-          "rcp".to_string(),
-        ],
-     // rcp_if_else_raw_stateless_alu_arith_rel_2_3
-    vec! ["rcp".to_string(),
-          "example_alus/stateful_alus/nested_ifs.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "2".to_string(),
-          "3".to_string(),
-          "0,1,2,3".to_string(),
-          "2".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "3".to_string(), // Stateful ALUs
-          "hole_configurations/rcp_nested_ifs_stateless_alu_2_3_hole_cfgs.txt".to_string(), // Hole config file
-          "rcp".to_string(),
-        ],
      //times_two_sub_stateless_alu_arith_3_3 
     vec! ["times_two".to_string(),
           "example_alus/stateful_alus/sub.alu".to_string(),
@@ -798,57 +574,6 @@ fn test_configurations () -> Vec <Vec <String> > {
         ],
 
 
-    vec! ["blue_increase_equivalent_6_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu_arith.alu".to_string(),
-          "4".to_string(),
-          "2".to_string(),
-          "1,10,11,22,1,13,12,10,0,2,3".to_string(),
-          "2".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "2".to_string(), // Stateful ALUs
-          "hole_configurations/blue_increase_equivalent_6_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
-          "blue_increase".to_string(),
-        ],
-
-    vec! ["blue_increase_equivalent_7_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu_arith.alu".to_string(),
-          "4".to_string(),
-          "2".to_string(),
-          "5,15,21,9,10,3,14,4,12,10,0,16,1,11,22,6,1,2,20".to_string(),
-          "2".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "2".to_string(), // Stateful ALUs
-          "hole_configurations/blue_increase_equivalent_7_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
-          "blue_increase".to_string(),
-        ],
-
-
-    vec! ["blue_increase_equivalent_9_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu_arith.alu".to_string(),
-          "4".to_string(),
-          "2".to_string(),
-          "12,0,10,2,3,215,1,1,203,11,214,204".to_string(),
-          "2".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "2".to_string(), // Stateful ALUs
-          "hole_configurations/blue_increase_equivalent_9_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
-          "blue_increase".to_string(),
-        ],
-    vec! ["blue_increase_equivalent_10_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu_arith.alu".to_string(),
-          "4".to_string(),
-          "2".to_string(),
-          "0,11,1,10,13,3,2,10,12,21,1".to_string(),
-          "2".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "2".to_string(), // Stateful ALUs
-          "hole_configurations/blue_increase_equivalent_10_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
-          "blue_increase".to_string(),
-        ],
 
     vec! ["blue_decrease_equivalent_1_canonicalizer_equivalent_0".to_string(),
           "example_alus/stateful_alus/sub.alu".to_string(),
@@ -901,56 +626,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "hole_configurations/blue_decrease_equivalent_4_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
           "blue_decrease".to_string(),
         ],
-    vec! ["blue_decrease_equivalent_6_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/sub.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu_arith.alu".to_string(),
-          "4".to_string(),
-          "2".to_string(),
-          "2,12,11,1,1,2,0,10,3,10,13".to_string(),
-          "2".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "2".to_string(), // Stateful ALUs
-          "hole_configurations/blue_decrease_equivalent_6_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
-          "blue_decrease".to_string(),
-        ],
-    vec! ["blue_decrease_equivalent_7_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/sub.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu_arith.alu".to_string(),
-          "4".to_string(),
-          "2".to_string(),
-          "2,1023,10,11,1,13,18,3,5,12,9,20,10,7,1014,0,1".to_string(),
-          "2".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "2".to_string(), // Stateful ALUs
-          "hole_configurations/blue_decrease_equivalent_7_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
-          "blue_decrease".to_string(),
-        ],
 
-    vec! ["blue_decrease_equivalent_8_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/sub.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu_arith.alu".to_string(),
-          "4".to_string(),
-          "2".to_string(),
-          "0,3,11,10,12,1,10,1,2,21".to_string(),
-          "2".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "2".to_string(), // Stateful ALUs
-          "hole_configurations/blue_decrease_equivalent_8_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
-          "blue_decrease".to_string(),
-        ],
-
-    vec! ["blue_decrease_equivalent_9_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/sub.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu_arith.alu".to_string(),
-          "4".to_string(),
-          "2".to_string(),
-          "2,307,9,1,1,10,0,12,3,11".to_string(),
-          "2".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "2".to_string(), // Stateful ALUs
-          "hole_configurations/blue_decrease_equivalent_9_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_hole_cfgs.txt".to_string(), // Hole config file
-          "blue_decrease".to_string(),
-        ],
     vec! ["conga_equivalent_1_canonicalizer_equivalent_1".to_string(),
           "example_alus/stateful_alus/pair.alu".to_string(),
           "example_alus/stateless_alus/stateless_alu.alu".to_string(),
@@ -1011,69 +687,6 @@ fn test_configurations () -> Vec <Vec <String> > {
           "hole_configurations/conga_equivalent_5_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
           "conga".to_string(),
         ],
-   vec! ["conga_equivalent_6_canonicalizer_equivalent_1".to_string(),
-          "example_alus/stateful_alus/pair.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "1".to_string(),
-          "5".to_string(),
-          "0,1,2,3".to_string(),
-          "5".to_string(), // Num packets
-          "2".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/conga_equivalent_6_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
-          "conga".to_string(),
-        ],
-    vec! ["conga_equivalent_7_canonicalizer_equivalent_1".to_string(),
-          "example_alus/stateful_alus/pair.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "1".to_string(),
-          "5".to_string(),
-          "0,1,2,3".to_string(),
-          "5".to_string(), // Num packets
-          "2".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/conga_equivalent_7_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
-          "conga".to_string(),
-        ],
-
-    vec! ["conga_equivalent_8_canonicalizer_equivalent_1".to_string(),
-          "example_alus/stateful_alus/pair.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "1".to_string(),
-          "5".to_string(),
-          "0,1,2,3".to_string(),
-          "5".to_string(), // Num packets
-          "2".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/conga_equivalent_8_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
-          "conga".to_string(),
-        ],
-
-    vec! ["conga_equivalent_9_canonicalizer_equivalent_1".to_string(),
-          "example_alus/stateful_alus/pair.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "1".to_string(),
-          "5".to_string(),
-          "0,1,2,3".to_string(),
-          "5".to_string(), // Num packets
-          "2".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/conga_equivalent_9_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
-          "conga".to_string(),
-        ],
-    vec! ["conga_equivalent_10_canonicalizer_equivalent_1".to_string(),
-          "example_alus/stateful_alus/pair.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "1".to_string(),
-          "5".to_string(),
-          "0,1,2,3,4,303,337,687".to_string(),
-          "5".to_string(), // Num packets
-          "2".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/conga_equivalent_10_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt".to_string(), // Hole config file
-          "conga".to_string(),
-        ],
-        
     vec! ["marple_new_flow_equivalent_1_canonicalizer_equivalent_0".to_string(),
           "example_alus/stateful_alus/pred_raw.alu".to_string(),
           "example_alus/stateless_alus/stateless_alu.alu".to_string(),
@@ -1135,67 +748,6 @@ fn test_configurations () -> Vec <Vec <String> > {
           "marple_new_flow".to_string(),
         ],
         
-    vec! ["marple_new_flow_equivalent_6_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "2".to_string(),
-          "2".to_string(),
-          "0,1,2,3".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/marple_new_flow_equivalent_6_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
-          "marple_new_flow".to_string(),
-        ],
-    vec! ["marple_new_flow_equivalent_7_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "2".to_string(),
-          "2".to_string(),
-          "0,1,2,3".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/marple_new_flow_equivalent_7_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
-          "marple_new_flow".to_string(),
-        ],
-    vec! ["marple_new_flow_equivalent_8_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "2".to_string(),
-          "2".to_string(),
-          "0,1,2,3".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/marple_new_flow_equivalent_8_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
-          "marple_new_flow".to_string(),
-        ],
-
-    vec! ["marple_new_flow_equivalent_9_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "2".to_string(),
-          "2".to_string(),
-          "0,1,2,3".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/marple_new_flow_equivalent_9_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
-          "marple_new_flow".to_string(),
-        ],
-    vec! ["marple_new_flow_equivalent_10_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "2".to_string(),
-          "2".to_string(),
-          "0,1,2,3".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/marple_new_flow_equivalent_10_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_hole_cfgs.txt".to_string(), // Hole config file
-          "marple_new_flow".to_string(),
-        ],
     vec! ["marple_tcp_nmo_equivalent_1_canonicalizer_equivalent_0".to_string(),
           "example_alus/stateful_alus/pred_raw.alu".to_string(),
           "example_alus/stateless_alus/stateless_alu.alu".to_string(),
@@ -1259,70 +811,8 @@ fn test_configurations () -> Vec <Vec <String> > {
           "marple_tcp_nmo".to_string(),
         ],
 
-    vec! ["marple_tcp_nmo_equivalent_6_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "3".to_string(),
-          "2".to_string(),
-          "0,1,2,3".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "2".to_string(), // Stateful ALUs
-          "hole_configurations/marple_tcp_nmo_equivalent_6_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
-          "marple_tcp_nmo".to_string(),
-        ],
 
-    vec! ["marple_tcp_nmo_equivalent_7_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "3".to_string(),
-          "2".to_string(),
-          "0,1,2,3".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "2".to_string(), // Stateful ALUs
-          "hole_configurations/marple_tcp_nmo_equivalent_7_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
-          "marple_tcp_nmo_7".to_string(),
-        ],
 
-    vec! ["marple_tcp_nmo_equivalent_8_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "3".to_string(),
-          "2".to_string(),
-          "0,1,2,3".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "2".to_string(), // Stateful ALUs
-          "hole_configurations/marple_tcp_nmo_equivalent_8_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
-          "marple_tcp_nmo".to_string(),
-        ],
-
-    vec! ["marple_tcp_nmo_equivalent_9_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "3".to_string(),
-          "2".to_string(),
-          "0,1,2,3".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "2".to_string(), // Stateful ALUs
-          "hole_configurations/marple_tcp_nmo_equivalent_9_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
-          "marple_tcp_nmo".to_string(),
-        ],
-
-    vec! ["marple_tcp_nmo_equivalent_10_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "3".to_string(),
-          "2".to_string(),
-          "0,1,2,3".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "2".to_string(), // Stateful ALUs
-          "hole_configurations/marple_tcp_nmo_equivalent_10_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_hole_cfgs.txt".to_string(), // Hole config file
-          "marple_tcp_nmo".to_string(),
-        ],
 
     vec! ["learn_filter_equivalent_1_canonicalizer_equivalent_0".to_string(),
           "example_alus/stateful_alus/raw.alu".to_string(),
@@ -1388,70 +878,7 @@ fn test_configurations () -> Vec <Vec <String> > {
           "learn_filter".to_string(),
         ],
 
-    vec! ["learn_filter_equivalent_6_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "5".to_string(),
-          "3".to_string(),
-          "1,3,0,2".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "3".to_string(), // Stateful ALUs
-          "hole_configurations/learn_filter_equivalent_6_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
-          "learn_filter".to_string(),
-        ],
 
-    vec! ["learn_filter_equivalent_7_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "5".to_string(),
-          "3".to_string(),
-          "1,3,0,2".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "3".to_string(), // Stateful ALUs
-          "hole_configurations/learn_filter_equivalent_7_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
-          "learn_filter".to_string(),
-        ],
-
-    vec! ["learn_filter_equivalent_8_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "5".to_string(),
-          "3".to_string(),
-          "2,1,0,3".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "3".to_string(), // Stateful ALUs
-          "hole_configurations/learn_filter_equivalent_8_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
-          "learn_filter".to_string(),
-        ],
-
-    vec! ["learn_filter_equivalent_9_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "5".to_string(),
-          "3".to_string(),
-          "2,1,3,0".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "3".to_string(), // Stateful ALUs
-          "hole_configurations/learn_filter_equivalent_9_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
-          "learn_filter".to_string(),
-        ],
-
-    vec! ["learn_filter_equivalent_10_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "5".to_string(),
-          "3".to_string(),
-          "0,1,2,3".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "3".to_string(), // Stateful ALUs
-          "hole_configurations/learn_filter_equivalent_10_canonicalizer_equivalent_0_raw_stateless_alu_5_3_hole_cfgs.txt".to_string(), // Hole config file
-          "learn_filter".to_string(),
-        ],
     vec! ["flowlets_equivalent_1_canonicalizer_equivalent_0".to_string(),
           "example_alus/stateful_alus/pred_raw.alu".to_string(),
           "example_alus/stateless_alus/stateless_alu.alu".to_string(),
@@ -1510,66 +937,6 @@ fn test_configurations () -> Vec <Vec <String> > {
           "1".to_string(), // State vars
           "2".to_string(), // Stateful ALUs
           "hole_configurations/flowlets_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
-          "flowlets".to_string(),
-        ],
-    vec! ["flowlets_equivalent_6_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "4".to_string(),
-          "5".to_string(),
-          "0,1,2,3,5,6,1,3,2,7,196,195,4".to_string(),
-          "3".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "2".to_string(), // Stateful ALUs
-          "hole_configurations/flowlets_equivalent_6_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
-          "flowlets".to_string(),
-        ],
-    vec! ["flowlets_equivalent_7_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "4".to_string(),
-          "5".to_string(),
-          "0,1,2,3,5,6,1,2,42,43,44,45,50,7,5,38".to_string(),
-          "3".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "2".to_string(), // Stateful ALUs
-          "hole_configurations/flowlets_equivalent_7_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
-          "flowlets".to_string(),
-        ],
-    vec! ["flowlets_equivalent_8_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "4".to_string(),
-          "5".to_string(),
-          "0,1,2,3,5,6,1,7,2,5".to_string(),
-          "3".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "2".to_string(), // Stateful ALUs
-          "hole_configurations/flowlets_equivalent_8_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
-          "flowlets".to_string(),
-        ],
-    vec! ["flowlets_equivalent_9_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "4".to_string(),
-          "5".to_string(),
-          "0,1,2,3,5,6,1,7,2,9,11,3".to_string(),
-          "3".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "2".to_string(), // Stateful ALUs
-          "hole_configurations/flowlets_equivalent_9_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
-          "flowlets".to_string(),
-        ],
-    vec! ["flowlets_equivalent_10_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "4".to_string(),
-          "5".to_string(),
-          "0,1,2,3,5,6,1,7,2,5,8,11,4,27,22".to_string(),
-          "3".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "2".to_string(), // Stateful ALUs
-          "hole_configurations/flowlets_equivalent_10_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_hole_cfgs.txt".to_string(), // Hole config file
           "flowlets".to_string(),
         ],
 
@@ -1637,69 +1004,6 @@ fn test_configurations () -> Vec <Vec <String> > {
           "rcp".to_string(),
         ],
 
-    vec! ["rcp_equivalent_6_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "3".to_string(),
-          "3".to_string(),
-          "0, 1, 2, 3, 30".to_string(),
-          "2".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "3".to_string(), // Stateful ALUs
-          "hole_configurations/rcp_equivalent_6_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
-          "rcp".to_string(),
-        ],
-
-    vec! ["rcp_equivalent_7_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "3".to_string(),
-          "3".to_string(),
-          "0,1,2,3,30,31,192,320".to_string(),
-          "2".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "3".to_string(), // Stateful ALUs
-          "hole_configurations/rcp_equivalent_7_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
-          "rcp".to_string(),
-        ],
-
-    vec! ["rcp_equivalent_8_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "3".to_string(),
-          "3".to_string(),
-          "0, 1, 2, 3, 26, 28, 29, 30, 31, 295, 952, 953".to_string(),
-          "2".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "3".to_string(), // Stateful ALUs
-          "hole_configurations/rcp_equivalent_8_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
-          "rcp".to_string(),
-        ],
-    vec! ["rcp_equivalent_9_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "3".to_string(),
-          "3".to_string(),
-          "0, 1, 2, 3, 29, 30, 33, 34, 61".to_string(),
-          "2".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "3".to_string(), // Stateful ALUs
-          "hole_configurations/rcp_equivalent_9_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
-          "rcp".to_string(),
-        ],
-
-    vec! ["rcp_equivalent_10_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/pred_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "3".to_string(),
-          "3".to_string(),
-          "0, 1, 2, 3, 28, 29, 30, 31, 301, 1014".to_string(),
-          "2".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "3".to_string(), // Stateful ALUs
-          "hole_configurations/rcp_equivalent_10_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_hole_cfgs.txt".to_string(), // Hole config file
-          "rcp".to_string(),
-        ],
 
     vec! ["sampling_equivalent_1_canonicalizer_equivalent_0".to_string(),
           "example_alus/stateful_alus/if_else_raw.alu".to_string(),
@@ -1763,67 +1067,6 @@ fn test_configurations () -> Vec <Vec <String> > {
           "hole_configurations/sampling_equivalent_5_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
           "sampling".to_string(),
         ],
-    vec! ["sampling_equivalent_6_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/if_else_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "2".to_string(),
-          "1".to_string(),
-          "1,30,0,1,29, 29, 2, 3".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/sampling_equivalent_6_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
-          "sampling".to_string(),
-        ],
-    vec! ["sampling_equivalent_7_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/if_else_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "2".to_string(),
-          "1".to_string(),
-          "3, 1,0, 2,29, 29,30".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/sampling_equivalent_7_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
-          "sampling".to_string(),
-        ],
-    vec! ["sampling_equivalent_8_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/if_else_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "2".to_string(),
-          "1".to_string(),
-          "2, 1,29,4,30, 3,1,0, 29".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/sampling_equivalent_8_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
-          "sampling".to_string(),
-        ],
-    vec! ["sampling_equivalent_9_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/if_else_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "2".to_string(),
-          "1".to_string(),
-          "29,30,0,29,1, 2, 3, 1".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/sampling_equivalent_9_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
-          "sampling".to_string(),
-        ],
-    vec! ["sampling_equivalent_10_canonicalizer_equivalent_0".to_string(),
-          "example_alus/stateful_alus/if_else_raw.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "2".to_string(),
-          "1".to_string(),
-          "29,0,28,30, 2, 1, 3,1, 29".to_string(),
-          "1".to_string(), // Num packets
-          "1".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/sampling_equivalent_10_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt".to_string(), // Hole config file
-          "sampling".to_string(),
-        ],
-
     vec! ["snap_heavy_hitter_equivalent_1_canonicalizer_equivalent_1".to_string(),
           "example_alus/stateful_alus/pair.alu".to_string(),
           "example_alus/stateless_alus/stateless_alu.alu".to_string(),
@@ -1892,74 +1135,10 @@ fn test_configurations () -> Vec <Vec <String> > {
         ],
 
 
-    vec! ["snap_heavy_hitter_equivalent_6_canonicalizer_equivalent_1".to_string(),
-          "example_alus/stateful_alus/pair.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "1".to_string(),
-          "1".to_string(),
-          "0,1,2,3,998,999,1000".to_string(),
-          "1".to_string(), // Num packets
-          "2".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/snap_heavy_hitter_equivalent_6_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
-          "snap_heavy_hitter".to_string(),
-        ],
 
 
-    vec! ["snap_heavy_hitter_equivalent_7_canonicalizer_equivalent_1".to_string(),
-          "example_alus/stateful_alus/pair.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "1".to_string(),
-          "1".to_string(),
-          "0,1,2,3,4,997,998,999,1000,1001".to_string(),
-          "1".to_string(), // Num packets
-          "2".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/snap_heavy_hitter_equivalent_7_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
-          "snap_heavy_hitter".to_string(),
-        ],
 
 
-    vec! ["snap_heavy_hitter_equivalent_8_canonicalizer_equivalent_1".to_string(),
-          "example_alus/stateful_alus/pair.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "1".to_string(),
-          "1".to_string(),
-          "0,1,2,3,999,1000".to_string(),
-          "1".to_string(), // Num packets
-          "2".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/snap_heavy_hitter_equivalent_8_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
-          "snap_heavy_hitter".to_string(),
-        ],
-
-
-    vec! ["snap_heavy_hitter_equivalent_9_canonicalizer_equivalent_1".to_string(),
-          "example_alus/stateful_alus/pair.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "1".to_string(),
-          "1".to_string(),
-          "0,1,2,3,998,999,1000".to_string(),
-          "1".to_string(), // Num packets
-          "2".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/snap_heavy_hitter_equivalent_9_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
-          "snap_heavy_hitter".to_string(),
-        ],
-
-
-    vec! ["snap_heavy_hitter_equivalent_10_canonicalizer_equivalent_1".to_string(),
-          "example_alus/stateful_alus/pair.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "1".to_string(),
-          "1".to_string(),
-          "0,1,2,3,999,1000".to_string(),
-          "1".to_string(), // Num packets
-          "2".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/snap_heavy_hitter_equivalent_10_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
-          "snap_heavy_hitter".to_string(),
-        ],
 
     vec! ["spam_detection_equivalent_1_canonicalizer_equivalent_1".to_string(),
           "example_alus/stateful_alus/pair.alu".to_string(),
@@ -2021,68 +1200,6 @@ fn test_configurations () -> Vec <Vec <String> > {
           "hole_configurations/spam_detection_equivalent_5_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
           "spam_detection".to_string(),
         ],
-    vec! ["spam_detection_equivalent_6_canonicalizer_equivalent_1".to_string(),
-          "example_alus/stateful_alus/pair.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "1".to_string(),
-          "1".to_string(),
-          "0,1,2,3,4,5,995,999,1000".to_string(),
-          "1".to_string(), // Num packets
-          "2".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/spam_detection_equivalent_6_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
-          "spam_detection".to_string(),
-        ],
-    vec! ["spam_detection_equivalent_7_canonicalizer_equivalent_1".to_string(),
-          "example_alus/stateful_alus/pair.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "1".to_string(),
-          "1".to_string(),
-          "0,1,2,3,4,999,1000".to_string(),
-          "1".to_string(), // Num packets
-          "2".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/spam_detection_equivalent_7_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
-          "spam_detection".to_string(),
-        ],
-    vec! ["spam_detection_equivalent_8_canonicalizer_equivalent_1".to_string(),
-          "example_alus/stateful_alus/pair.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "1".to_string(),
-          "1".to_string(),
-          "0,1,2,3,999,1000,1001".to_string(),
-          "1".to_string(), // Num packets
-          "2".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/spam_detection_equivalent_8_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
-          "spam_detection".to_string(),
-        ],
-    vec! ["spam_detection_equivalent_9_canonicalizer_equivalent_1".to_string(),
-          "example_alus/stateful_alus/pair.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "1".to_string(),
-          "1".to_string(),
-          "0,1,2,3,4,998,999,1000".to_string(),
-          "1".to_string(), // Num packets
-          "2".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/spam_detection_equivalent_9_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
-          "spam_detection".to_string(),
-        ],
-    vec! ["spam_detection_equivalent_10_canonicalizer_equivalent_1".to_string(),
-          "example_alus/stateful_alus/pair.alu".to_string(),
-          "example_alus/stateless_alus/stateless_alu.alu".to_string(),
-          "1".to_string(),
-          "1".to_string(),
-          "0,1,2,3,4,998,999,1000".to_string(),
-          "1".to_string(), // Num packets
-          "2".to_string(), // State vars
-          "1".to_string(), // Stateful ALUs
-          "hole_configurations/spam_detection_equivalent_10_canonicalizer_equivalent_1_pair_stateless_alu_1_1_hole_cfgs.txt".to_string(), // Hole config file
-          "spam_detection".to_string(),
-        ],
-
-
     vec! ["stateful_fw_equivalent_3_canonicalizer_equivalent_0".to_string(),
           "example_alus/stateful_alus/pred_raw.alu".to_string(),
           "example_alus/stateless_alus/stateless_alu.alu".to_string(),

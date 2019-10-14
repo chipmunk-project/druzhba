@@ -33,13 +33,14 @@ pub OptHeader : Box<OptHeader> = {
 
   "name" ":" <id:ID>
   "hole configs" ":" <holes:ID?>
-  "pipeline" "stage" ":" <n1:Num> 
-  "alu" ":" <n2:Num>
-  "[" <n3:(<Num> ",")*> <n4:Num?> "]" => {
-    let constant_vec = match n4 {
+  "pipeline" "stage" ":" <stage_num:Num> 
+  "alu" ":" <alu_num:Num>
+  "opt" "level" ":" <opt_num:Num>
+  "[" <n1:(<Num> ",")*> <n2:Num?> "]" => {
+    let constant_vec = match n2 {
       Some (var) => {
         let mut constant_vec_vars : Vec <String> = Vec::new();
-        for x in n3.iter(){
+        for x in n1.iter(){
           constant_vec_vars.push(x.to_string());
         }
         constant_vec_vars.push(var.to_string());
@@ -47,13 +48,18 @@ pub OptHeader : Box<OptHeader> = {
       }
       None => {
         let mut temp_vec : Vec <String> = Vec::new();
-        for x in n3.iter() {
+        for x in n1.iter() {
           temp_vec.push(x.to_string());
         }
         temp_vec
       },
     };
-    Box::new (OptHeader::Data (id, holes, n1, n2, constant_vec))
+    Box::new (OptHeader::Data (id, 
+                               holes, 
+                               stage_num, 
+                               alu_num, 
+                               opt_num, 
+                               constant_vec))
   }
 };
 // TODO: this is working for now but should refine later
