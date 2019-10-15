@@ -9,6 +9,7 @@ pub struct PipelineStage {
    pub stateful_atoms : Vec<ALU>,
    pub salu_configs : Vec<i32>,
    pub output_mux_globals : Vec<i32>,
+   pub state_container : Vec<Vec<i32>>,
 }
 
 impl PipelineStage {
@@ -16,28 +17,36 @@ impl PipelineStage {
     PipelineStage { stateless_atoms : Vec::new(),
                     stateful_atoms : Vec::new(), 
                     salu_configs : vec![0], 
-                    output_mux_globals : vec![0] }
+                    output_mux_globals : vec![0],
+                    state_container : Vec::new()}
   }
   pub fn with_atoms (stateless : Vec <ALU>, stateful : Vec<ALU>, t_salu_configs : Vec<i32>) -> Self{
     PipelineStage { stateless_atoms : stateless,
                     stateful_atoms : stateful, 
                     salu_configs : t_salu_configs,
                     output_mux_globals : vec![0],
+                    state_container : Vec::new(),
     }
   }
 
   // Iterates through all atoms stored and calls their 
   // underlying function on the incoming Phv in 
   // random order. Pass the mutated phv containers to their respective muxes.
-  pub fn tick(&mut self, input_phv: Phv<i32>) -> Phv<i32>{ 
+  pub fn tick(&mut self, 
+              t_initial_phv : Phv <i32>,
+              t_input_phv : Phv<i32>) -> (Phv<i32>,Phv<i32>){ 
+
+      let mut input_phv : Phv <i32> = t_input_phv.clone();
+      let mut initial_phv : Phv <i32> = t_initial_phv.clone();
       if input_phv.is_bubble() {
-        Phv::new()
+        (Phv::new(), Phv::new())
       }
       else{
         let mut output_phv : Phv<i32> = 
             Phv { bubble : false, 
                   packets: Vec::new(),
-                  state : Vec::new() };
+                  state : Vec::new()};
+
 
         let mut old_state : Vec <i32> = Vec::new();
         // List of new state variables for output mux
@@ -47,6 +56,21 @@ impl PipelineStage {
         let mut atom_count : usize = 0;
         for atom in self.stateful_atoms.iter_mut () {
           if self.salu_configs[atom_count] == 1 {
+
+              if self.state_container.len() == 0 {
+                self.state_container = input_phv.get_state();
+                output_phv.set_state (input_phv.get_state());
+              }
+              // Update new phv state
+              else {
+                input_phv.set_state(self.state_container.clone());
+                let mut initial_state : Vec < Vec<i32>> = input_phv.get_state();
+                if initial_state.len () == 0 {
+                  initial_state = self.state_container.clone();
+                }
+                initial_state[atom_count] = self.state_container[atom_count].clone();
+                initial_phv.set_state(initial_state);
+              }
 
               atom.set_state_variables 
                   (input_phv.get_state()[atom_count].clone());
@@ -98,13 +122,15 @@ impl PipelineStage {
         for i in 0..self.salu_configs.len() {
           if self.salu_configs[i] == 1 {
             output_state.push (new_state[i].clone());
+            // Write to state variables for next PHV
+            self.state_container[i] = new_state[i].clone();
           }
           else {
             output_state.push (input_phv.get_state()[i].clone());
           }
         }
         output_phv.set_state (output_state);
-        output_phv
+        (initial_phv, output_phv)
       }
       
     }

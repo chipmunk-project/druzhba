@@ -128,11 +128,15 @@ fn main() {
       state.push (tmp_state_vec);
     }
     packet.set_state(state);
-    input_phvs.push (packet.clone());
-    let new_packet : Phv<i32> = pipeline.tick (packet);
+    let updated_input_output_phvs: (Phv<i32>, Phv<i32>) = 
+        pipeline.tick (packet);
 
-    if !new_packet.is_bubble() {
-      output_phvs.push(new_packet.clone());
+    let updated_input_phv = updated_input_output_phvs.0;
+    let output_phv = updated_input_output_phvs.1;
+
+    input_phvs.push (updated_input_phv.clone());
+    if !output_phv.is_bubble() {
+      output_phvs.push(output_phv.clone());
     }
   }
   for i in 0..output_phvs.len(){

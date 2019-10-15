@@ -6,8 +6,14 @@ fn {name}() {{
 
   let pipeline : Pipeline = 
     {prog_to_run_file}::init_pipeline (hole_cfgs_map.clone());
-  let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                     pipeline,
-                                                     10000);
+  let result_input_output_phvs : (Vec<Phv<i32>>, Vec <Phv<i32>>)  =      run_pipeline (input_phvs.clone(),
+                   pipeline,
+                   10000);
+  let output_phvs : Vec<Phv<i32>> = result_input_output_phvs.1; 
+
+  let updated_input_phvs : Vec<Phv<i32>> = result_input_output_phvs.0; 
+  for i in 0..input_phvs.len() {{
+    input_phvs[i as usize].set_state (updated_input_phvs[i].get_state());
+  }}
   {test_function} (input_phvs, output_phvs);
 }}
