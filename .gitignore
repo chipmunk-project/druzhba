@@ -5,10 +5,10 @@ target
 .DS_STORE
 *.swp
 dgen_bin
-benches/blue_increase_optimized.rs
-benches/flowlets_optimized.rs
-benches/learn_filter_optimized.rs
-benches/rcp_optimized.rs
+benches/blue_increase_optimized*.rs
+benches/flowlets_optimized*.rs
+benches/learn_filter_optimized*.rs
+benches/rcp_optimized*.rs
 
 benches/blue_increase_unoptimized.rs
 benches/flowlets_unoptimized.rs
