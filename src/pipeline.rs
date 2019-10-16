@@ -16,7 +16,8 @@ pub struct Pipeline {
    //Format : key = stage_number, value = PHV
    old_phvs: HashMap<usize, Phv<i32>>,
    new_phvs: HashMap<usize, Phv<i32>>,
-   initial_phvs : HashMap<usize, Phv<i32>>
+   old_initial_phvs : HashMap<usize, Phv<i32>>,
+   new_initial_phvs : HashMap<usize, Phv<i32>>
 }
 
 impl Pipeline {
@@ -26,21 +27,21 @@ impl Pipeline {
     Pipeline { pipeline_stages : stages, 
                old_phvs: HashMap::new(), 
                new_phvs : HashMap::new(),
-               initial_phvs : HashMap::new()}
+               old_initial_phvs : HashMap::new(),
+               new_initial_phvs : HashMap::new()}
   }
 
   pub fn with_pipeline_stages (t_pipeline_stages : Vec <PipelineStage>) -> Self {
-    let mut old_phv : HashMap<usize, Phv<i32>> = HashMap::new();
-    let mut new_phv : HashMap<usize, Phv<i32>> = HashMap::new();
+    let mut empty_phvs : HashMap<usize, Phv<i32>> = HashMap::new();
     for i in 0..t_pipeline_stages.len(){
-      old_phv.insert(i as usize, Phv::new());
-      new_phv.insert(i as usize, Phv::new());
+      empty_phvs.insert(i as usize, Phv::new());
     }
     Pipeline { pipeline_stages : t_pipeline_stages, 
-               old_phvs: old_phv, 
-               new_phvs: new_phv,
-               initial_phvs : HashMap::new()}
-  }
+               old_phvs: empty_phvs.clone(), 
+               new_phvs: empty_phvs.clone(),
+               old_initial_phvs : empty_phvs.clone(),
+               new_initial_phvs : empty_phvs.clone()}
+}
 
   pub fn len (&self) -> usize {
     self.pipeline_stages.len()
@@ -56,22 +57,23 @@ impl Pipeline {
                                        t_packet.clone());
 
       self.new_phvs.insert(0, first_result_phv);
-      self.initial_phvs.insert(0, first_initial_phv);
-
+      self.new_initial_phvs.insert(0, first_initial_phv);
       for x in 1..self.pipeline_stages.len() - 1 {
-        let (initial_phv, result_phv) = self.pipeline_stages[0].
-            tick(self.initial_phvs[&(x-1)].clone(),
+        let (initial_phv, result_phv) = self.pipeline_stages[x].
+            tick(self.old_initial_phvs[&(x-1)].clone(),
                  self.old_phvs[&(x-1)].clone());
         self.new_phvs.insert(x, result_phv);
-        self.initial_phvs.insert(x, initial_phv);
+        self.new_initial_phvs.insert(x, initial_phv);
       }
 
       let length : usize = self.pipeline_stages.len();
 
       let last_phvs : (Phv <i32>, Phv<i32>)  = self.pipeline_stages[length - 1]
-        .tick(self.initial_phvs[&(length-2)].clone(),
+        .tick(self.old_initial_phvs[&(length-2)].clone(),
               self.old_phvs[&(length - 2)].clone());
       mem::swap(&mut self.new_phvs, &mut self.old_phvs);
+
+      mem::swap(&mut self.new_initial_phvs, &mut self.old_initial_phvs);
       last_phvs
     }
   }

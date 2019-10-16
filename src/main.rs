@@ -95,7 +95,6 @@ fn main() {
   // retrieve resulting packet.
   let mut input_phvs : Vec <Phv <i32> > = Vec::new();
   let mut output_phvs : Vec <Phv <i32> > = Vec::new();
-  println!("Beginning execution ... ");
   // _t not used
   for _t in 0..ticks {
     
@@ -128,14 +127,17 @@ fn main() {
       state.push (tmp_state_vec);
     }
     packet.set_state(state);
+    println!("ORiginal input: {}", packet);
     let updated_input_output_phvs: (Phv<i32>, Phv<i32>) = 
         pipeline.tick (packet);
 
+    println!("\n");
     let updated_input_phv = updated_input_output_phvs.0;
     let output_phv = updated_input_output_phvs.1;
 
-    input_phvs.push (updated_input_phv.clone());
     if !output_phv.is_bubble() {
+
+      input_phvs.push (updated_input_phv.clone());
       output_phvs.push(output_phv.clone());
     }
   }

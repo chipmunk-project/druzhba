@@ -11,8 +11,8 @@ fn {name}() {{
   let output_phvs : Vec<Phv<i32>> = result_input_output_phvs.1; 
 
   let updated_input_phvs : Vec<Phv<i32>> = result_input_output_phvs.0; 
-  for i in 0..input_phvs.len() {{
-    input_phvs[i as usize].set_state (updated_input_phvs[i].get_state());
-  }}
-  {test_function} (input_phvs, output_phvs);
+/*  for i in 0..input_phvs.len() {{
+    input_phvs[i as usize].set_state (updated_input_phvs[i].get_state()); 
+  }} */
+  {test_function} (updated_input_phvs, output_phvs);
 }}
