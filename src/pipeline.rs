@@ -46,6 +46,16 @@ impl Pipeline {
   pub fn len (&self) -> usize {
     self.pipeline_stages.len()
   }
+  // Pumps a phv into the pipeline and runs the ALUs in the
+  // first stage on them. Phvs later in the pipeline are
+  // funneled to the next sequential stage. 
+  //
+  // Also calculates and keeps track of the state variable
+  // values for any phv prior to it entering the appropriate 
+  // stage. To calculate this for a phv leaving the pipeline,
+  // get the stateful ALUs that change a state variable at each
+  // stage and record the input state variable prior to modification
+  // that occurs when that phv gets executed.
   pub fn tick (&mut self, t_packet : Phv<i32>) -> (Phv<i32>, Phv<i32>) {
     if self.pipeline_stages.len() == 1{
       
