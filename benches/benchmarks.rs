@@ -92,16 +92,21 @@ fn extract_hole_cfgs (hole_cfgs_file : String) -> HashMap <String, i32 > {
 
 fn run_pipeline (input_phvs : Vec <Phv <i32> >,
                  pipeline : &mut Pipeline,
-                 ticks : i32) -> Vec <Phv <i32 > > {
+                 ticks : i32) -> (Vec<Phv<i32>>, Vec <Phv <i32>>) {
   let mut output_phvs : Vec <Phv <i32> > = Vec::new();
+  let mut result_updated_input_phvs : Vec <Phv<i32> > = Vec::new();
+  let mut result_output_phvs : Vec <Phv<i32> > = Vec::new();
+
   for t in 0..ticks {
-    let new_packet : Phv<i32> = 
+    let updated_input_output_phvs : (Phv<i32>, Phv<i32>) = 
         pipeline.tick (input_phvs[t as usize].clone());
-    if !new_packet.is_bubble() {
-      output_phvs.push(new_packet.clone());
+
+    if !updated_input_output_phvs.1.is_bubble() {
+      result_output_phvs.push(updated_input_output_phvs.1);
+      result_updated_input_phvs.push(updated_input_output_phvs.0);
     }
   }
-  output_phvs
+  (result_updated_input_phvs, result_output_phvs)
 }
 
 
@@ -206,10 +211,10 @@ fn bench_blue_increase_dsim_unoptimized (b : &mut Bencher)
       blue_increase_unoptimized::init_pipeline (hole_cfgs_map.clone());
     b.iter(||{
 
-      let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                         &mut pipeline,
-                                                         num_ticks);
-
+      let input_output_phvs : (Vec<Phv<i32>>, Vec<Phv<i32>>) = 
+          run_pipeline (input_phvs.clone(),
+                        &mut pipeline,
+                        num_ticks);
     });
 }
 
@@ -223,10 +228,10 @@ fn bench_flowlets_dsim_unoptimized (b : &mut Bencher) {
     let mut pipeline : Pipeline = 
         flowlets_unoptimized::init_pipeline (hole_cfgs_map.clone());
     b.iter(||{
-
-      let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                         &mut pipeline,
-                                                         num_ticks);
+      let input_output_phvs : (Vec<Phv<i32>>, Vec<Phv<i32>>) = 
+          run_pipeline (input_phvs.clone(),
+                        &mut pipeline,
+                        num_ticks);
 
     });
 }
@@ -241,11 +246,10 @@ fn bench_learn_filter_dsim_unoptimized (b : &mut Bencher) {
     let mut pipeline : Pipeline = 
       learn_filter_unoptimized::init_pipeline (hole_cfgs_map.clone());
     b.iter(|| {
-
-      let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                         &mut pipeline,
-                                                         num_ticks);
-
+      let input_output_phvs : (Vec<Phv<i32>>, Vec<Phv<i32>>) = 
+          run_pipeline (input_phvs.clone(),
+                        &mut pipeline,
+                        num_ticks);
     });
 }
 
@@ -260,9 +264,10 @@ fn bench_rcp_dsim_unoptimized (b : &mut Bencher) {
       rcp_unoptimized::init_pipeline (hole_cfgs_map.clone());
 
     b.iter(|| {
-      let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                         &mut pipeline,
-                                                         num_ticks);
+      let input_output_phvs : (Vec<Phv<i32>>, Vec<Phv<i32>>) = 
+          run_pipeline (input_phvs.clone(),
+                        &mut pipeline,
+                        num_ticks);
 
     });
 }
@@ -280,11 +285,10 @@ fn bench_blue_increase_dsim_optimized_1 (b : &mut Bencher)
     let mut pipeline : Pipeline = 
       blue_increase_optimized_1::init_pipeline (HashMap::new());
     b.iter(||{
-
-      let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                         &mut pipeline,
-                                                         num_ticks);
-
+      let input_output_phvs : (Vec<Phv<i32>>, Vec<Phv<i32>>) = 
+          run_pipeline (input_phvs.clone(),
+                        &mut pipeline,
+                        num_ticks);
     });
 }
 
@@ -296,10 +300,10 @@ fn bench_flowlets_dsim_optimized_1(b : &mut Bencher) {
     let mut pipeline : Pipeline = 
       flowlets_optimized_1::init_pipeline (HashMap::new());
     b.iter(|| {
-
-      let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                         &mut pipeline,
-                                                         num_ticks);
+      let input_output_phvs : (Vec<Phv<i32>>, Vec<Phv<i32>>) = 
+          run_pipeline (input_phvs.clone(),
+                        &mut pipeline,
+                        num_ticks);
 
     });
 }
@@ -312,10 +316,11 @@ fn bench_learn_filter_dsim_optimized_1(b : &mut Bencher) {
     let mut pipeline : Pipeline = 
       learn_filter_optimized_1::init_pipeline (HashMap::new());
     b.iter(|| {
+      let input_output_phvs : (Vec<Phv<i32>>, Vec<Phv<i32>>) = 
+          run_pipeline (input_phvs.clone(),
+                        &mut pipeline,
+                        num_ticks);
 
-      let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                         &mut pipeline,
-                                                         num_ticks);
     });
 }
 
@@ -328,9 +333,10 @@ fn bench_rcp_optimized_1(b : &mut Bencher) {
       rcp_optimized_1::init_pipeline (HashMap::new());
     b.iter(|| {
 
-      let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                         &mut pipeline,
-                                                         num_ticks);
+      let input_output_phvs : (Vec<Phv<i32>>, Vec<Phv<i32>>) = 
+          run_pipeline (input_phvs.clone(),
+                        &mut pipeline,
+                        num_ticks);
 
     });
 }
@@ -348,10 +354,11 @@ fn bench_blue_increase_dsim_optimized_2 (b : &mut Bencher)
     let mut pipeline : Pipeline = 
       blue_increase_optimized_2::init_pipeline (HashMap::new());
     b.iter(||{
+      let input_output_phvs : (Vec<Phv<i32>>, Vec<Phv<i32>>) = 
+          run_pipeline (input_phvs.clone(),
+                        &mut pipeline,
+                        num_ticks);
 
-      let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                         &mut pipeline,
-                                                         num_ticks);
 
     });
 }
@@ -365,9 +372,10 @@ fn bench_flowlets_dsim_optimized_2(b : &mut Bencher) {
       flowlets_optimized_2::init_pipeline (HashMap::new());
 
     b.iter(|| {
-      let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                     &mut pipeline,
-                                                     num_ticks);
+      let input_output_phvs : (Vec<Phv<i32>>, Vec<Phv<i32>>) = 
+          run_pipeline (input_phvs.clone(),
+                        &mut pipeline,
+                        num_ticks);
 
     });
 }
@@ -381,9 +389,11 @@ fn bench_learn_filter_dsim_optimized_2(b : &mut Bencher) {
       learn_filter_optimized_2::init_pipeline (HashMap::new());
 
     b.iter(|| {
-      let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                         &mut pipeline,
-                                                         num_ticks);
+      let input_output_phvs : (Vec<Phv<i32>>, Vec<Phv<i32>>) = 
+          run_pipeline (input_phvs.clone(),
+                        &mut pipeline,
+                        num_ticks);
+
     });
 }
 
@@ -396,9 +406,11 @@ fn bench_rcp_optimized_2(b : &mut Bencher) {
         rcp_optimized_2::init_pipeline (HashMap::new());
 
     b.iter(|| {
-      let output_phvs : Vec <Phv <i32> > = run_pipeline (input_phvs.clone(),
-                                                         &mut pipeline,
-                                                         num_ticks);
+      let input_output_phvs : (Vec<Phv<i32>>, Vec<Phv<i32>>) = 
+          run_pipeline (input_phvs.clone(),
+                        &mut pipeline,
+                        num_ticks);
+
     });
 }
 

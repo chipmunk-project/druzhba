@@ -127,11 +127,9 @@ fn main() {
       state.push (tmp_state_vec);
     }
     packet.set_state(state);
-    println!("ORiginal input: {}", packet);
     let updated_input_output_phvs: (Phv<i32>, Phv<i32>) = 
         pipeline.tick (packet);
 
-    println!("\n");
     let updated_input_phv = updated_input_output_phvs.0;
     let output_phv = updated_input_output_phvs.1;
 

@@ -55,13 +55,9 @@ impl PipelineStage {
         // into output muxes later
         let mut atom_count : usize = 0;
 
-        println!("BEGIN PIPELINE STAGE");
-        println!("salu configs: {:?}", self.salu_configs);
-        println!("Initial phv before: {}", initial_phv);
         for atom in self.stateful_atoms.iter_mut () {
           if self.salu_configs[atom_count] == 1 {
 
-            println!("Salu config set. atom_count: {}", atom_count);
             if self.state_container.len() == 0 {
               self.state_container = input_phv.get_state();
               output_phv.set_state (input_phv.get_state());
@@ -126,7 +122,6 @@ impl PipelineStage {
         let mut output_state : Vec <Vec <i32> > = Vec::new();
         for i in 0..self.salu_configs.len() {
           if self.salu_configs[i] == 1 {
-            println!("Writing back. salu config set: {:?}", new_state);
             output_state.push (new_state[i].clone());
             // Write to state variables for next PHV
             self.state_container[i] = new_state[i].clone();
@@ -137,11 +132,6 @@ impl PipelineStage {
         }
 
         output_phv.set_state (output_state);
-        println!("state_container: {:?}", self.state_container);
-        println!("Initial phv: {}", initial_phv);
-        println!("Output phv: {}:", output_phv);
-        println!("END PIPELINE STAGE");
-        println!("\n\n");
         (initial_phv, output_phv)
       }
       
