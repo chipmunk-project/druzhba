@@ -65,12 +65,16 @@ impl PipelineStage {
             if self.state_container.len() == 0 {
               self.state_container = input_phv.get_state();
               output_phv.set_state (input_phv.get_state());
-              initial_phv.set_state(input_phv.get_state());
             }
             // Update new phv state
             else {
-              input_phv.set_state(self.state_container.clone());
-              initial_phv.set_state(self.state_container.clone());
+              let mut t_input_state : Vec<Vec<i32>> = input_phv.get_state().clone();
+              t_input_state[atom_count] = self.state_container[atom_count].clone();
+              input_phv.set_state(t_input_state);
+
+              let mut t_initial_state : Vec<Vec<i32>> = initial_phv.get_state();
+              t_initial_state[atom_count] = self.state_container[atom_count].clone();
+              initial_phv.set_state(t_initial_state);
             }
 
             atom.set_state_variables 
