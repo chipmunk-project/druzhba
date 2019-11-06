@@ -113,6 +113,8 @@ def main ():
     args.append(str(raw_args.ticks))
     opt_level = raw_args.opt_level
     args.append(str(opt_level))
+    subprocess.run(['./build_dgen.sh'])
+
     if opt_level == 0:
 
         run_dgen_unoptimized(args)
