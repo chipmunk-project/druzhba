@@ -25,7 +25,11 @@ won't compile.
 
 To run these tests:
 
-    cargo test
+    ./build_dgen && cargo test
+
+To run benchmarks:
+
+    ./build_dgen && cargo bench
 
 Similarly, the dgen tests ensure that the alu grammar
 is being parsed correctly and that the ast is being
