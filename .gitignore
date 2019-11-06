@@ -14,3 +14,5 @@ benches/blue_increase_unoptimized.rs
 benches/flowlets_unoptimized.rs
 benches/learn_filter_unoptimized.rs
 benches/rcp_unoptimized.rs
+
+build
