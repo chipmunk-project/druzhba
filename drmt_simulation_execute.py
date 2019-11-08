@@ -39,8 +39,18 @@ def main ():
     args.append(str(raw_args.ticks))
     args.append(str(raw_args.num_processors))
 
-    print('drmt script args: ' , args)
     subprocess.run(['./build_dgen.sh'])
+    spike_result = subprocess.run(['which',
+                                   'spike'],
+                                   stdout=subprocess.DEVNULL)
+    cross_compiler_result = subprocess.run(['which',
+                                            'riscv64-unknown-elf-gcc'],
+                                            stdout=subprocess.DEVNULL)
+    if spike_result.returncode != 0:
+        print('WARNING: Spike could not be found')
+    if cross_compiler_result.returncode != 0:
+        print('WARNING: The riscv64-unknown-elf-gcc cross compiler could not be found')
+
     run_druzhba (args)
 
 if __name__ == '__main__':

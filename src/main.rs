@@ -6,6 +6,7 @@ mod tests;
 use druzhba::pipeline::Pipeline;
 use druzhba::phv::Phv;
 use druzhba::phv_container::PhvContainer;
+use druzhba::processor::Processor;
 use rand::Rng;
 use std::collections::HashMap;
 use std::env;
@@ -150,7 +151,7 @@ fn execute_rmt (args : Vec<String>)
 // Simulates using dRMT architecture
 fn execute_drmt (args : Vec <String>)
 {
-    let riscv_file : &str = &args[2];
+    let input_file : &str = &args[2];
     let num_packets : i32 = 
       match args[3].parse::<i32>() {
 
@@ -172,9 +173,20 @@ fn execute_drmt (args : Vec <String>)
       };
 
     assert! (ticks >= 1);
+    let mut processors : Vec<Processor> = Vec::new();
+    // _i not used
+    for _i in 0..num_processors {
+        processors.push(Processor::with_riscv_file (
+                input_file.to_string()));
+    }
     for t in 0..ticks {
         let mut phv : Phv <i32> = generate_random_phv(num_packets);
         println!("Input: {}", phv);
+        processors[(t % num_processors) as usize]
+                    .add_phv(phv);
+
+        processors[(t % num_processors) as usize]
+                    .execute_program();
     }
 
 }

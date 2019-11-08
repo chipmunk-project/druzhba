@@ -49,6 +49,7 @@ fn main() {
   }
   // Copies benchmark prog_to_run files to benches dir
   copy_benchmark_files();
+
 }
 // Copies prog_to_run files from tests directory to
 // benches directory to be used in benchmarks 

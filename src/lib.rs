@@ -6,5 +6,5 @@ pub mod phv_container;
 pub mod input_mux;
 pub mod output_mux;
 pub mod alu;
-
+pub mod processor;
 
