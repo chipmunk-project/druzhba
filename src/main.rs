@@ -15,7 +15,7 @@ use std::fs;
 // and initializes a HashMap from hole vaiables to
 // i32s.
 fn extract_hole_cfgs (hole_cfgs_file : String) -> HashMap <String, i32> {
-
+    
   let mut hole_cfgs_map : HashMap <String, i32> = HashMap::new();
   let hole_cfgs_file_contents : String = fs::read_to_string(hole_cfgs_file).expect ("Error: Hole configs file could not be found");
   let hole_cfgs_file_vec : Vec <String> = hole_cfgs_file_contents
@@ -37,58 +37,70 @@ fn extract_hole_cfgs (hole_cfgs_file : String) -> HashMap <String, i32> {
   }
   hole_cfgs_map
 }
-#[warn(unused_imports)]
-fn main() {
 
-  let args : Vec<String> = env::args().collect();
-  assert!(args.len() == 4 || args.len() == 3);
-
+fn generate_random_phv (num_packets : i32) -> Phv <i32> {
+    let mut phv : Phv<i32> = Phv::new();
+    
+    (0..num_packets)
+         // _s not used
+        .for_each ( |_s| {
+         phv.add_container_to_phv(PhvContainer {
+             field_value :rand::thread_rng().gen_range(0,100),
+         }); 
+      });
+    phv
+ 
+}
+// Initiate RMT pipeline simulation using prog_to_run.rs
+// provided by dgen
+fn execute_rmt (args : Vec<String>)
+{
   // Parse returns a result so unwrap
-
   let num_stateful_alus = prog_to_run::num_stateful_alus();
   let num_state_values = prog_to_run::num_state_variables();
-//  println!("{:?}", hole_cfgs);
   assert! (num_stateful_alus>=1);
   let num_packets : i32 = 
-      match args.len() == 4 {
-        true =>  match args[2].parse::<i32>() {
-
-          Ok  (t_pkts) => t_pkts,
-          Err (_)         => panic!("Failure: Unable to unwrap ticks"),
-        },
-        false => match args[1].parse::<i32>() {
-
-          Ok  (t_pkts) => t_pkts,
-          Err (_)         => panic!("Failure: Unable to unwrap ticks"),
-        },
-
-    };
-
-  assert!(num_packets <= prog_to_run::pipeline_width());
-  let ticks : i32 = 
-      match args.len() == 4 {
+      match args.len() == 5 {
         true =>  match args[3].parse::<i32>() {
 
-          Ok  (t_ticks) => t_ticks,
+          Ok  (t_pkts) => t_pkts,
           Err (_)         => panic!("Failure: Unable to unwrap ticks"),
         },
         false => match args[2].parse::<i32>() {
 
+          Ok  (t_pkts) => t_pkts,
+          Err (_)         => panic!("Failure: Unable to unwrap ticks"),
+        },
+    };
+
+  assert!(num_packets <= prog_to_run::pipeline_width());
+  let ticks : i32 = 
+      match args.len() == 5 {
+        true =>  match args[4].parse::<i32>() {
+
           Ok  (t_ticks) => t_ticks,
           Err (_)         => panic!("Failure: Unable to unwrap ticks"),
         },
+        false => match args[3].parse::<i32>() {
 
+          Ok  (t_ticks) => t_ticks,
+          Err (_)         => panic!("Failure: Unable to unwrap ticks"),
+        },
     };
-
   assert! (ticks >= 1);
-      
+     
   let mut pipeline : Pipeline = 
-      match args.len() == 4 {
-        true  => prog_to_run::init_pipeline(extract_hole_cfgs(args[1].clone())),
+      match args.len() == 5 {
+        true  => 
+            prog_to_run::init_pipeline(extract_hole_cfgs(args[1].clone())),
         // TODO: REmove hashmap argument when possible
-        false => prog_to_run::init_pipeline(HashMap::new()),
+        false => {
+            println!("Args len not 5");
+            prog_to_run::init_pipeline(HashMap::new())
+        },
       };
 
+  println!("Initializing phvs");
   // For every tick create a new packet with the 
   // specified input fields set to random values from
   // 0 to 100. Send packet through pipeline and 
@@ -97,20 +109,10 @@ fn main() {
   let mut output_phvs : Vec <Phv <i32> > = Vec::new();
   // _t not used
   for _t in 0..ticks {
-    
-    let mut packet : Phv<i32> = Phv::new();
-    
-        (0..num_packets)
-                    // _s not used
-            .for_each ( |_s| {
-             packet.add_container_to_phv(PhvContainer {
-                 field_value :rand::thread_rng().gen_range(0,100),
-             }); 
-           });
-           
+    let mut phv : Phv<i32> = generate_random_phv (num_packets);
     (num_packets..prog_to_run::pipeline_width())
         .for_each( |_s| { 
-            packet.add_container_to_phv (PhvContainer{
+            phv.add_container_to_phv (PhvContainer{
                 field_value : 0,
             });
         });
@@ -121,14 +123,14 @@ fn main() {
       let mut tmp_state_vec : Vec<i32> = Vec::new();
       // _j not used
       for _j in 0..num_state_values {
-        tmp_state_vec.push(rand :: thread_rng().gen_range(0,100));
+        tmp_state_vec.push(0);
            
       }
       state.push (tmp_state_vec);
     }
-    packet.set_state(state);
+    phv.set_state(state);
     let updated_input_output_phvs: (Phv<i32>, Phv<i32>) = 
-        pipeline.tick (packet);
+        pipeline.tick (phv);
 
     let updated_input_phv = updated_input_output_phvs.0;
     let output_phv = updated_input_output_phvs.1;
@@ -143,6 +145,66 @@ fn main() {
     println!("Input: {}", input_phvs[i]);
     println!("Result: {}\n", output_phvs[i]);
   }
+}
+
+// Simulates using dRMT architecture
+fn execute_drmt (args : Vec <String>)
+{
+    let riscv_file : &str = &args[2];
+    let num_packets : i32 = 
+      match args[3].parse::<i32>() {
+
+        Ok  (t_pkts)    => t_pkts,
+        Err (_)         => panic!("Failure: Unable to unwrap num_packets"),
+      };
+
+    let ticks : i32 = 
+      match args[4].parse::<i32>() {
+
+        Ok  (t_ticks) => t_ticks,
+        Err (_)       => panic!("Failure: Unable to unwrap ticks"),
+      };
+    let num_processors : i32 = 
+      match args[5].parse::<i32>() {
+
+        Ok  (t_num_processors)    => t_num_processors,
+        Err (_)                   => panic!("Failure: Unable to unwrap num_processors"),
+      };
+
+    assert! (ticks >= 1);
+    for t in 0..ticks {
+        let mut phv : Phv <i32> = generate_random_phv(num_packets);
+        println!("Input: {}", phv);
+    }
+
+}
+
+#[warn(unused_imports)]
+fn main() {
+
+  let args : Vec<String> = env::args().collect();
+  let arch : &str = &args[1];
+  println!("Args: {:?}", args);
+  match arch {
+    "dRMT" => {
+                assert!(args.len() == 6);
+                execute_drmt(args);
+    },
+    "drmt" => {
+                assert!(args.len() == 6);
+                execute_drmt(args);
+    },
+    "RMT"  => {
+                assert!(args.len() == 4 || args.len() == 5);
+                execute_rmt(args);
+    },
+    "rmt"  => {
+                assert!(args.len() == 4 || args.len() == 5);
+                execute_rmt(args);
+    },
+    _      => panic!("Incorrect architecture. Only rmt and drmt are supported"),
+  };
+
 }
 #[cfg(test)]
 mod test_druzhba;

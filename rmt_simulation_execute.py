@@ -19,10 +19,12 @@ def run_dgen_unoptimized (args):
     subprocess.run(['rm',
                     'dgen_bin'])
 
+# Gives dsim hole configs
 def run_druzhba_unoptimized (args):
     subprocess.run(['cargo',
                     'run',
-                    args[7],
+                    'rmt',
+                    args[7], 
                     args[8],
                     args[9]])
 def run_dgen_optimized (args):
@@ -47,6 +49,7 @@ def run_dgen_optimized (args):
 def run_druzhba_optimized (args):
     subprocess.run(['cargo',
                     'run',
+                    'rmt',
                     args[8],
                     args[9]])
 def main ():
@@ -125,5 +128,5 @@ def main ():
         run_druzhba_optimized(args)
 
 
-if __name__== "__main__":
+if __name__== '__main__':
     main()

@@ -125,18 +125,6 @@ fn run_dgen (test_case_names : &Vec<String>,
            .output()
            .expect("Adding execution permissions to dgen_bin failed");
   let mut index : usize = 0;
-  // Initializes a prog_to_run just so that Druzhba can compile
-  Command::new("./dgen_bin")
-              .arg("simple") // Name
-              .arg("example_alus/stateful_alus/raw.alu") // Stateful ALU
-              .arg("example_alus/stateless_alus/stateless_alu.alu") // Stateless ALU
-              .arg("2") // Depth
-              .arg("2") // Width
-              .arg("1") // Stateful ALUs
-              .arg("0,1,2,3") // constant vec
-              .arg("src/prog_to_run.rs")
-              .output()
-              .expect("Error running dgen");
 
   for arg in dgen_args.iter(){
     // Optimization level 1
