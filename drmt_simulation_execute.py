@@ -20,7 +20,7 @@ def main ():
             help='RISCV asm file to be run on each processor')
 
     parser.add_argument(
-            'num_packets',
+            'num_packet_fields',
             type=int,
             help='Number of PHV containers (should be equal to the number of packet fields)')
     parser.add_argument(
@@ -35,7 +35,7 @@ def main ():
     raw_args = parser.parse_args(argv[1:])
     args = []
     args.append(raw_args.riscv_file)
-    args.append(str(raw_args.num_packets))
+    args.append(str(raw_args.num_packet_fields))
     args.append(str(raw_args.ticks))
     args.append(str(raw_args.num_processors))
 

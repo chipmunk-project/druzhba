@@ -1,0 +1,1 @@
+python3 drmt_simulation_execute.py riscv_programs/add_one.s 2 10 3

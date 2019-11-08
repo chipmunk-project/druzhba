@@ -39,10 +39,10 @@ fn extract_hole_cfgs (hole_cfgs_file : String) -> HashMap <String, i32> {
   hole_cfgs_map
 }
 
-fn generate_random_phv (num_packets : i32) -> Phv <i32> {
+fn generate_random_phv (num_packets_fields : i32) -> Phv <i32> {
     let mut phv : Phv<i32> = Phv::new();
     
-    (0..num_packets)
+    (0..num_packet_fields)
          // _s not used
         .for_each ( |_s| {
          phv.add_container_to_phv(PhvContainer {
@@ -60,7 +60,7 @@ fn execute_rmt (args : Vec<String>)
   let num_stateful_alus = prog_to_run::num_stateful_alus();
   let num_state_values = prog_to_run::num_state_variables();
   assert! (num_stateful_alus>=1);
-  let num_packets : i32 = 
+  let num_packet_fields : i32 = 
       match args.len() == 5 {
         true =>  match args[3].parse::<i32>() {
 
@@ -74,7 +74,7 @@ fn execute_rmt (args : Vec<String>)
         },
     };
 
-  assert!(num_packets <= prog_to_run::pipeline_width());
+  assert!(num_packet_fields <= prog_to_run::pipeline_width());
   let ticks : i32 = 
       match args.len() == 5 {
         true =>  match args[4].parse::<i32>() {
@@ -110,8 +110,8 @@ fn execute_rmt (args : Vec<String>)
   let mut output_phvs : Vec <Phv <i32> > = Vec::new();
   // _t not used
   for _t in 0..ticks {
-    let mut phv : Phv<i32> = generate_random_phv (num_packets);
-    (num_packets..prog_to_run::pipeline_width())
+    let mut phv : Phv<i32> = generate_random_phv (num_packet_fields);
+    (num_packet_fields..prog_to_run::pipeline_width())
         .for_each( |_s| { 
             phv.add_container_to_phv (PhvContainer{
                 field_value : 0,
@@ -152,11 +152,11 @@ fn execute_rmt (args : Vec<String>)
 fn execute_drmt (args : Vec <String>)
 {
     let input_file : &str = &args[2];
-    let num_packets : i32 = 
+    let num_packets_fields : i32 = 
       match args[3].parse::<i32>() {
 
         Ok  (t_pkts)    => t_pkts,
-        Err (_)         => panic!("Failure: Unable to unwrap num_packets"),
+        Err (_)         => panic!("Failure: Unable to unwrap num_packet_fields"),
       };
 
     let ticks : i32 = 
@@ -180,7 +180,7 @@ fn execute_drmt (args : Vec <String>)
                 input_file.to_string()));
     }
     for t in 0..ticks {
-        let mut phv : Phv <i32> = generate_random_phv(num_packets);
+        let mut phv : Phv <i32> = generate_random_phv(num_packets_fields);
         println!("Input: {}", phv);
         processors[(t % num_processors) as usize]
                     .add_phv(phv);
