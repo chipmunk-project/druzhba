@@ -1,12 +1,10 @@
-#include <stdio.h>
-
 struct Packet {
   int x;
   int y;
   int z;
 };
 
-void add (struct Packet pkt)
+void simple_add (struct Packet pkt)
 {
   pkt.x = pkt.x + 1; 
   pkt.y = pkt.y + 2; 

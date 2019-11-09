@@ -33,21 +33,26 @@ impl Processor {
        let current_phv = self.phvs.remove(0);
        let mut binary_file = self.riscv_file.clone();
        binary_file.truncate(binary_file.len() - 2);
-       println!("Generated main: {}", self.generate_main_function(current_phv));
+
+       let complete_riscv_file : String = format!("{}{}.s", 
+                                                  binary_file, 
+                                                  "_complete");
+       let riscv_file_contents : String = 
+            fs::read_to_string(self.riscv_file.clone())
+            .expect("Error: RISCV file could not be found. Double check the that the file path is correct");
+
+       fs::write(complete_riscv_file.clone(),
+                 format!("{}{}",
+                         riscv_file_contents,
+                         self.generate_main_function(current_phv)));
+
 
        Command::new("riscv64-unknown-elf-gcc")
-                .arg(&self.riscv_file)
+                .arg(&complete_riscv_file)
                 .arg("-o")
                 .arg(&binary_file)
                 .output()
                 .expect("Could not run cross compiler");
-/*
-  let hole_cfgs_file_vec : Vec <String> = hole_cfgs_file_contents
-                                          .split ("\n")
-                                          .map (|s| s.to_string())
-                                          .collect();*/
-
-
 
        let output = Command::new("spike")
                 .arg("pk")
@@ -60,6 +65,10 @@ impl Processor {
                 .arg(&binary_file)
                 .output()
                 .expect("Could not remove binary");
+       Command::new("rm")
+                .arg(&complete_riscv_file)
+                .output()
+                .expect("Could not complete RISCV file");
     }
     fn generate_main_function (&self, input_phv : Phv<i32>) 
         -> String {
@@ -146,7 +155,7 @@ impl Processor {
                                        stack_frame_offset*-1 - 16));
         main_function.push_str(&format!("  addi  sp,sp,{}\n",
                                         stack_frame_offset*-1));
-        main_function.push_str("  jr ra\n  .size main, .-main\n  .ident \"GCC: (GNU) 9.2.0\"");
+        main_function.push_str("  jr ra\n  .size main, .-main\n  .ident \"GCC: (GNU) 9.2.0\"\n");
         main_function
 
     }

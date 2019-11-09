@@ -182,6 +182,7 @@ fn execute_drmt (args : Vec <String>)
     for t in 0..ticks {
         let mut phv : Phv <i32> = 
             generate_random_phv(num_packets_fields);
+        println!("Cycle : {}, processor: {}", t, t % num_processors);
         println!("Input: {}", phv);
         processors[(t % num_processors) as usize]
                     .add_phv(phv);

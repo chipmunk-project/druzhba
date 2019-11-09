@@ -1,4 +1,4 @@
-	.file	"simple_add_with_main.c"
+	.file	"simple_add_with_print.c"
 	.option nopic
 	.attribute arch, "rv64i2p0_m2p0_a2p0_f2p0_d2p0_c2p0"
 	.attribute unaligned_access, 0
@@ -7,12 +7,12 @@
 	.section	.rodata
 	.align	3
 .LC0:
-	.string	"Packet: %d %d %d\n"
+	.string	"Result: %d, %d, %d\n"
 	.text
 	.align	1
-	.globl	add
-	.type	add, @function
-add:
+	.globl	simple_add_with_print
+	.type	simple_add_with_print, @function
+simple_add_with_print:
 	addi	sp,sp,-32
 	sd	ra,24(sp)
 	sd	s0,16(sp)
@@ -44,25 +44,5 @@ add:
 	ld	s0,16(sp)
 	addi	sp,sp,32
 	jr	ra
-	.size	add, .-add
-	.align	1
-	.globl	main
-	.type	main, @function
-main:
-	addi	sp,sp,-32
-	sd	ra,24(sp)
-	sd	s0,16(sp)
-	addi	s0,sp,32
-	sw	zero,-32(s0)
-	sw	zero,-28(s0)
-	sw	zero,-24(s0)
-	ld	a0,-32(s0)
-	ld	a1,-24(s0)
-	call	add
-	nop
-	ld	ra,24(sp)
-	ld	s0,16(sp)
-	addi	sp,sp,32
-	jr	ra
-	.size	main, .-main
+	.size	simple_add_with_print, .-simple_add_with_print
 	.ident	"GCC: (GNU) 9.2.0"
