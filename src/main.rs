@@ -39,7 +39,7 @@ fn extract_hole_cfgs (hole_cfgs_file : String) -> HashMap <String, i32> {
   hole_cfgs_map
 }
 
-fn generate_random_phv (num_packets_fields : i32) -> Phv <i32> {
+fn generate_random_phv (num_packet_fields : i32) -> Phv <i32> {
     let mut phv : Phv<i32> = Phv::new();
     
     (0..num_packet_fields)

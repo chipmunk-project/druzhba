@@ -21,7 +21,8 @@ Running dsim using the dRMT architecture:
 
     python3 drmt_simulation_execute.py <RISCV file> <packet fields> <ticks> <processors>
 
-    python3 drmt_simulation_execute.py riscv_programs/add_one.s 2 10 3
+Example:
+    python3 drmt_simulation_execute.py riscv_programs/add_one.s 1 10 3
 
 Tests will ensure the druhzba pipeline is outputting
 the correct packets relative to the input packets
