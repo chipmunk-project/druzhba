@@ -8,7 +8,7 @@ use std::process::Command;
 // into test_case_names and fill out the necessary data
 // in dgen_data
 fn main() { 
-   
+/*   
   let out_dir = String::from("src/");
   let destination = Path::new(&out_dir).join("test_with_chipmunk.rs");
   let mut test_file = File::create(&destination).unwrap();
@@ -49,6 +49,7 @@ fn main() {
   }
   // Copies benchmark prog_to_run files to benches dir
   copy_benchmark_files();
+  */
 
 }
 // Copies prog_to_run files from tests directory to

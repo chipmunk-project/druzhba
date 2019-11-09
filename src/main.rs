@@ -180,7 +180,8 @@ fn execute_drmt (args : Vec <String>)
                 input_file.to_string()));
     }
     for t in 0..ticks {
-        let mut phv : Phv <i32> = generate_random_phv(num_packets_fields);
+        let mut phv : Phv <i32> = 
+            generate_random_phv(num_packets_fields);
         println!("Input: {}", phv);
         processors[(t % num_processors) as usize]
                     .add_phv(phv);
