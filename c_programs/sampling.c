@@ -19,7 +19,7 @@ void write_results(struct packet pkt)
     }
     fclose(fp);
 }
-void rcp (struct packet pkt)
+void sampling (struct packet pkt)
 {
   if (state[0] != 29) {
     pkt.x = 0;

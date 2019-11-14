@@ -396,7 +396,7 @@ fn bench_blue_decrease_dsim_unoptimized (b : &mut Bencher)
 {
     let num_ticks : i32 = 10000;
     let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 2, 2, 1, 2);
-    let hole_cfg_file : String = String::from("hole_configurations/blue_decrease_equivalent_1_canonicalizer_equivalent_0_hole_cfgs.txt");
+    let hole_cfg_file : String = String::from("hole_configurations/blue_decrease_equivalent_1_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_hole_cfgs.txt");
     let hole_cfgs_map : HashMap <String, i32> = extract_hole_cfgs (hole_cfg_file);
 
     let mut pipeline : Pipeline = 

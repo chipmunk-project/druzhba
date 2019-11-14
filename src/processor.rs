@@ -69,7 +69,7 @@ impl Processor {
        self.process_results();
 
         Command::new("rm")
-                .arg(&"state.txt")
+                .arg(&"results.txt")
                 .output()
                 .expect("Could not remove state.txt");
    
@@ -81,20 +81,25 @@ impl Processor {
                 .arg(&complete_riscv_file)
                 .output()
                 .expect("Could not complete RISCV file"); 
+
     }
     fn process_results (&mut self) {
        let results_contents : String = fs::read_to_string("results.txt").expect("Error: results.txt could not be opened");
        let lines : Vec<String> = results_contents.split("\n")
                                                  .map(|s| s.to_string())
                                                  .collect(); 
-       println!("Result: {}", lines[0]);
-       let state_results : Vec <&str>= lines[1].split(",").collect();
-       for i in 0..state_results.len(){
-         self.state[i] = match state_results[i].parse::<i32>() {
-           Ok (t_sv) => t_sv,
-           Err (_)   => panic!("Error: unable to unwrap state variable from results.txt"),
+       if lines.len() == 1 {
+         panic!("Error: No state found in results.txt");
+       }
+       else {
+         let state_results : Vec <&str>= lines[1].split(",").collect();
+         for i in 0..state_results.len(){
+           self.state[i] = match state_results[i].parse::<i32>() {
+             Ok (t_sv) => t_sv,
+             Err (_)   => panic!("Error: unable to unwrap state variable from results.txt"),
 
-         };
+           };
+         }
        }
        println!("State result: {:?}\n", self.state);
        
@@ -116,13 +121,16 @@ impl Processor {
            }  
            if in_state {
                for var in self.state.iter() {
-                   //println!("Writing state var {}", var);
                    new_riscv_file_contents.push_str(&format!("  .word {}\n", var));
                }
                in_state = false;
            }
            else if line.contains(".bss") {
                new_riscv_file_contents.push_str(".data\n");
+           }
+           else if line.contains(".sbss") &&
+                   line.contains("nobits"){
+              new_riscv_file_contents.push_str("  .section .sdata,\"aw\"\n");
            }
            else {
                new_riscv_file_contents.push_str(&line);
