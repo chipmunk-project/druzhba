@@ -18,7 +18,7 @@ pub mod flowlets_unoptimized;
 pub mod learn_filter_unoptimized;
 pub mod rcp_unoptimized;
 pub mod blue_decrease_unoptimized;
-pub mod conga_unoptimized;
+pub mod sampling_unoptimized;
 pub mod marple_new_flow_unoptimized;
 pub mod marple_tcp_nmo_unoptimized;
 pub mod snap_heavy_hitter_unoptimized;
@@ -29,7 +29,7 @@ pub mod flowlets_optimized_1;
 pub mod learn_filter_optimized_1;
 pub mod rcp_optimized_1;
 pub mod blue_decrease_optimized_1;
-pub mod conga_optimized_1;
+pub mod sampling_optimized_1;
 pub mod marple_new_flow_optimized_1;
 pub mod marple_tcp_nmo_optimized_1;
 pub mod snap_heavy_hitter_optimized_1;
@@ -40,7 +40,7 @@ pub mod flowlets_optimized_2;
 pub mod learn_filter_optimized_2;
 pub mod rcp_optimized_2;
 pub mod blue_decrease_optimized_2;
-pub mod conga_optimized_2;
+pub mod sampling_optimized_2;
 pub mod marple_new_flow_optimized_2;
 pub mod marple_tcp_nmo_optimized_2;
 pub mod snap_heavy_hitter_optimized_2;
@@ -153,6 +153,126 @@ fn bench_drmt_blue_increase (b : &mut Bencher)
   });
 }
 #[bench] 
+fn bench_drmt_blue_decrease (b : &mut Bencher)
+{
+  let num_ticks : i32 = 10000;
+
+  let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 2, 2, 1, 2);
+  let num_processors : i32 = 3;
+  let mut processors : Vec<Processor> = Vec::new();
+  for _i in 0..num_processors {
+    processors.push (Processor {
+      riscv_file : "riscv_programs/blue_decrease.s".to_string(),
+      phvs : Vec::new(),
+      state : vec![0; 2]
+    });
+  }
+  b.iter(|| {
+    for t in 0..num_ticks {
+      processors[(t % num_processors) as usize]
+        .add_phv(input_phvs[t as usize].clone());
+     processors[(t % num_processors) as usize]
+        .execute_program();
+    }
+  });
+}
+#[bench] 
+fn bench_drmt_marple_new_flow (b : &mut Bencher)
+{
+  let num_ticks : i32 = 10000;
+
+  let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 2, 1, 1, 1);
+  let num_processors : i32 = 3;
+  let mut processors : Vec<Processor> = Vec::new();
+  for _i in 0..num_processors {
+    processors.push (Processor {
+      riscv_file : "riscv_programs/marple_new_flow.s".to_string(),
+      phvs : Vec::new(),
+      state : vec![0; 2]
+    });
+  }
+  b.iter(|| {
+    for t in 0..num_ticks {
+      processors[(t % num_processors) as usize]
+        .add_phv(input_phvs[t as usize].clone());
+     processors[(t % num_processors) as usize]
+        .execute_program();
+    }
+  });
+}
+#[bench] 
+fn bench_drmt_marple_tcp_nmo (b : &mut Bencher)
+{
+  let num_ticks : i32 = 10000;
+
+  let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 2, 1, 1, 2);
+  let num_processors : i32 = 3;
+  let mut processors : Vec<Processor> = Vec::new();
+  for _i in 0..num_processors {
+    processors.push (Processor {
+      riscv_file : "riscv_programs/marple_tcp_nmo.s".to_string(),
+      phvs : Vec::new(),
+      state : vec![0; 2]
+    });
+  }
+  b.iter(|| {
+    for t in 0..num_ticks {
+      processors[(t % num_processors) as usize]
+        .add_phv(input_phvs[t as usize].clone());
+     processors[(t % num_processors) as usize]
+        .execute_program();
+    }
+  });
+}
+#[bench] 
+fn bench_drmt_stateful_fw (b : &mut Bencher)
+{
+  let num_ticks : i32 = 10000;
+
+  let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 5, 4, 1, 1);
+  let num_processors : i32 = 3;
+  let mut processors : Vec<Processor> = Vec::new();
+  for _i in 0..num_processors {
+    processors.push (Processor {
+      riscv_file : "riscv_programs/stateful_fw.s".to_string(),
+      phvs : Vec::new(),
+      state : vec![0; 2]
+    });
+  }
+  b.iter(|| {
+    for t in 0..num_ticks {
+      processors[(t % num_processors) as usize]
+        .add_phv(input_phvs[t as usize].clone());
+     processors[(t % num_processors) as usize]
+        .execute_program();
+    }
+  });
+}
+#[bench] 
+fn bench_drmt_snap_heavy_hitter (b : &mut Bencher)
+{
+  let num_ticks : i32 = 10000;
+
+  let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 1, 1, 2, 1);
+  let num_processors : i32 = 3;
+  let mut processors : Vec<Processor> = Vec::new();
+  for _i in 0..num_processors {
+    processors.push (Processor {
+      riscv_file : "riscv_programs/snap_heavy_hitter.s".to_string(),
+      phvs : Vec::new(),
+      state : vec![0; 2]
+    });
+  }
+  b.iter(|| {
+    for t in 0..num_ticks {
+      processors[(t % num_processors) as usize]
+        .add_phv(input_phvs[t as usize].clone());
+     processors[(t % num_processors) as usize]
+        .execute_program();
+    }
+  });
+}
+#[bench] 
 fn bench_drmt_flowlet (b : &mut Bencher)
 {
   let num_ticks : i32 = 10000;
@@ -226,6 +346,31 @@ fn bench_drmt_rcp  (b : &mut Bencher)
     }
   });
 }
+#[bench] 
+fn bench_drmt_sampling  (b : &mut Bencher)
+{
+  let num_ticks : i32 = 10000;
+
+  let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 5, 5, 2, 1);
+  let num_processors : i32 = 3;
+  let mut processors : Vec<Processor> = Vec::new();
+  for _i in 0..num_processors {
+    processors.push (Processor {
+      riscv_file : "riscv_programs/sampling.s".to_string(),
+      phvs : Vec::new(),
+      state : vec![0; 2]
+    });
+  }
+  b.iter(|| {
+    for t in 0..num_ticks {
+      processors[(t % num_processors) as usize]
+        .add_phv(input_phvs[t as usize].clone());
+     processors[(t % num_processors) as usize]
+        .execute_program();
+    }
+  });
+}
+
 
 // Unoptimized benches
 #[bench]
@@ -265,15 +410,15 @@ fn bench_blue_decrease_dsim_unoptimized (b : &mut Bencher)
     });
 }
 #[bench]
-fn bench_conga_dsim_unoptimized (b : &mut Bencher)
+fn bench_sampling_dsim_unoptimized (b : &mut Bencher)
 {
     let num_ticks : i32 = 10000;
     let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 5, 5, 2, 1);
-    let hole_cfg_file : String = String::from("hole_configurations/conga_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_5_hole_cfgs.txt");
+    let hole_cfg_file : String = String::from("hole_configurations/sampling_equivalent_1_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_hole_cfgs.txt");
     let hole_cfgs_map : HashMap <String, i32> = extract_hole_cfgs (hole_cfg_file);
 
     let mut pipeline : Pipeline = 
-      conga_unoptimized::init_pipeline (hole_cfgs_map.clone());
+      sampling_unoptimized::init_pipeline (hole_cfgs_map.clone());
     b.iter(||{
 
       let input_output_phvs : (Vec<Phv<i32>>, Vec<Phv<i32>>) = 
@@ -449,13 +594,13 @@ fn bench_blue_decrease_dsim_optimized_1 (b : &mut Bencher)
     });
 }
 #[bench]
-fn bench_conga_dsim_optimized_1 (b : &mut Bencher)
+fn bench_sampling_dsim_optimized_1 (b : &mut Bencher)
 {
     let num_ticks : i32 = 10000;
     let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 5, 5, 2, 1);
 
     let mut pipeline : Pipeline = 
-      conga_optimized_1::init_pipeline (HashMap::new());
+      sampling_optimized_1::init_pipeline (HashMap::new());
     b.iter(||{
       let input_output_phvs : (Vec<Phv<i32>>, Vec<Phv<i32>>) = 
           run_pipeline (input_phvs.clone(),
@@ -611,13 +756,13 @@ fn bench_blue_decrease_dsim_optimized_2 (b : &mut Bencher)
     });
 }
 #[bench]
-fn bench_conga_dsim_optimized_2 (b : &mut Bencher)
+fn bench_sampling_dsim_optimized_2 (b : &mut Bencher)
 {
     let num_ticks : i32 = 10000;
     let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 5, 5, 2, 1);
 
     let mut pipeline : Pipeline = 
-      conga_optimized_2::init_pipeline (HashMap::new());
+      sampling_optimized_2::init_pipeline (HashMap::new());
     b.iter(||{
       let input_output_phvs : (Vec<Phv<i32>>, Vec<Phv<i32>>) = 
           run_pipeline (input_phvs.clone(),

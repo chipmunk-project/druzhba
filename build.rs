@@ -8,7 +8,7 @@ use std::process::Command;
 // into test_case_names and fill out the necessary data
 // in dgen_data
 fn main() { 
-/*   
+   
   let out_dir = String::from("src/");
   let destination = Path::new(&out_dir).join("test_with_chipmunk.rs");
   let mut test_file = File::create(&destination).unwrap();
@@ -47,7 +47,7 @@ fn main() {
                test_case_names[index].clone());
     index+=1;
   }
-  */
+
   // Copies benchmark prog_to_run files to benches dir
   copy_benchmark_files();
 
@@ -71,12 +71,12 @@ fn copy_benchmark_files ()
   copy_benchmark_file("src/tests/blue_decrease_equivalent_1_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_optimized_2.rs",
                        "benches/blue_decrease_optimized_2.rs");
 
-   copy_benchmark_file("src/tests/conga_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_5.rs",
-                       "benches/conga_unoptimized.rs");
-   copy_benchmark_file("src/tests/conga_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_5_optimized_1.rs",
-                       "benches/conga_optimized_1.rs");
-   copy_benchmark_file("src/tests/conga_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_5_optimized_2.rs",
-                       "benches/conga_optimized_2.rs");
+   copy_benchmark_file("src/tests/sampling_equivalent_1_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1.rs",
+                       "benches/sampling_unoptimized.rs");
+   copy_benchmark_file("src/tests/sampling_equivalent_1_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_optimized_1.rs",
+                       "benches/sampling_optimized_1.rs");
+   copy_benchmark_file("src/tests/sampling_equivalent_1_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_optimized_2.rs",
+                       "benches/sampling_optimized_2.rs");
 
 
    copy_benchmark_file("src/tests/marple_new_flow_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2.rs",
