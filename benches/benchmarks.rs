@@ -6,6 +6,7 @@ extern crate druzhba;
 use druzhba::pipeline::Pipeline;
 use druzhba::phv::Phv;
 use druzhba::phv_container::PhvContainer;
+use druzhba::processor::Processor;
 
 use rand::Rng;
 use std::fs;
@@ -108,9 +109,107 @@ fn run_pipeline (input_phvs : Vec <Phv <i32> >,
   }
   (result_updated_input_phvs, result_output_phvs)
 }
+// dRMT benchmarks
+#[bench] 
+fn bench_drmt_blue_increase (b : &mut Bencher)
+{
+  let num_ticks : i32 = 10000;
 
+  let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 2, 2, 2, 2);
+  let num_processors : i32 = 3;
+  let mut processors : Vec<Processor> = Vec::new();
+  for _i in 0..num_processors {
+    processors.push (Processor {
+      riscv_file : "riscv_programs/blue_increase.s".to_string(),
+      phvs : Vec::new(),
+      state : vec![0; 2]
+    });
+  }
+  b.iter(|| {
+    for t in 0..num_ticks {
+      processors[(t % num_processors) as usize]
+        .add_phv(input_phvs[t as usize].clone());
+     processors[(t % num_processors) as usize]
+        .execute_program();
+    }
+  });
+}
+#[bench] 
+fn bench_drmt_flowlet (b : &mut Bencher)
+{
+  let num_ticks : i32 = 10000;
 
+  let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 3, 5, 1, 2);
+  let num_processors : i32 = 3;
+  let mut processors : Vec<Processor> = Vec::new();
+  for _i in 0..num_processors {
+    processors.push (Processor {
+      riscv_file : "riscv_programs/flowlet.s".to_string(),
+      phvs : Vec::new(),
+      state : vec![0; 2]
+    });
+  }
+  b.iter(|| {
+    for t in 0..num_ticks {
+      processors[(t % num_processors) as usize]
+        .add_phv(input_phvs[t as usize].clone());
+     processors[(t % num_processors) as usize]
+        .execute_program();
+    }
+  });
+}
 
+#[bench] 
+fn bench_drmt_learn_filter  (b : &mut Bencher)
+{
+  let num_ticks : i32 = 10000;
+
+  let num_processors : i32 = 3;
+  let mut processors : Vec<Processor> = Vec::new();
+
+  let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 1, 3, 1, 3);
+  for _i in 0..num_processors {
+    processors.push (Processor {
+      riscv_file : "riscv_programs/learn_filter.s".to_string(),
+      phvs : Vec::new(),
+      state : vec![0; 3]
+    });
+  }
+  b.iter(|| {
+    for t in 0..num_ticks {
+      processors[(t % num_processors) as usize]
+        .add_phv(input_phvs[t as usize].clone());
+     processors[(t % num_processors) as usize]
+        .execute_program();
+    }
+  });
+}
+#[bench] 
+fn bench_drmt_rcp  (b : &mut Bencher)
+{
+  let num_ticks : i32 = 10000;
+
+  let input_phvs : Vec <Phv <i32> > = create_random_phvs (num_ticks, 2, 3, 1, 3);
+  let num_processors : i32 = 3;
+  let mut processors : Vec<Processor> = Vec::new();
+  for _i in 0..num_processors {
+    processors.push (Processor {
+      riscv_file : "riscv_programs/rcp.s".to_string(),
+      phvs : Vec::new(),
+      state : vec![0; 2]
+    });
+  }
+  b.iter(|| {
+    for t in 0..num_ticks {
+      processors[(t % num_processors) as usize]
+        .add_phv(input_phvs[t as usize].clone());
+     processors[(t % num_processors) as usize]
+        .execute_program();
+    }
+  });
+}
+
+// Spec benchmarks
 #[bench]
 fn bench_blue_increase_spec (b : &mut Bencher)
 {

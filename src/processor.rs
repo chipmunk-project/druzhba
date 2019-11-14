@@ -42,9 +42,6 @@ impl Processor {
                                                   "_complete");
 
        self.generate_state_variables(&complete_riscv_file);
-/*       let riscv_file_contents : String = 
-            fs::read_to_string(self.riscv_file.clone())
-            .expect("Error: RISCV file could not be found. Double check the that the file path is correct");*/
        let riscv_file_contents : String = fs::read_to_string(complete_riscv_file.clone())
             .expect("Error: RISCV file could not be found. Double check the that the file path is correct");
 
@@ -83,7 +80,7 @@ impl Processor {
        Command::new("rm")
                 .arg(&complete_riscv_file)
                 .output()
-                .expect("Could not complete RISCV file");
+                .expect("Could not complete RISCV file"); 
     }
     fn process_results (&mut self) {
        let results_contents : String = fs::read_to_string("results.txt").expect("Error: results.txt could not be opened");
