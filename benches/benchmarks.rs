@@ -188,7 +188,7 @@ fn bench_drmt_marple_new_flow (b : &mut Bencher)
     processors.push (Processor {
       riscv_file : "riscv_programs/marple_new_flow.s".to_string(),
       phvs : Vec::new(),
-      state : vec![0; 2]
+      state : vec![0; 1]
     });
   }
   b.iter(|| {
@@ -334,7 +334,7 @@ fn bench_drmt_rcp  (b : &mut Bencher)
     processors.push (Processor {
       riscv_file : "riscv_programs/rcp.s".to_string(),
       phvs : Vec::new(),
-      state : vec![0; 2]
+      state : vec![0; 3]
     });
   }
   b.iter(|| {
@@ -358,7 +358,7 @@ fn bench_drmt_sampling  (b : &mut Bencher)
     processors.push (Processor {
       riscv_file : "riscv_programs/sampling.s".to_string(),
       phvs : Vec::new(),
-      state : vec![0; 2]
+      state : vec![0; 1]
     });
   }
   b.iter(|| {
