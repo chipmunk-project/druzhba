@@ -9,7 +9,8 @@ def run_druzhba (args):
                     args[0], # RISCV file
                     args[1], # Number of packets
                     args[2], # Number of ticks
-                    args[3]]) # Number of processors
+                    args[3], # Number of processors
+                    args[4]]) # Number of state vars
 
 def main ():
     argv = sys.argv
@@ -31,6 +32,11 @@ def main ():
             'num_processors',
             type=int,
             help='Number of processors for dRMT architecture')
+    parser.add_argument(
+            'num_state_vars',
+            type=int,
+            help='Number of state variables for dRMT architecture')
+
     # TODO: Add argument for number of cycles the program will run for
     raw_args = parser.parse_args(argv[1:])
     args = []
@@ -38,6 +44,7 @@ def main ():
     args.append(str(raw_args.num_packet_fields))
     args.append(str(raw_args.ticks))
     args.append(str(raw_args.num_processors))
+    args.append(str(raw_args.num_state_vars))
 
     subprocess.run(['./build_dgen.sh'])
     spike_result = subprocess.run(['which',
@@ -46,6 +53,10 @@ def main ():
     cross_compiler_result = subprocess.run(['which',
                                             'riscv64-unknown-elf-gcc'],
                                             stdout=subprocess.DEVNULL)
+    cross_compiler_result = subprocess.run(['which',
+                                            'riscv64-unknown-linux-gnu-gcc'],
+                                            stdout=subprocess.DEVNULL)
+
     if spike_result.returncode != 0:
         print('WARNING: Spike could not be found')
     if cross_compiler_result.returncode != 0:

@@ -4,8 +4,9 @@ use std::fs;
 use std::process::Command;
 
 pub struct Processor {
-    riscv_file : String,
-    phvs : Vec<Phv<i32>>,
+    pub riscv_file : String,
+    pub phvs : Vec<Phv<i32>>,
+    pub state : Vec<i32>,
 }
 
 impl Processor {
@@ -13,6 +14,7 @@ impl Processor {
         Processor {
             riscv_file : String::from(""),
             phvs : Vec::new(),
+            state: vec![0,1],
         }
     }
 
@@ -21,6 +23,7 @@ impl Processor {
          Processor {
             riscv_file : t_riscv_file,
             phvs : Vec::new(),
+            state : vec![0;1],
         }
        
     }
@@ -37,22 +40,28 @@ impl Processor {
        let complete_riscv_file : String = format!("{}{}.s", 
                                                   binary_file, 
                                                   "_complete");
-       let riscv_file_contents : String = 
+
+       self.generate_state_variables(&complete_riscv_file);
+/*       let riscv_file_contents : String = 
             fs::read_to_string(self.riscv_file.clone())
+            .expect("Error: RISCV file could not be found. Double check the that the file path is correct");*/
+       let riscv_file_contents : String = fs::read_to_string(complete_riscv_file.clone())
             .expect("Error: RISCV file could not be found. Double check the that the file path is correct");
+
 
        fs::write(complete_riscv_file.clone(),
                  format!("{}{}",
                          riscv_file_contents,
                          self.generate_main_function(current_phv)));
 
-
-       Command::new("riscv64-unknown-elf-gcc")
+       Command::new("riscv64-unknown-linux-gnu-gcc")
+                .arg("-static")
                 .arg(&complete_riscv_file)
                 .arg("-o")
                 .arg(&binary_file)
                 .output()
                 .expect("Could not run cross compiler");
+
 
        let output = Command::new("spike")
                 .arg("pk")
@@ -60,7 +69,13 @@ impl Processor {
                 .output()
                 .expect("Could not run spike");
        println!("{}", String::from_utf8_lossy(&output.stdout));
+       self.process_results();
 
+        Command::new("rm")
+                .arg(&"state.txt")
+                .output()
+                .expect("Could not remove state.txt");
+   
        Command::new("rm")
                 .arg(&binary_file)
                 .output()
@@ -69,6 +84,60 @@ impl Processor {
                 .arg(&complete_riscv_file)
                 .output()
                 .expect("Could not complete RISCV file");
+    }
+    fn process_results (&mut self) {
+       let results_contents : String = fs::read_to_string("results.txt").expect("Error: results.txt could not be opened");
+       let lines : Vec<String> = results_contents.split("\n")
+                                                 .map(|s| s.to_string())
+                                                 .collect(); 
+       println!("Result: {}", lines[0]);
+       let state_results : Vec <&str>= lines[1].split(",").collect();
+       for i in 0..state_results.len(){
+         self.state[i] = match state_results[i].parse::<i32>() {
+           Ok (t_sv) => t_sv,
+           Err (_)   => panic!("Error: unable to unwrap state variable from results.txt"),
+
+         };
+       }
+       println!("State result: {:?}\n", self.state);
+       
+    }
+    fn generate_state_variables (&self, complete_riscv_file : &str) {
+       let riscv_file_contents : String = 
+            fs::read_to_string(self.riscv_file.clone())
+            .expect("Error: RISCV file could not be found. Double check the that the file path is correct");
+       let mut new_riscv_file_contents : String = String::from("");
+       let lines : Vec<String> = riscv_file_contents.split("\n")
+                                                    .map(|s| s.to_string())
+                                                    .collect(); 
+       println!("Using previous state {:?}", self.state);
+       let mut in_state : bool = false;
+       for line in lines.iter() {
+           if line.contains(".ident") {
+              new_riscv_file_contents.push_str("  .align 1\n");
+              break;
+           }  
+           if in_state {
+               for var in self.state.iter() {
+                   //println!("Writing state var {}", var);
+                   new_riscv_file_contents.push_str(&format!("  .word {}\n", var));
+               }
+               in_state = false;
+           }
+           else if line.contains(".bss") {
+               new_riscv_file_contents.push_str(".data\n");
+           }
+           else {
+               new_riscv_file_contents.push_str(&line);
+               new_riscv_file_contents.push_str("\n");
+           }     
+           if line.contains("state:") {
+               in_state = true;
+           } 
+       }
+      fs::write(complete_riscv_file.clone(),
+                new_riscv_file_contents);
+
     }
     fn generate_main_function (&self, input_phv : Phv<i32>) 
         -> String {

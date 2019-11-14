@@ -172,12 +172,21 @@ fn execute_drmt (args : Vec <String>)
         Err (_)                   => panic!("Failure: Unable to unwrap num_processors"),
       };
 
+    let num_state_vars : i32 = 
+      match args[6].parse::<i32>() {
+
+        Ok  (t_num_state_vars)   => t_num_state_vars,
+        Err (_)                   => panic!("Failure: Unable to unwrap num_state_vars"),
+      };
+
     assert! (ticks >= 1);
     let mut processors : Vec<Processor> = Vec::new();
     // _i not used
     for _i in 0..num_processors {
-        processors.push(Processor::with_riscv_file (
-                input_file.to_string()));
+        processors.push(Processor {
+          riscv_file : input_file.to_string(),
+          phvs : Vec::new(),
+          state : vec![0; num_state_vars as usize]}); 
     }
     for t in 0..ticks {
         let mut phv : Phv <i32> = 
@@ -201,11 +210,11 @@ fn main() {
   println!("Args: {:?}", args);
   match arch {
     "dRMT" => {
-                assert!(args.len() == 6);
+                assert!(args.len() == 7);
                 execute_drmt(args);
     },
     "drmt" => {
-                assert!(args.len() == 6);
+                assert!(args.len() == 7);
                 execute_drmt(args);
     },
     "RMT"  => {
