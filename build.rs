@@ -8,7 +8,7 @@ use std::process::Command;
 // into test_case_names and fill out the necessary data
 // in dgen_data
 fn main() { 
-   
+/*   
   let out_dir = String::from("src/");
   let destination = Path::new(&out_dir).join("test_with_chipmunk.rs");
   let mut test_file = File::create(&destination).unwrap();
@@ -47,6 +47,7 @@ fn main() {
                test_case_names[index].clone());
     index+=1;
   }
+  */
   // Copies benchmark prog_to_run files to benches dir
   copy_benchmark_files();
 
@@ -62,6 +63,48 @@ fn copy_benchmark_files ()
                        "benches/blue_increase_optimized_1.rs");
    copy_benchmark_file("src/tests/blue_increase_pair_stateless_alu_arith_4_2_optimized_2.rs",
                        "benches/blue_increase_optimized_2.rs");
+
+   copy_benchmark_file("src/tests/blue_decrease_equivalent_1_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2.rs",
+                       "benches/blue_decrease_unoptimized.rs");
+   copy_benchmark_file("src/tests/blue_decrease_equivalent_1_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_optimized_1.rs",
+                       "benches/blue_decrease_optimized_1.rs");
+  copy_benchmark_file("src/tests/blue_decrease_equivalent_1_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_optimized_2.rs",
+                       "benches/blue_decrease_optimized_2.rs");
+
+   copy_benchmark_file("src/tests/conga_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_5.rs",
+                       "benches/conga_unoptimized.rs");
+   copy_benchmark_file("src/tests/conga_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_5_optimized_1.rs",
+                       "benches/conga_optimized_1.rs");
+   copy_benchmark_file("src/tests/conga_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_5_optimized_2.rs",
+                       "benches/conga_optimized_2.rs");
+
+
+   copy_benchmark_file("src/tests/marple_new_flow_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2.rs",
+                       "benches/marple_new_flow_unoptimized.rs");
+   copy_benchmark_file("src/tests/marple_new_flow_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_optimized_1.rs",
+                       "benches/marple_new_flow_optimized_1.rs"); 
+   copy_benchmark_file("src/tests/marple_new_flow_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_optimized_2.rs",
+                       "benches/marple_new_flow_optimized_2.rs");
+
+   copy_benchmark_file("src/tests/marple_tcp_nmo_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2.rs",
+                       "benches/marple_tcp_nmo_unoptimized.rs");
+   copy_benchmark_file("src/tests/marple_tcp_nmo_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_optimized_1.rs",
+                       "benches/marple_tcp_nmo_optimized_1.rs");
+   copy_benchmark_file("src/tests/marple_tcp_nmo_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_optimized_2.rs",
+                       "benches/marple_tcp_nmo_optimized_2.rs");
+
+   copy_benchmark_file("src/tests/snap_heavy_hitter_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_1.rs",
+                       "benches/snap_heavy_hitter_unoptimized.rs");
+   copy_benchmark_file("src/tests/snap_heavy_hitter_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_1_optimized_1.rs",
+                       "benches/snap_heavy_hitter_optimized_1.rs");  copy_benchmark_file("src/tests/snap_heavy_hitter_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_1_optimized_2.rs",
+                       "benches/snap_heavy_hitter_optimized_2.rs");
+
+   copy_benchmark_file("src/tests/stateful_fw_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5.rs",
+                       "benches/stateful_fw_unoptimized.rs");
+   copy_benchmark_file("src/tests/stateful_fw_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_optimized_1.rs",
+                       "benches/stateful_fw_optimized_1.rs");
+   copy_benchmark_file("src/tests/stateful_fw_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_optimized_2.rs",
+                       "benches/stateful_fw_optimized_2.rs");
 
 
    copy_benchmark_file("src/tests/flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5.rs",
@@ -98,10 +141,10 @@ fn copy_benchmark_file (source : &str,
            .arg(source)
            .arg(destination)
            .output()
-           .expect("Could not copy to benches");
+           .expect(&format!("Could not copy {} to benches", source));
    let contents : String = 
        fs::read_to_string(destination)
-         .expect("Could not open for benchmarks");
+         .expect(&format!("Could not open {} for benchmarks", destination));
 
    fs::write(destination,
              format!("{}{}",
