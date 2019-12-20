@@ -7,6 +7,7 @@ use std::process::Command;
 // To add a new test to the test suite, insert the name
 // into test_case_names and fill out the necessary data
 // in dgen_data
+/*
 fn main() { 
    
   let out_dir = String::from("src/");
@@ -53,6 +54,8 @@ fn main() {
 
 
 }
+*/
+fn main () {}
 // Copies prog_to_run files from tests directory to
 // benches directory to be used in benchmarks 
 fn copy_benchmark_files ()

@@ -7,6 +7,7 @@ use druzhba::pipeline::Pipeline;
 use druzhba::phv::Phv;
 use druzhba::phv_container::PhvContainer;
 use druzhba::processor::Processor;
+use druzhba::scheduler::Scheduler;
 use rand::Rng;
 use std::collections::HashMap;
 use std::env;
@@ -199,6 +200,28 @@ fn execute_drmt (args : Vec <String>)
         processors[(t % num_processors) as usize]
                     .execute_program();
     }
+}
+
+fn execute_p4_drmt (args : Vec <String>) 
+{
+     let p4_input_file : &str = &args[2];
+     let ticks : i32 = 
+      match args[3].parse::<i32>() {
+
+        Ok  (t_ticks) => t_ticks,
+        Err (_)       => panic!("Failure: Unable to unwrap ticks"),
+      };
+
+    let num_state_vars : i32 = 
+      match args[4].parse::<i32>() {
+
+        Ok  (t_num_state_vars)   => t_num_state_vars,
+        Err (_)                   => panic!("Failure: Unable to unwrap num_state_vars"),
+      };
+    
+    assert! (ticks >= 1);
+    let scheduler : Scheduler = Scheduler { input_file : p4_input_file.to_string() };
+    scheduler.exec_drmt_scheduler();
 
 }
 
@@ -224,6 +247,11 @@ fn main() {
     "rmt"  => {
                 assert!(args.len() == 4 || args.len() == 5);
                 execute_rmt(args);
+    },
+    "drmt_p4" => {
+                assert!(args.len() == 5);
+                execute_p4_drmt(args);
+
     },
     _      => panic!("Incorrect architecture. Only rmt and drmt are supported"),
   };

@@ -883,7 +883,7 @@ fn bench_rcp_optimized_2(b : &mut Bencher) {
     });
 }
 
-/*
+
 // Spec benchmarks
 #[bench]
 fn bench_blue_increase_spec (b : &mut Bencher)
@@ -971,4 +971,4 @@ fn bench_rcp_spec  (b : &mut Bencher){
     }
   });
 }
-*/
+

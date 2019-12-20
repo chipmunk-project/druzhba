@@ -11,3 +11,4 @@ benches/*unoptimized.rs
 
 build
 riscv_programs/*_complete.s
+stateful*

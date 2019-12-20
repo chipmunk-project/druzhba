@@ -1,0 +1,292 @@
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
+running 201 tests
+test test_with_chipmunk::test_blue_decrease_equivalent_1_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2 ... ignored
+test test_with_chipmunk::test_blue_decrease_equivalent_1_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_optimized_1 ... ignored
+test test_with_chipmunk::test_blue_decrease_equivalent_1_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_optimized_2 ... ignored
+test test_with_chipmunk::test_blue_decrease_equivalent_2_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2 ... ignored
+test test_with_chipmunk::test_blue_decrease_equivalent_2_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_optimized_1 ... ignored
+test test_with_chipmunk::test_blue_decrease_equivalent_2_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_optimized_2 ... ignored
+test test_with_chipmunk::test_blue_decrease_equivalent_3_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2 ... ignored
+test test_with_chipmunk::test_blue_decrease_equivalent_3_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_optimized_1 ... ignored
+test test_with_chipmunk::test_blue_decrease_equivalent_3_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_optimized_2 ... ignored
+test test_with_chipmunk::test_blue_decrease_equivalent_4_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2 ... ignored
+test test_with_chipmunk::test_blue_decrease_equivalent_4_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_optimized_1 ... ignored
+test test_with_chipmunk::test_blue_decrease_equivalent_4_canonicalizer_equivalent_0_sub_stateless_alu_arith_4_2_optimized_2 ... ignored
+test test_with_chipmunk::test_blue_increase_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2 ... ignored
+test test_with_chipmunk::test_blue_increase_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2_optimized_1 ... ignored
+test test_with_chipmunk::test_blue_increase_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2_optimized_2 ... ignored
+test test_with_chipmunk::test_blue_increase_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2 ... ignored
+test test_with_chipmunk::test_blue_increase_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2_optimized_1 ... ignored
+test test_with_chipmunk::test_blue_increase_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_arith_4_2_optimized_2 ... ignored
+test test_with_chipmunk::test_blue_increase_pair_stateless_alu_arith_4_2 ... ignored
+test test_with_chipmunk::test_blue_increase_pair_stateless_alu_arith_4_2_optimized_1 ... ignored
+test test_with_chipmunk::test_blue_increase_pair_stateless_alu_arith_4_2_optimized_2 ... ignored
+test test_with_chipmunk::test_conga_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_5 ... ignored
+test test_with_chipmunk::test_conga_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_5_optimized_1 ... ignored
+test test_with_chipmunk::test_conga_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_5_optimized_2 ... ignored
+test test_with_chipmunk::test_conga_equivalent_2_canonicalizer_equivalent_1_pair_stateless_alu_1_5 ... ignored
+test test_with_chipmunk::test_conga_equivalent_2_canonicalizer_equivalent_1_pair_stateless_alu_1_5_optimized_1 ... ignored
+test test_with_chipmunk::test_conga_equivalent_2_canonicalizer_equivalent_1_pair_stateless_alu_1_5_optimized_2 ... ignored
+test test_with_chipmunk::test_conga_equivalent_3_canonicalizer_equivalent_1_pair_stateless_alu_1_5 ... ignored
+test test_with_chipmunk::test_conga_equivalent_3_canonicalizer_equivalent_1_pair_stateless_alu_1_5_optimized_1 ... ignored
+test test_with_chipmunk::test_conga_equivalent_3_canonicalizer_equivalent_1_pair_stateless_alu_1_5_optimized_2 ... ignored
+test test_with_chipmunk::test_conga_equivalent_4_canonicalizer_equivalent_1_pair_stateless_alu_1_5 ... ignored
+test test_with_chipmunk::test_conga_equivalent_4_canonicalizer_equivalent_1_pair_stateless_alu_1_5_optimized_1 ... ignored
+test test_with_chipmunk::test_conga_equivalent_4_canonicalizer_equivalent_1_pair_stateless_alu_1_5_optimized_2 ... ignored
+test test_with_chipmunk::test_conga_equivalent_5_canonicalizer_equivalent_1_pair_stateless_alu_1_5 ... ignored
+test test_with_chipmunk::test_conga_equivalent_5_canonicalizer_equivalent_1_pair_stateless_alu_1_5_optimized_1 ... ignored
+test test_with_chipmunk::test_conga_equivalent_5_canonicalizer_equivalent_1_pair_stateless_alu_1_5_optimized_2 ... ignored
+test test_with_chipmunk::test_flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5 ... ignored
+test test_with_chipmunk::test_flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_optimized_1 ... ignored
+test test_with_chipmunk::test_flowlets_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_optimized_2 ... ignored
+test test_with_chipmunk::test_flowlets_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5 ... ignored
+test test_with_chipmunk::test_flowlets_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_optimized_1 ... ignored
+test test_with_chipmunk::test_flowlets_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_optimized_2 ... ignored
+test test_with_chipmunk::test_flowlets_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5 ... ignored
+test test_with_chipmunk::test_flowlets_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_optimized_1 ... ignored
+test test_with_chipmunk::test_flowlets_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_optimized_2 ... ignored
+test test_with_chipmunk::test_flowlets_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5 ... ignored
+test test_with_chipmunk::test_flowlets_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_optimized_1 ... ignored
+test test_with_chipmunk::test_flowlets_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_optimized_2 ... ignored
+test test_with_chipmunk::test_flowlets_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5 ... ignored
+test test_with_chipmunk::test_flowlets_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_optimized_1 ... ignored
+test test_with_chipmunk::test_flowlets_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_optimized_2 ... ignored
+test test_with_chipmunk::test_learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3 ... ignored
+test test_with_chipmunk::test_learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3_optimized_1 ... ignored
+test test_with_chipmunk::test_learn_filter_equivalent_1_canonicalizer_equivalent_0_raw_stateless_alu_5_3_optimized_2 ... ignored
+test test_with_chipmunk::test_learn_filter_equivalent_2_canonicalizer_equivalent_0_raw_stateless_alu_5_3 ... ignored
+test test_with_chipmunk::test_learn_filter_equivalent_2_canonicalizer_equivalent_0_raw_stateless_alu_5_3_optimized_1 ... ignored
+test test_with_chipmunk::test_learn_filter_equivalent_2_canonicalizer_equivalent_0_raw_stateless_alu_5_3_optimized_2 ... ignored
+test test_with_chipmunk::test_learn_filter_equivalent_3_canonicalizer_equivalent_0_raw_stateless_alu_5_3 ... ignored
+test test_with_chipmunk::test_learn_filter_equivalent_3_canonicalizer_equivalent_0_raw_stateless_alu_5_3_optimized_1 ... ignored
+test test_with_chipmunk::test_learn_filter_equivalent_3_canonicalizer_equivalent_0_raw_stateless_alu_5_3_optimized_2 ... ignored
+test test_with_chipmunk::test_learn_filter_equivalent_4_canonicalizer_equivalent_0_raw_stateless_alu_5_3 ... ignored
+test test_with_chipmunk::test_learn_filter_equivalent_4_canonicalizer_equivalent_0_raw_stateless_alu_5_3_optimized_1 ... ignored
+test test_with_chipmunk::test_learn_filter_equivalent_4_canonicalizer_equivalent_0_raw_stateless_alu_5_3_optimized_2 ... ignored
+test test_with_chipmunk::test_learn_filter_equivalent_5_canonicalizer_equivalent_0_raw_stateless_alu_5_3 ... ignored
+test test_with_chipmunk::test_learn_filter_equivalent_5_canonicalizer_equivalent_0_raw_stateless_alu_5_3_optimized_1 ... ignored
+test test_with_chipmunk::test_learn_filter_equivalent_5_canonicalizer_equivalent_0_raw_stateless_alu_5_3_optimized_2 ... ignored
+test test_with_chipmunk::test_marple_new_flow_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2 ... ignored
+test test_with_chipmunk::test_marple_new_flow_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_optimized_1 ... ignored
+test test_with_chipmunk::test_marple_new_flow_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_optimized_2 ... ignored
+test test_with_chipmunk::test_marple_new_flow_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2 ... ignored
+test test_with_chipmunk::test_marple_new_flow_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_optimized_1 ... ignored
+test test_with_chipmunk::test_marple_new_flow_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_optimized_2 ... ignored
+test test_with_chipmunk::test_marple_new_flow_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2 ... ignored
+test test_with_chipmunk::test_marple_new_flow_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_optimized_1 ... ignored
+test test_with_chipmunk::test_marple_new_flow_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_optimized_2 ... ignored
+test test_with_chipmunk::test_marple_new_flow_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2 ... ignored
+test test_with_chipmunk::test_marple_new_flow_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_optimized_1 ... ignored
+test test_with_chipmunk::test_marple_new_flow_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_optimized_2 ... ignored
+test test_with_chipmunk::test_marple_new_flow_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2 ... ignored
+test test_with_chipmunk::test_marple_new_flow_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_optimized_1 ... ignored
+test test_with_chipmunk::test_marple_new_flow_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_2_2_optimized_2 ... ignored
+test test_with_chipmunk::test_marple_tcp_nmo_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2 ... ignored
+test test_with_chipmunk::test_marple_tcp_nmo_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_optimized_1 ... ignored
+test test_with_chipmunk::test_marple_tcp_nmo_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_optimized_2 ... ignored
+test test_with_chipmunk::test_marple_tcp_nmo_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2 ... ignored
+test test_with_chipmunk::test_marple_tcp_nmo_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_optimized_1 ... ignored
+test test_with_chipmunk::test_marple_tcp_nmo_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_optimized_2 ... ignored
+test test_with_chipmunk::test_marple_tcp_nmo_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2 ... ignored
+test test_with_chipmunk::test_marple_tcp_nmo_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_optimized_1 ... ignored
+test test_with_chipmunk::test_marple_tcp_nmo_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_optimized_2 ... ignored
+test test_with_chipmunk::test_marple_tcp_nmo_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2 ... ignored
+test test_with_chipmunk::test_marple_tcp_nmo_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_optimized_1 ... ignored
+test test_with_chipmunk::test_marple_tcp_nmo_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_optimized_2 ... ignored
+test test_with_chipmunk::test_marple_tcp_nmo_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2 ... ignored
+test test_with_chipmunk::test_marple_tcp_nmo_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_optimized_1 ... ignored
+test test_with_chipmunk::test_marple_tcp_nmo_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_2_optimized_2 ... ignored
+test test_with_chipmunk::test_rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3 ... ignored
+test test_with_chipmunk::test_rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_optimized_1 ... ignored
+test test_with_chipmunk::test_rcp_equivalent_1_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_optimized_2 ... ignored
+test test_with_chipmunk::test_rcp_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3 ... ignored
+test test_with_chipmunk::test_rcp_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_optimized_1 ... ignored
+test test_with_chipmunk::test_rcp_equivalent_2_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_optimized_2 ... ignored
+test test_with_chipmunk::test_rcp_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3 ... ignored
+test test_with_chipmunk::test_rcp_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_optimized_1 ... ignored
+test test_with_chipmunk::test_rcp_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_optimized_2 ... ignored
+test test_with_chipmunk::test_rcp_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3 ... ignored
+test test_with_chipmunk::test_rcp_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_optimized_1 ... ignored
+test test_with_chipmunk::test_rcp_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_optimized_2 ... ignored
+test test_with_chipmunk::test_rcp_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3 ... ignored
+test test_with_chipmunk::test_rcp_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_optimized_1 ... ignored
+test test_with_chipmunk::test_rcp_equivalent_5_canonicalizer_equivalent_0_pred_raw_stateless_alu_3_3_optimized_2 ... ignored
+test test_with_chipmunk::test_sampling_equivalent_1_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1 ... ignored
+test test_with_chipmunk::test_sampling_equivalent_1_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_optimized_1 ... ignored
+test test_with_chipmunk::test_sampling_equivalent_1_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_optimized_2 ... ignored
+test test_with_chipmunk::test_sampling_equivalent_2_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1 ... ignored
+test test_with_chipmunk::test_sampling_equivalent_2_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_optimized_1 ... ignored
+test test_with_chipmunk::test_sampling_equivalent_2_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_optimized_2 ... ignored
+test test_with_chipmunk::test_sampling_equivalent_3_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1 ... ignored
+test test_with_chipmunk::test_sampling_equivalent_3_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_optimized_1 ... ignored
+test test_with_chipmunk::test_sampling_equivalent_3_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_optimized_2 ... ignored
+test test_with_chipmunk::test_sampling_equivalent_4_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1 ... ignored
+test test_with_chipmunk::test_sampling_equivalent_4_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_optimized_1 ... ignored
+test test_with_chipmunk::test_sampling_equivalent_4_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_optimized_2 ... ignored
+test test_with_chipmunk::test_sampling_equivalent_5_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1 ... ignored
+test test_with_chipmunk::test_sampling_equivalent_5_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_optimized_1 ... ignored
+test test_with_chipmunk::test_sampling_equivalent_5_canonicalizer_equivalent_0_if_else_raw_stateless_alu_2_1_optimized_2 ... ignored
+test test_with_chipmunk::test_sampling_revised_nested_ifs_stateless_alu_arith_rel_cond_2_2 ... ignored
+test test_with_chipmunk::test_sampling_revised_nested_ifs_stateless_alu_arith_rel_cond_2_2_optimized_1 ... ignored
+test test_with_chipmunk::test_sampling_revised_nested_ifs_stateless_alu_arith_rel_cond_2_2_optimized_2 ... ignored
+test test_with_chipmunk::test_sampling_revised_pair_stateless_alu_arith_rel_3_3 ... ignored
+test test_with_chipmunk::test_sampling_revised_pair_stateless_alu_arith_rel_3_3_optimized_1 ... ignored
+test test_with_chipmunk::test_sampling_revised_pair_stateless_alu_arith_rel_3_3_optimized_2 ... ignored
+test test_with_chipmunk::test_simple_if_else_raw_stateless_alu_arith_rel_cond_bool_2_4 ... ignored
+test test_with_chipmunk::test_simple_if_else_raw_stateless_alu_arith_rel_cond_bool_2_4_optimized_1 ... ignored
+test test_with_chipmunk::test_simple_if_else_raw_stateless_alu_arith_rel_cond_bool_2_4_optimized_2 ... ignored
+test test_with_chipmunk::test_simple_nested_ifs_stateless_alu_arith_rel_2_2 ... ignored
+test test_with_chipmunk::test_simple_nested_ifs_stateless_alu_arith_rel_2_2_optimized_1 ... ignored
+test test_with_chipmunk::test_simple_nested_ifs_stateless_alu_arith_rel_2_2_optimized_2 ... ignored
+test test_with_chipmunk::test_simple_pair_stateless_alu_arith_2_4 ... ignored
+test test_with_chipmunk::test_simple_pair_stateless_alu_arith_2_4_optimized_1 ... ignored
+test test_with_chipmunk::test_simple_pair_stateless_alu_arith_2_4_optimized_2 ... ignored
+test test_with_chipmunk::test_simple_raw_stateless_alu_2_2 ... ignored
+test test_with_chipmunk::test_simple_raw_stateless_alu_2_2_optimized_1 ... ignored
+test test_with_chipmunk::test_simple_raw_stateless_alu_2_2_optimized_2 ... ignored
+test test_with_chipmunk::test_simple_sub_stateless_alu_arith_rel_cond_2_3 ... ignored
+test test_with_chipmunk::test_simple_sub_stateless_alu_arith_rel_cond_2_3_optimized_1 ... ignored
+test test_with_chipmunk::test_simple_sub_stateless_alu_arith_rel_cond_2_3_optimized_2 ... ignored
+test test_with_chipmunk::test_snap_heavy_hitter_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_1 ... ignored
+test test_with_chipmunk::test_snap_heavy_hitter_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_1_optimized_1 ... ignored
+test test_with_chipmunk::test_snap_heavy_hitter_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_1_optimized_2 ... ignored
+test test_with_chipmunk::test_snap_heavy_hitter_equivalent_2_canonicalizer_equivalent_1_pair_stateless_alu_1_1 ... ignored
+test test_with_chipmunk::test_snap_heavy_hitter_equivalent_2_canonicalizer_equivalent_1_pair_stateless_alu_1_1_optimized_1 ... ignored
+test test_with_chipmunk::test_snap_heavy_hitter_equivalent_2_canonicalizer_equivalent_1_pair_stateless_alu_1_1_optimized_2 ... ignored
+test test_with_chipmunk::test_snap_heavy_hitter_equivalent_3_canonicalizer_equivalent_1_pair_stateless_alu_1_1 ... ignored
+test test_with_chipmunk::test_snap_heavy_hitter_equivalent_3_canonicalizer_equivalent_1_pair_stateless_alu_1_1_optimized_1 ... ignored
+test test_with_chipmunk::test_snap_heavy_hitter_equivalent_3_canonicalizer_equivalent_1_pair_stateless_alu_1_1_optimized_2 ... ignored
+test test_with_chipmunk::test_snap_heavy_hitter_equivalent_4_canonicalizer_equivalent_1_pair_stateless_alu_1_1 ... ignored
+test test_with_chipmunk::test_snap_heavy_hitter_equivalent_4_canonicalizer_equivalent_1_pair_stateless_alu_1_1_optimized_1 ... ignored
+test test_with_chipmunk::test_snap_heavy_hitter_equivalent_4_canonicalizer_equivalent_1_pair_stateless_alu_1_1_optimized_2 ... ignored
+test test_with_chipmunk::test_snap_heavy_hitter_equivalent_5_canonicalizer_equivalent_1_pair_stateless_alu_1_1 ... ignored
+test test_with_chipmunk::test_snap_heavy_hitter_equivalent_5_canonicalizer_equivalent_1_pair_stateless_alu_1_1_optimized_1 ... ignored
+test test_with_chipmunk::test_snap_heavy_hitter_equivalent_5_canonicalizer_equivalent_1_pair_stateless_alu_1_1_optimized_2 ... ignored
+test test_with_chipmunk::test_snap_heavy_hitter_pair_stateless_alu_2_3 ... ignored
+test test_with_chipmunk::test_snap_heavy_hitter_pair_stateless_alu_2_3_optimized_1 ... ignored
+test test_with_chipmunk::test_snap_heavy_hitter_pair_stateless_alu_2_3_optimized_2 ... ignored
+test test_with_chipmunk::test_snap_heavy_hitter_pair_stateless_alu_arith_rel_2_2 ... ignored
+test test_with_chipmunk::test_snap_heavy_hitter_pair_stateless_alu_arith_rel_2_2_optimized_1 ... ignored
+test test_with_chipmunk::test_snap_heavy_hitter_pair_stateless_alu_arith_rel_2_2_optimized_2 ... ignored
+test test_with_chipmunk::test_spam_detection_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_1 ... ignored
+test test_with_chipmunk::test_spam_detection_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_1_optimized_1 ... ignored
+test test_with_chipmunk::test_spam_detection_equivalent_1_canonicalizer_equivalent_1_pair_stateless_alu_1_1_optimized_2 ... ignored
+test test_with_chipmunk::test_spam_detection_equivalent_2_canonicalizer_equivalent_1_pair_stateless_alu_1_1 ... ignored
+test test_with_chipmunk::test_spam_detection_equivalent_2_canonicalizer_equivalent_1_pair_stateless_alu_1_1_optimized_1 ... ignored
+test test_with_chipmunk::test_spam_detection_equivalent_2_canonicalizer_equivalent_1_pair_stateless_alu_1_1_optimized_2 ... ignored
+test test_with_chipmunk::test_spam_detection_equivalent_3_canonicalizer_equivalent_1_pair_stateless_alu_1_1 ... ignored
+test test_with_chipmunk::test_spam_detection_equivalent_3_canonicalizer_equivalent_1_pair_stateless_alu_1_1_optimized_1 ... ignored
+test test_with_chipmunk::test_spam_detection_equivalent_3_canonicalizer_equivalent_1_pair_stateless_alu_1_1_optimized_2 ... ignored
+test test_with_chipmunk::test_spam_detection_equivalent_4_canonicalizer_equivalent_1_pair_stateless_alu_1_1 ... ignored
+test test_with_chipmunk::test_spam_detection_equivalent_4_canonicalizer_equivalent_1_pair_stateless_alu_1_1_optimized_1 ... ignored
+test test_with_chipmunk::test_spam_detection_equivalent_4_canonicalizer_equivalent_1_pair_stateless_alu_1_1_optimized_2 ... ignored
+test test_with_chipmunk::test_spam_detection_equivalent_5_canonicalizer_equivalent_1_pair_stateless_alu_1_1 ... ignored
+test test_with_chipmunk::test_spam_detection_equivalent_5_canonicalizer_equivalent_1_pair_stateless_alu_1_1_optimized_1 ... ignored
+test test_with_chipmunk::test_spam_detection_equivalent_5_canonicalizer_equivalent_1_pair_stateless_alu_1_1_optimized_2 ... ignored
+test test_with_chipmunk::test_stateful_fw_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5 ... ignored
+test test_with_chipmunk::test_stateful_fw_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_optimized_1 ... ignored
+test test_with_chipmunk::test_stateful_fw_equivalent_3_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_optimized_2 ... ignored
+test test_with_chipmunk::test_stateful_fw_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5 ... ignored
+test test_with_chipmunk::test_stateful_fw_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_optimized_1 ... ignored
+test test_with_chipmunk::test_stateful_fw_equivalent_4_canonicalizer_equivalent_0_pred_raw_stateless_alu_4_5_optimized_2 ... ignored
+test test_with_chipmunk::test_test_if_else_raw_stateless_alu_arith_rel_cond_4_4 ... ignored
+test test_with_chipmunk::test_test_if_else_raw_stateless_alu_arith_rel_cond_4_4_optimized_1 ... ignored
+test test_with_chipmunk::test_test_if_else_raw_stateless_alu_arith_rel_cond_4_4_optimized_2 ... ignored
+test test_with_chipmunk::test_test_pred_raw_stateless_alu_arith_rel_cond_bool_3_3 ... ignored
+test test_with_chipmunk::test_test_pred_raw_stateless_alu_arith_rel_cond_bool_3_3_optimized_1 ... ignored
+test test_with_chipmunk::test_test_pred_raw_stateless_alu_arith_rel_cond_bool_3_3_optimized_2 ... ignored
+test test_with_chipmunk::test_times_two_if_else_raw_stateless_alu_arith_rel_4_2 ... ignored
+test test_with_chipmunk::test_times_two_if_else_raw_stateless_alu_arith_rel_4_2_optimized_1 ... ignored
+test test_with_chipmunk::test_times_two_if_else_raw_stateless_alu_arith_rel_4_2_optimized_2 ... ignored
+test test_with_chipmunk::test_times_two_sub_stateless_alu_arith_3_3 ... ignored
+test test_with_chipmunk::test_times_two_sub_stateless_alu_arith_3_3_optimized_1 ... ignored
+test test_with_chipmunk::test_times_two_sub_stateless_alu_arith_3_3_optimized_2 ... ignored
+
+test result: ok. 0 passed; 0 failed; 201 ignored; 0 measured; 0 filtered out
+
+
+running 16 tests
+test bench_blue_increase_dsim_optimized_1 ... bench: 141,502,928 ns/iter (+/- 389,923)
+test bench_blue_increase_dsim_optimized_2 ... bench: 141,637,041 ns/iter (+/- 3,495,194)
+test bench_blue_increase_dsim_unoptimized ... bench: 249,997,092 ns/iter (+/- 449,268)
+test bench_blue_increase_spec             ... bench:   1,502,773 ns/iter (+/- 44,637)
+test bench_flowlets_dsim_optimized_1      ... bench: 194,957,599 ns/iter (+/- 10,952,536)
+test bench_flowlets_dsim_optimized_2      ... bench: 194,928,125 ns/iter (+/- 655,941)
+test bench_flowlets_dsim_unoptimized      ... bench: 352,290,606 ns/iter (+/- 14,936,810)
+test bench_flowlets_spec                  ... bench:   1,521,190 ns/iter (+/- 23,957)
+test bench_learn_filter_dsim_optimized_1  ... bench: 230,201,843 ns/iter (+/- 612,618)
+test bench_learn_filter_dsim_optimized_2  ... bench: 229,984,765 ns/iter (+/- 493,066)
+test bench_learn_filter_dsim_unoptimized  ... bench: 380,734,075 ns/iter (+/- 1,035,685)
+test bench_learn_filter_spec              ... bench:   1,840,487 ns/iter (+/- 11,141)
+test bench_rcp_dsim_unoptimized           ... bench: 250,362,305 ns/iter (+/- 14,489,895)
+test bench_rcp_optimized_1                ... bench: 156,358,169 ns/iter (+/- 790,945)
+test bench_rcp_optimized_2                ... bench: 156,686,677 ns/iter (+/- 9,162,018)
+test bench_rcp_spec                       ... bench:   1,929,772 ns/iter (+/- 34,179)
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 16 measured; 0 filtered out
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
