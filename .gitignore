@@ -8,7 +8,9 @@ dgen_bin
 benches/*optimized_1.rs
 benches/*optimized_2.rs
 benches/*unoptimized.rs
-
+*.dot
+*.png
+control_flow_opt*
 build
 riscv_programs/*_complete.s
 stateful*
