@@ -1,0 +1,37 @@
+digraph g {
+   wire [shape=doublecircle];
+   __table__condition_0 [label=_condition_0 shape=doublecircle];
+   wire -> start
+   start [shape=record label="{start}"];
+   start -> parse_ethernet [label="default"];
+   parse_ethernet [shape=record label="{parse_ethernet | {ethernet.etherType}}"];
+   parse_ethernet -> parse_vlan [label="0x8100"];
+   parse_vlan [shape=record label="{parse_vlan | {vlan_tag_[next].etherType}}"];
+   parse_vlan -> parse_vlan [label="0x8100"];
+   parse_ipv4 [shape=record label="{parse_ipv4 | {ipv4.fragOffset | ipv4.protocol}}"];
+   parse_ipv4 -> parse_icmp [label="0x1"];
+   parse_icmp [shape=record label="{parse_icmp}"];
+   parse_icmp -> _condition_0 [label="default"];
+   parse_tcp [shape=record label="{parse_tcp}"];
+   parse_tcp -> _condition_0 [label="default"];
+   parse_udp [shape=record label="{parse_udp}"];
+   parse_udp -> _condition_0 [label="default"];
+   parse_ipv4 -> parse_tcp [label="0x6"];
+   parse_ipv4 -> parse_udp [label="0x11"];
+   parse_ipv6 [shape=record label="{parse_ipv6 | {ipv6.nextHdr}}"];
+   parse_ipv6 -> parse_icmpv6 [label="0x3a"];
+   parse_icmpv6 [shape=record label="{parse_icmpv6}"];
+   parse_icmpv6 -> _condition_0 [label="default"];
+   parse_ipv6 -> parse_tcp [label="0x6"];
+   parse_ipv6 -> parse_udp [label="0x11"];
+   parse_vlan -> parse_vlan [label="0x9100"];
+   parse_vlan -> parse_vlan [label="0x9200"];
+   parse_vlan -> parse_vlan [label="0x9300"];
+   parse_vlan -> parse_ipv4 [label="0x800"];
+   parse_vlan -> parse_ipv6 [label="0x86dd"];
+   parse_ethernet -> parse_vlan [label="0x9100"];
+   parse_ethernet -> parse_vlan [label="0x9200"];
+   parse_ethernet -> parse_vlan [label="0x9300"];
+   parse_ethernet -> parse_ipv4 [label="0x800"];
+   parse_ethernet -> parse_ipv6 [label="0x86dd"];
+}
