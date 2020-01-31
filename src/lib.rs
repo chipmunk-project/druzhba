@@ -7,4 +7,5 @@ pub mod input_mux;
 pub mod output_mux;
 pub mod alu;
 pub mod processor;
+pub mod drmt_processor;
 pub mod scheduler;

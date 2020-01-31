@@ -7,11 +7,13 @@ use druzhba::pipeline::Pipeline;
 use druzhba::phv::Phv;
 use druzhba::phv_container::PhvContainer;
 use druzhba::processor::Processor;
+use druzhba::drmt_processor::dRMTProcessor;
 use druzhba::scheduler::Scheduler;
 use rand::Rng;
 use std::collections::HashMap;
 use std::env;
 use std::fs;
+use std::path::Path;
 
 // Opens hole configs file of hole variable assignments
 // and initializes a HashMap from hole vaiables to
@@ -153,7 +155,7 @@ fn execute_rmt (args : Vec<String>)
 fn execute_drmt (args : Vec <String>)
 {
     let input_file : &str = &args[2];
-    let num_packets_fields : i32 = 
+    let num_packet_fields : i32 = 
       match args[3].parse::<i32>() {
 
         Ok  (t_pkts)    => t_pkts,
@@ -191,7 +193,7 @@ fn execute_drmt (args : Vec <String>)
     }
     for t in 0..ticks {
         let mut phv : Phv <i32> = 
-            generate_random_phv(num_packets_fields);
+            generate_random_phv(num_packet_fields);
         println!("Cycle : {}, processor: {}", t, t % num_processors);
         println!("Input: {}", phv);
         processors[(t % num_processors) as usize]
@@ -204,24 +206,96 @@ fn execute_drmt (args : Vec <String>)
 
 fn execute_p4_drmt (args : Vec <String>) 
 {
-     let p4_input_file : &str = &args[2];
-     let ticks : i32 = 
-      match args[3].parse::<i32>() {
+    let p4_input_file : &str = &args[2];
+    let num_packet_fields : i32 = 
+    match args[3].parse::<i32>() {
+
+        Ok  (t_pkts)    => t_pkts,
+        Err (_)         => panic!("Failure: Unable to unwrap num_packet_fields"),
+      };
+
+    let ticks : i32 = 
+      match args[4].parse::<i32>() {
 
         Ok  (t_ticks) => t_ticks,
         Err (_)       => panic!("Failure: Unable to unwrap ticks"),
       };
+    let num_processors : i32 = 
+      match args[5].parse::<i32>() {
+
+        Ok  (t_num_processors)    => t_num_processors,
+        Err (_)                   => panic!("Failure: Unable to unwrap num_processors"),
+      };
 
     let num_state_vars : i32 = 
-      match args[4].parse::<i32>() {
+      match args[6].parse::<i32>() {
 
         Ok  (t_num_state_vars)   => t_num_state_vars,
         Err (_)                   => panic!("Failure: Unable to unwrap num_state_vars"),
       };
+    let path_to_drmt : &str = &args[7];
     
     assert! (ticks >= 1);
     let scheduler : Scheduler = Scheduler { input_file : p4_input_file.to_string() };
-    scheduler.exec_drmt_scheduler();
+    let mut cycles_to_matches_and_actions : HashMap <i32, Vec<String> > = 
+      scheduler.exec_drmt_scheduler(path_to_drmt);
+
+    let mut max : i32 = 0;
+     // Get max tick
+    for k in cycles_to_matches_and_actions.keys(){
+      if k > &max {
+        max = *k;
+      }
+    }
+    // TODO: Allow more hw and latency configurations apart
+    // from just large_hw.py and drmt_latencies.py
+    let hw_file : &str = "drmt_specs/large_hw.py";
+    let latencies_file : &str = "drmt_specs/drmt_latencies.py";
+    if Path::new(latencies_file).exists(){
+      let contents : String = fs::read_to_string(&latencies_file)
+        .expect("Something went wrong with reading latencies file");
+      let latencies_vec : Vec<String> = contents
+                                        .split ("\n")
+                                        .map (|s| s.to_string())
+                                        .collect();
+      for line in latencies_vec.iter() {
+        let assignment_line : Vec <String> = line
+                                             .split("=")
+                                             .map(|s| s.to_string())
+                                             .collect();
+        if assignment_line[0].trim() == "dA" {
+          max += assignment_line[1].trim()                                                             .parse::<i32>()  
+                                   .unwrap();
+ 
+        }
+      }
+
+    }
+
+    println!("Schedule takes {} ticks", max);
+    let mut processors : Vec <dRMTProcessor> = Vec::new();
+    for i in 0..num_processors {
+      let processor : dRMTProcessor = dRMTProcessor {
+        processor_id : i,
+        schedule : cycles_to_matches_and_actions.clone(),
+        phvs_and_initial_tick : Vec::new(),
+        phv_output_strings : HashMap::new(),
+        state : Vec::new(),
+        current_tick : -1,
+        max_tick : max,
+      };
+      processors.push(processor);
+    }
+      
+    println!("Beginning simulation");
+    for t in 0..ticks {
+      let mut phv : Phv<i32> = 
+        generate_random_phv (num_packet_fields);
+      processors [(t % num_processors) as usize].add_phv (phv, t);
+      for i in 0..processors.len() {
+        processors [i as usize].tick();
+      }
+    }
 
 }
 
@@ -249,7 +323,7 @@ fn main() {
                 execute_rmt(args);
     },
     "drmt_p4" => {
-                assert!(args.len() == 5);
+                assert!(args.len() == 8);
                 execute_p4_drmt(args);
 
     },

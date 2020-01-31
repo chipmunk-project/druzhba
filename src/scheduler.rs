@@ -11,7 +11,7 @@ impl Scheduler {
 
   // Runs dRMT scheduler and parses output to get
   // matches/actions at certain cycles
-  pub fn exec_drmt_scheduler (&self) {
+  pub fn exec_drmt_scheduler (&self, path_to_drmt : &str) -> HashMap <i32, Vec<String> > {
      let output = Command::new("p4-graphs")
                   .arg("--split-match-action-events")
                   .arg(&self.input_file)
@@ -40,11 +40,20 @@ impl Scheduler {
               .output()
               .expect("Could not change file name");
 
+     assert!(path_to_drmt.chars().count() > 0 );
+     let mut path_to_drmt_script : String = path_to_drmt.to_string();
+     
+     if path_to_drmt.chars().last().unwrap() == '/' {
+       path_to_drmt_script.truncate(path_to_drmt_script.len() - 1);
+     }
+     path_to_drmt_script.trim();
+       
      let drmt_scheduler_output = Command::new("./run_drmt.sh")
-                                 .arg(format!("{}", py_file))
-                                 .arg("/home/mikewong/Documents/drmt")
-                                 .output()
-                                 .expect("Could not run DRMT scheduler");
+                                   .arg(format!("{}", py_file))
+                                   .arg(path_to_drmt_script)
+                                   .output()
+                                   .expect("Could not run DRMT scheduler");
+     
     let drmt_scheduler_result : String = 
       String::from_utf8_lossy (&drmt_scheduler_output.stdout)
       .to_string();
@@ -136,6 +145,7 @@ impl Scheduler {
       }
     }
     println!("{:?}", cycles_to_matches_and_actions);
+    cycles_to_matches_and_actions
 
   }
 }
