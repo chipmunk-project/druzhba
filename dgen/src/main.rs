@@ -1,6 +1,10 @@
 pub mod alu_parsing_utils;
 pub mod alu_generation_utils;
 pub mod rust_code_generator;
+pub mod scheduler;
+pub mod drmt_code_generator;
+
+use std::collections::HashMap;
 // Important: nightly must be enabled to work
 #[macro_use] extern crate lazy_static;
 #[macro_use] extern crate lalrpop_util;
@@ -12,10 +16,36 @@ lalrpop_mod!(pub alugrammar); // synthesized by LALRPOP
 fn main() {
     let args : Vec<String> = env::args().collect();
     // Make room for optional hole configs
+
+    let arch : &str = &args[1];
+    match arch {
+      "dRMT" => drmt_generation (args),
+      "RMT"  => rmt_generation (args),
+      _      => panic!("Error: Architecture not supported."),      
+    };
+ 
+}
+fn drmt_generation (args : Vec <String>) {
+    let p4_file : String = args[2].clone();
+    let path_to_drmt : String = args[3].clone();
+/*
+    let scheduler : scheduler::Scheduler = 
+      scheduler::Scheduler { input_file : p4_file.clone() };    
+    let schedule : HashMap <i32, Vec<String>> = scheduler.exec_drmt_scheduler (&path_to_drmt);*/
+    let schedule = HashMap::new();
+    let mut code_generator : drmt_code_generator::dRMTCodeGenerator = 
+      drmt_code_generator::dRMTCodeGenerator { 
+                           input_file : p4_file.clone(), 
+                           output_file : String::from("src/match_action_ops.rs") };
+    code_generator.generate(schedule);
+
+    
+}
+fn rmt_generation (args : Vec <String>) {
+   
     assert! (args.len() == 9 || 
              args.len() == 10 ||
              args.len() == 11);
-
     let spec_name : String = args[1].clone();
     let stateful_alu : String = 
         format!("{}", args[2].clone());

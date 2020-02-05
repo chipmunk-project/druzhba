@@ -2,6 +2,17 @@
 import argparse
 import sys
 import subprocess
+def run_dgen (args):
+    subprocess.run(['cp',
+                    'dgen/target/debug/dgen',
+                    'dgen_bin'])
+    subprocess.run(['./dgen_bin',
+                    "dRMT", # Architecture
+                    args[0], # P4 file
+                    args[5], # Path to dRMT repository
+                    ])
+    subprocess.run(['rm',
+                    'dgen_bin'])
 
 def run_druzhba (args):
     subprocess.run(['cargo',
@@ -11,8 +22,8 @@ def run_druzhba (args):
                     args[1], # Number of packet fields
                     args[2], # Number of ticks
                     args[3], # Number of processors
-                    args[4], # Number of state vars
-                    args[5]]) # Path to dRMT repository
+                    args[4]]) # Number of state vars
+#                    args[5]]) # Path to dRMT repository
 
 def main ():
     argv = sys.argv
@@ -54,6 +65,7 @@ def main ():
     args.append(str(raw_args.path_to_drmt))
 
     print('Args: ' , args)
+    run_dgen(args)
     run_druzhba (args)
 
 if __name__ == '__main__':

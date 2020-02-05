@@ -233,13 +233,13 @@ fn execute_p4_drmt (args : Vec <String>)
         Ok  (t_num_state_vars)   => t_num_state_vars,
         Err (_)                   => panic!("Failure: Unable to unwrap num_state_vars"),
       };
-    let path_to_drmt : &str = &args[7];
+//    let path_to_drmt : &str = &args[7];
     
     assert! (ticks >= 1);
-    let scheduler : Scheduler = Scheduler { input_file : p4_input_file.to_string() };
-    let mut cycles_to_matches_and_actions : HashMap <i32, Vec<String> > = 
-      scheduler.exec_drmt_scheduler(path_to_drmt);
-
+ //   let scheduler : Scheduler = Scheduler { input_file : p4_input_file.to_string() };
+//    let mut cycles_to_matches_and_actions : HashMap <i32, Vec<String> > = 
+//      scheduler.exec_drmt_scheduler(path_to_drmt);
+/*
     let mut max : i32 = 0;
      // Get max tick
     for k in cycles_to_matches_and_actions.keys(){
@@ -296,7 +296,7 @@ fn execute_p4_drmt (args : Vec <String>)
         processors [i as usize].tick();
       }
     }
-
+*/
 }
 
 #[warn(unused_imports)]
@@ -323,7 +323,7 @@ fn main() {
                 execute_rmt(args);
     },
     "drmt_p4" => {
-                assert!(args.len() == 8);
+                assert!(args.len() == 7);
                 execute_p4_drmt(args);
 
     },
