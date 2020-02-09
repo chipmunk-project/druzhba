@@ -28,11 +28,10 @@ fn main() {
 fn drmt_generation (args : Vec <String>) {
     let p4_file : String = args[2].clone();
     let path_to_drmt : String = args[3].clone();
-/*
+
     let scheduler : scheduler::Scheduler = 
       scheduler::Scheduler { input_file : p4_file.clone() };    
-    let schedule : HashMap <i32, Vec<String>> = scheduler.exec_drmt_scheduler (&path_to_drmt);*/
-    let schedule = HashMap::new();
+    let schedule : HashMap <i32, Vec<String>> = scheduler.exec_drmt_scheduler (&path_to_drmt);
     let mut code_generator : drmt_code_generator::dRMTCodeGenerator = 
       drmt_code_generator::dRMTCodeGenerator { 
                            input_file : p4_file.clone(), 
