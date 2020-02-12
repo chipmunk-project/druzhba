@@ -32,8 +32,8 @@ fn drmt_generation (args : Vec <String>) {
     let scheduler : scheduler::Scheduler = 
       scheduler::Scheduler { input_file : p4_file.clone() };    
     let schedule : HashMap <i32, Vec<String>> = scheduler.exec_drmt_scheduler (&path_to_drmt);
-    let mut code_generator : drmt_code_generator::dRMTCodeGenerator = 
-      drmt_code_generator::dRMTCodeGenerator { 
+    let mut code_generator : match_action_code_generator::MatchActionCodeGenerator = 
+      match_action_code_generator::MatchActionCodeGenerator { 
                            input_file : p4_file.clone(), 
                            output_file : String::from("src/match_action_ops.rs") };
     code_generator.generate(schedule);

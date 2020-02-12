@@ -1,11 +1,11 @@
 use std::fs;
 use std::collections::HashMap;
-pub struct dRMTCodeGenerator {
+pub struct MatchActionCodeGenerator {
     pub input_file : String,
     pub output_file : String,
 }
 
-impl  dRMTCodeGenerator{
+impl  MatchActionCodeGenerator{
 
     fn generate_use_declarations (&self) -> String {
         let use_hashmap : String = 
