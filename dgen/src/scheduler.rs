@@ -74,8 +74,6 @@ impl Scheduler {
     let mut cycles_to_matches_and_actions : HashMap <i32, Vec<String> >  = 
       HashMap::new();
 
-        let mut hashmap_insertion_code : String = 
-          "    let mut cycles_to_matches_and_actions : HashMap<i32, Vec<String> > = HashMap::new()\n".to_string();
     // Parse through dRMT result file and get matches/actions
     // and the cycles that they occur in
     for i in 0..drmt_scheduler_result_vec.len() {
