@@ -2,7 +2,7 @@ pub mod alu_parsing_utils;
 pub mod alu_generation_utils;
 pub mod rust_code_generator;
 pub mod scheduler;
-pub mod drmt_code_generator;
+pub mod match_action_code_generator;
 
 use std::collections::HashMap;
 // Important: nightly must be enabled to work
