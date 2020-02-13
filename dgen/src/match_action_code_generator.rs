@@ -467,7 +467,30 @@ impl  MatchActionCodeGenerator{
       action_functions_string.push_str("\n}\n");
       (action_functions_string, new_argument_types)
     }
-          
+    // Code generation for meters, registers, counters.
+    // Each stateful memory is represented as a HashMap
+    fn update_stateful_strings (&self,
+                                state : &str,
+                                name_vec : &mut Vec<String>,
+                                current_string : &mut String,
+                                prev_token : &str,
+                                token : &str, 
+                                next_token : &str) {
+          if current_string.len() == 0 {
+            *current_string = format!("fn {}s () -> HashMap <String, HashMap <String, String>> {{\n  let mut {}_map : HashMap <String, HashMap <String,String>> = HashMap::new();\n", state, state);
+          }
+          if prev_token == state {
+            current_string.push_str(&format!("  let mut {}_map : HashMap <String, HashMap <String, String>> = HashMap::new();\n", &token));
+            name_vec.push (token.to_string());
+          }
+          else if token == ":" {
+
+            let name : String = name_vec.last().expect("Error: name_vec is empty").clone();
+            current_string.push_str(&format!("  {}_map.insert(\"{}\", \"{}\");\n", 
+                                     &name, prev_token, next_token));
+          }
+
+    }         
     // Parse tokens from P4 file and generates Rust code String.
     // Returns a pair; the first element is the Rust string to
     // be written to a new file and the second is a Vec<String>
@@ -485,10 +508,16 @@ impl  MatchActionCodeGenerator{
       let mut curly_brace_stack : Vec<String> = Vec::new();
       let mut header_types : Vec<String> = Vec::new();
       let mut table_stack : Vec<String> = Vec::new();
+      let mut register_stack : Vec<String> = Vec::new();
+      let mut meter_stack : Vec<String> = Vec::new();
+      let mut counter_stack : Vec<String> = Vec::new();
       // state variable indicates which portion of the P4
       // file we are parsing so we know what type of
       // data to extract
       let mut state : String = String::from("none");
+      let mut register_string : String = String::from("");
+      let mut meter_string : String = String::from("");
+      let mut counter_string : String = String::from("");
       let mut header_type_string : String = String::from("");
       let mut action_functions_string : String = String::from("");
       let mut table_matches_string : String = String::from("");
@@ -515,9 +544,8 @@ impl  MatchActionCodeGenerator{
         else if token == "}" {
           curly_brace_stack.pop();
           if curly_brace_stack.len() == 0 {
-            if state == "action" {
-
-              //action_functions_string.push_str("\n}\n");
+            if tmp_token_buffer.len() > 0 {
+              tmp_token_buffer.clear();
             }
             state = String::from("none");
           }
@@ -534,9 +562,9 @@ impl  MatchActionCodeGenerator{
         else if state == "table" {
               if table_matches_string == "" && table_actions_string == "" {
                 table_matches_string = 
-          String::from("pub fn get_matches () -> HashMap<String, Vec<Vec<String>>>\n  let matches : HashMap <String, Vec<Vec<String>>> = HashMap::new();\n");
+          String::from("pub fn matches () -> HashMap<String, Vec<Vec<String>>>\n  let matches : HashMap <String, Vec<Vec<String>>> = HashMap::new();\n");
                 table_actions_string = 
-          String::from("pub fn get_table_name_to_actions () -> HashMap<String, Vec<String>>\n  let table_to_actions : HashMap <String, Vec<String>> = HashMap::new();\n");
+          String::from("pub fn table_name_to_actions () -> HashMap<String, Vec<String>>\n  let table_to_actions : HashMap <String, Vec<String>> = HashMap::new();\n");
 
               }
 
@@ -611,7 +639,7 @@ impl  MatchActionCodeGenerator{
               tokens[i-1] == "metadata") &&
               tokens[i+1] != ";" {
             if instances_to_types_string == "" {
-              instances_to_types_string = String::from("pub fn get instances_to_types () -> HashMap <String, String> { \n  let mut instances_to_types_string : HashMap <String, String> = HashMap::new();\n");
+              instances_to_types_string = String::from("pub fn instances_to_types () -> HashMap <String, String> { \n  let mut instances_to_types_string : HashMap <String, String> = HashMap::new();\n");
             }
             instances_to_types_string.push_str(
                 &format!("  instances_to_types_string.insert(\"{}\", \"{}\");\n",
@@ -626,7 +654,7 @@ impl  MatchActionCodeGenerator{
         else if state=="header_type" {
           if tokens[i-1] == "header_type" {
             if header_type_string == "" {
-              header_type_string = String::from("pub fn get_header_types () -> HashMap <String, HashMap<String, i32> > { \n  let mut header_types : HashMap<String, HashMap <String, i32>> = HashMap::new();\n");
+              header_type_string = String::from("pub fn header_types () -> HashMap <String, HashMap<String, i32> > { \n  let mut header_types : HashMap<String, HashMap <String, i32>> = HashMap::new();\n");
             }
             header_type_string.push_str(
               &format!("\n  let mut {}_map : HashMap <String, i32> = HashMap::new();\n", 
@@ -645,6 +673,45 @@ impl  MatchActionCodeGenerator{
                                     &mut header_types,
                                     &mut header_type_string);
         }
+        else if state == "counter" {
+          self.update_stateful_strings ("counter", 
+                                   &mut counter_stack, 
+                                   &mut counter_string, 
+                                   &tokens[i-1],  
+                                   &token, 
+                                   &tokens[i+1]);
+        }
+        else if state == "meter" {
+          self.update_stateful_strings ("meter", 
+                                   &mut meter_stack, 
+                                   &mut meter_string, 
+                                   &tokens[i-1],  
+                                   &token, 
+                                   &tokens[i+1]);       
+        }
+        else if state == "register" {
+          if token == ":" && 
+             tokens[i+1] == "saturating" && 
+             tokens[i+2] == "," && 
+             tokens[i+3] == "signed" {
+            self.update_stateful_strings ("register", 
+                                     &mut register_stack, 
+                                     &mut register_string, 
+                                     &tokens[i-1],  
+                                     &token, 
+                                     "saturating, signed");       
+
+          } 
+          else {
+            self.update_stateful_strings ("register", 
+                                     &mut register_stack, 
+                                     &mut register_string, 
+                                     &tokens[i-1],  
+                                     &token, 
+                                     &tokens[i+1]);       
+          }
+
+        }
         // We can ignore these for now
         else if (token == "parser" ||
                  token == "control" ||
@@ -658,6 +725,7 @@ impl  MatchActionCodeGenerator{
         // Important P4 states that we want 
         else if (token == "table" ||
                  token == "counter" ||
+                 token == "meter" ||
                  token == "metadata" || 
                  token == "register" ||
                  token == "action" || 
@@ -665,16 +733,8 @@ impl  MatchActionCodeGenerator{
                  token == "header_type") &&
                  state != "comment" {
           state = token.clone();
-          if state == "action" {
-            //action_functions_string.push_str("pub fn ");
-          }
-          else if state == "header_type" {
-
-          }
         }
-        
       }
-        
      // Finishes populating the data structures and complete 
      // returns of functions
      if header_types.len() > 0 {
@@ -684,7 +744,7 @@ impl  MatchActionCodeGenerator{
        }
        header_type_string.push_str("  header_types\n}\n");
      }
-     if instances_to_types_string != "" {
+     if instances_to_types_string.len() > 0 {
        instances_to_types_string.push_str("  instances_to_types\n}\n");
      }
      if table_stack.len() > 0 {
@@ -700,6 +760,29 @@ impl  MatchActionCodeGenerator{
        table_matches_string.push_str("  matches\n}\n");
        table_actions_string.push_str("  table_to_actions\n}\n");
      }
+     if register_stack.len() > 0 {
+       for nn in register_stack.iter() {
+         register_string.push_str(
+            &format!("  register_map.insert(\"{}\", {}_map);\n", nn, nn));
+       }
+       register_string.push_str("  register_map\n}\n");
+     }
+     if counter_stack.len() > 0 {
+       for cn in counter_stack.iter() {
+         counter_string.push_str(
+            &format!("  counter_map.insert(\"{}\", {}_map);\n ", cn, cn));
+       }
+       counter_string.push_str("  counter_map\n}\n");
+     }
+     if meter_stack.len() > 0 {
+       for mn in meter_stack.iter() {
+         meter_string.push_str(
+            &format!("  meter_map.insert(\"{}\", {}_map);\n ", mn, mn));
+       }
+       meter_string.push_str("  meter_map\n}\n");
+
+     }
+
      let mut table_actions_types_map : HashMap <String, Vec<String>> = 
         HashMap::new();
      for ta in table_actions_list.iter() {
@@ -709,11 +792,15 @@ impl  MatchActionCodeGenerator{
                 self.compound_actions_string(table_actions_list, 
                                              actions_to_strings_map , 
                                              table_actions_types_map);
-     (format!("{}{}{}{}{}", action_functions_string,
-                            header_type_string,
-                            instances_to_types_string,
-                            table_matches_string,
-                            table_actions_string,
+
+     (format!("{}{}{}{}{}{}{}{}", action_functions_string,
+                                  header_type_string,
+                                  instances_to_types_string,
+                                  table_matches_string,
+                                  table_actions_string,
+                                  counter_string,
+                                  register_string,
+                                  meter_string
                             )
     ,complete_p4_files)
 
@@ -747,7 +834,7 @@ impl  MatchActionCodeGenerator{
       "fn add_to_field (pkt_field : &mut i32, value : i32) {\n  *pkt_field += value;\n}\n".to_string()    
     }
     fn generate_count (&self) -> String {
-      "fn count (c : &mut Vec<i32>, value : i32) {\n  c[value] += 1; \n}\n".to_string()
+      "fn count (c : &mut Vec<i32>, value : i32) {\n  c[value] += value; \n}\n".to_string()
     }
     fn generate_primitive_actions (&self) -> String {
       format!("{}{}{}{}",
