@@ -12,8 +12,11 @@ impl  MatchActionCodeGenerator{
           String::from("use std::collections::HashMap;\n"); 
         let use_packet : String = 
           String::from("use druzhba::packet::Packet;\n"); 
-        format!("{}{}", use_hashmap,
-                        use_packet)
+        let use_stateful_memories : String =
+          String::from("use druzhba::stateful_memory::{StatefulMemory, StatefulMemories};\n");
+        format!("{}{}{}", use_hashmap,
+                          use_packet, 
+                          use_stateful_memories)
  
     }
 
@@ -121,7 +124,7 @@ impl  MatchActionCodeGenerator{
          for token in tmp_token_buffer.iter() { 
            table_matches_string.push_str(&format!("String::from(\"{}\"), ", token));
          }
-         table_matches_string.push_str("];\n");
+         table_matches_string.push_str("]);\n");
        tmp_token_buffer.clear();
       }
 
@@ -282,7 +285,8 @@ impl  MatchActionCodeGenerator{
     fn compound_actions_string (&self,
                                 actions_list : Vec<String>, // Root actions from tables
                                 actions_to_strings_map : HashMap <String, Vec<String>>, // Action name to tokens
-                                argument_types : HashMap<String, Vec<String>> )// Codes for the arg types (reference or value)
+                                argument_types : HashMap<String, Vec<String>>,  // Codes for the arg types (reference or value)
+                                is_table_action : bool)
                                 -> String {
 
       
@@ -298,7 +302,8 @@ impl  MatchActionCodeGenerator{
         let (function_string, new_argument_types) : 
             (String , HashMap <String, Vec<String>>) = 
                         self.process_function(tokens, 
-                                               argument_types_for_action);
+                                              argument_types_for_action,
+                                              is_table_action);
         function_actions_string.push_str(&function_string);
 
         let mut new_actions_list : Vec<String>= Vec::new();
@@ -310,7 +315,8 @@ impl  MatchActionCodeGenerator{
         function_actions_string.push_str(
                                  &self.compound_actions_string (new_actions_list,
                                                                 actions_to_strings_map.clone(),
-                                                                new_argument_types.clone()));
+                                                                new_argument_types.clone(),
+                                                                false));
         }                                        
       
       function_actions_string
@@ -320,22 +326,29 @@ impl  MatchActionCodeGenerator{
     // of the transpiled Rust code
     fn process_function (&self,
                         tokens : Vec<String>,
-                        argument_types : Vec<String>) 
+                        argument_types : Vec<String>,
+                        is_table_action : bool) 
                          -> (String, HashMap <String, Vec<String>>){
       let mut curly_brace_stack : Vec<String> = Vec::new();
-      let mut action_functions_string : String = String::from("");
+      let mut action_functions_header : String = String::from("");
+      let mut action_functions_body : String = String::from("");
       let mut argument_num : usize = 0;
       let mut new_argument_types : HashMap <String, Vec<String>> = HashMap::new();
       let mut parameter_types : HashMap <String, String> = HashMap::new();
       let mut calling_function_name : String = String::from("none");  
       let mut calling_function_types : Vec<String> = Vec::new();
+      // "special" primitive functions take in pkt as param
+      let mut is_special_primitive : bool = false;
+      let mut field_declarations : String = String::from("");
+      let mut field_ctr : i32 = 0;
+      let mut header_types_and_fields : Vec<(String, String)> = Vec::new();
 
         // Other actions that are not in the table and are not primitive
         for i in 0..tokens.len() {
           let token : String = tokens[i].clone();
           
           if i == 0 {
-            action_functions_string.push_str(&format!("fn {}", token));
+            action_functions_header.push_str(&format!("fn {}", token));
             continue;
           }
           if token == "{" {
@@ -353,47 +366,45 @@ impl  MatchActionCodeGenerator{
 
               match arg_type {
                 "reference" => {
-                  action_functions_string.push_str(" : &mut i32 ");
+                  action_functions_header.push_str(" : &mut i32 ");
                   argument_num+=1;
                   parameter_types.insert(tokens[i-1].clone(), "reference".to_string());
                 },
                 "value"     => {
-                  action_functions_string.push_str(" : i32 ");
+                  action_functions_header.push_str(" : i32 ");
                   argument_num+=1;
                   parameter_types.insert(tokens[i-1].clone(), "value".to_string());
                 },
 
                 "root"      => {
-                  action_functions_string.push_str(" : i32 ");
+                  action_functions_header.push_str(" : i32 ");
                   parameter_types.insert(tokens[i-1].clone(), "value".to_string());
                 },
                 _           => panic!("Error: Invalid argument type provided "), 
               }
               if token == ")" {
-                action_functions_string.push_str(", pkt : &mut Packet"); 
+                  action_functions_header.push_str(", pkt : &mut Packet, stateful_memories : &mut StatefulMemories"); 
               }
-              action_functions_string.push_str(&token);
+              action_functions_header.push_str(&token);
           }
           // Add packet parameter for for actions with no parameters
           else if curly_brace_stack.len() == 0 &&
                   (token == ")" && tokens[i-1] == "(") {
 
-            action_functions_string.push_str("pkt : &mut Packet)");
+            action_functions_header.push_str("pkt : &mut Packet,  stateful_memories : &mut StatefulMemories)");
 
           }
           else if token=="{" {
-
-            action_functions_string.push_str("{\n  ");
+            action_functions_header.push_str("{\n  ");
           }
           else if token == ";" {
-
             if calling_function_name != "none" {
               new_argument_types.insert(calling_function_name.clone(),
                                         calling_function_types.clone());
             }
             calling_function_types.clear();
             calling_function_name = "none".to_string();
-            action_functions_string.push_str(";\n  ");
+            action_functions_body.push_str(";\n  ");
           }
           // TODO: Update this when new primitive functions are supported
           else if curly_brace_stack.len() != 0 &&
@@ -409,7 +420,10 @@ impl  MatchActionCodeGenerator{
             else {
              calling_function_name="none".to_string();
             }
-            action_functions_string.push_str(&token);
+            action_functions_body.push_str(&token);
+            if token == "drop" {
+              is_special_primitive = true;
+            }
           }
           // NOTE: currently not processing hex values. Look into
           // implementing this if masks are needed. Used to prevent
@@ -418,6 +432,7 @@ impl  MatchActionCodeGenerator{
                   token[0..2].to_string() == "0x" {
             continue;
           }
+          // Handle packet or metadata field
           else if token.contains(".") {
               let period_index : usize = 
                 match token.as_str().find('.') {
@@ -431,17 +446,51 @@ impl  MatchActionCodeGenerator{
                 token[period_index+1..token.len()]
                                   .to_string();
 
-            
-            action_functions_string.push_str(
-               &format!("&mut pkt[\"{}\"][\"{}\"]", 
-                       &header_type_for_action, 
-                       &field_for_action));
+           
+            field_declarations.push_str(
+              &format!("  let mut field_{} : i32 = pkt.get_field_value (\"{}\", \"{}\");\n  ",
+                      field_ctr, &header_type_for_action, &field_for_action));
+            action_functions_body.push_str(
+               &format!("&mut field_{}", field_ctr));
+            header_types_and_fields.push((header_type_for_action.clone(),
+                                         field_for_action.clone()));
+            field_ctr += 1; 
               if calling_function_name != "none" {
                 calling_function_types.push("reference".to_string());
               }
             }
             else {
-              action_functions_string.push_str(&token);
+
+
+              if !token.parse::<f64>().is_ok() &&
+                  curly_brace_stack.len() != 0 &&
+                 !parameter_types.contains_key(&token) &&
+                 token != "," && 
+                 token != "{" && 
+                 token != "}" && 
+                 token != "(" && 
+                 token != ")"  {
+                action_functions_body.push_str(
+                  &format!("stateful_memories.get_mut_ref_memory(\"{}\")", token));
+              }
+              // The drop primitive takes in a pkt
+              else if is_special_primitive && token == "(" {
+                action_functions_body.push_str("(pkt");
+              }
+              // Add pkt, stateful_memories arguments for calling 
+              // compound functions
+              else if token == ")" &&
+                      calling_function_name != "none" {
+                action_functions_body.push_str(", pkt, stateful_memories)");
+              }
+              else {
+                if curly_brace_stack.len() == 0 {
+                  action_functions_header.push_str(&token);
+                }
+                else {
+                  action_functions_body.push_str(&token);
+                }
+              }
               if token != "," && 
                  token != "{" && 
                  token != "}" && 
@@ -464,8 +513,17 @@ impl  MatchActionCodeGenerator{
             }
           }
 
-      action_functions_string.push_str("\n}\n");
-      (action_functions_string, new_argument_types)
+      for i in 0..field_ctr {
+        let pair : (String, String) = 
+          header_types_and_fields[i as usize].clone();
+        action_functions_body.push_str(&format!("  *pkt.get_mut_ref_field(\"{}\", \"{}\") = field_{};\n", 
+                                       pair.0, pair.1, i));
+      }
+      action_functions_body.push_str("\n}\n");
+      (format!("{}{}{}", action_functions_header,
+                         field_declarations,
+                         action_functions_body),
+      new_argument_types)
     }
     // Code generation for meters, registers, counters.
     // Each stateful memory is represented as a HashMap
@@ -480,13 +538,13 @@ impl  MatchActionCodeGenerator{
             *current_string = format!("fn {}s () -> HashMap <String, HashMap <String, String>> {{\n  let mut {}_map : HashMap <String, HashMap <String,String>> = HashMap::new();\n", state, state);
           }
           if prev_token == state {
-            current_string.push_str(&format!("  let mut {}_map : HashMap <String, HashMap <String, String>> = HashMap::new();\n", &token));
+            current_string.push_str(&format!("  let mut {}_map : HashMap <String, String> = HashMap::new();\n", &token));
             name_vec.push (token.to_string());
           }
           else if token == ":" {
 
             let name : String = name_vec.last().expect("Error: name_vec is empty").clone();
-            current_string.push_str(&format!("  {}_map.insert(\"{}\", \"{}\");\n", 
+            current_string.push_str(&format!("  {}_map.insert(String::from(\"{}\"), String::from(\"{}\"));\n", 
                                      &name, prev_token, next_token));
           }
 
@@ -560,17 +618,26 @@ impl  MatchActionCodeGenerator{
         }
         // Enter table section of P4 file
         else if state == "table" {
-              if table_matches_string == "" && table_actions_string == "" {
-                table_matches_string = 
-          String::from("pub fn matches () -> HashMap<String, Vec<Vec<String>>>\n  let matches : HashMap <String, Vec<Vec<String>>> = HashMap::new();\n");
-                table_actions_string = 
-          String::from("pub fn table_name_to_actions () -> HashMap<String, Vec<String>>\n  let table_to_actions : HashMap <String, Vec<String>> = HashMap::new();\n");
+              if table_matches_string.len() == 0 && 
+                 table_actions_string.len() == 0 {
+                table_matches_string.push_str(
+                  "// Returns HashMap mapping table name with type of match \n"); 
+                table_matches_string.push_str(
+                  "pub fn matches () -> HashMap<String, Vec<Vec<String>>>{\n");
+                table_matches_string.push_str(
+                  "  let mut matches : HashMap <String, Vec<Vec<String>>> = HashMap::new();\n");
+                table_actions_string.push_str(
+                  "// Returns HashMap of table names to the actions contained in them\n");
+                table_actions_string.push_str(
+                  "pub fn table_name_to_actions () -> HashMap<String, Vec<String>>{\n");
+                table_actions_string.push_str(
+                  "  let mut table_to_actions : HashMap <String, Vec<String>> = HashMap::new();\n");
 
               }
 
           if tokens[i-1] == "table" {
             table_stack.push(token.clone()); 
-            table_matches_string.push_str(&format!("  let mut {}_vec: Vec<Vec<String>> = Vec::new();\n", token));
+            table_matches_string.push_str(&format!("  let mut {}_vec : Vec<Vec<String>> = Vec::new();\n", token));
             table_actions_string.push_str(&format!("  let mut {}_vec  : Vec <String> = Vec::new();\n", token));
           }
           if token == "reads" {
@@ -638,11 +705,16 @@ impl  MatchActionCodeGenerator{
           if (tokens[i-1] == "header" ||
               tokens[i-1] == "metadata") &&
               tokens[i+1] != ";" {
-            if instances_to_types_string == "" {
-              instances_to_types_string = String::from("pub fn instances_to_types () -> HashMap <String, String> { \n  let mut instances_to_types_string : HashMap <String, String> = HashMap::new();\n");
+            if instances_to_types_string.len() == 0{
+              instances_to_types_string.push_str(
+                "// Returns HashMap mapping created instance name to the declared header_type or metadata name\n");
+              instances_to_types_string.push_str(
+                "pub fn instances_to_types () -> HashMap <String, String> { \n");
+              instances_to_types_string.push_str(
+                "  let mut instances_to_types_map : HashMap <String, String> = HashMap::new();\n");
             }
             instances_to_types_string.push_str(
-                &format!("  instances_to_types_string.insert(\"{}\", \"{}\");\n",
+                &format!("  instances_to_types_map.insert(String::from(\"{}\"), String::from(\"{}\"));\n",
                                                     &tokens[i+1],
                                                     &token));
           }
@@ -653,8 +725,13 @@ impl  MatchActionCodeGenerator{
         // Parse all of the different header_types
         else if state=="header_type" {
           if tokens[i-1] == "header_type" {
-            if header_type_string == "" {
-              header_type_string = String::from("pub fn header_types () -> HashMap <String, HashMap<String, i32> > { \n  let mut header_types : HashMap<String, HashMap <String, i32>> = HashMap::new();\n");
+            if header_type_string.len() == 0 {
+              header_type_string.push_str(
+                "// Returns HashMap from  a header_type to a HashMap of header fields\n");
+              header_type_string.push_str(
+                "pub fn header_types () -> HashMap <String, HashMap<String, i32> > { \n");
+              header_type_string.push_str(
+                "  let mut header_types : HashMap<String, HashMap <String, i32>> = HashMap::new();\n");
             }
             header_type_string.push_str(
               &format!("\n  let mut {}_map : HashMap <String, i32> = HashMap::new();\n", 
@@ -740,12 +817,12 @@ impl  MatchActionCodeGenerator{
      if header_types.len() > 0 {
        for h in header_types.iter() {
          header_type_string.push_str(
-            &format!("  header_types.push({}_map);\n", h));
+            &format!("  header_types.insert(String::from(\"{}\"), {}_map);\n",h,  h));
        }
        header_type_string.push_str("  header_types\n}\n");
      }
      if instances_to_types_string.len() > 0 {
-       instances_to_types_string.push_str("  instances_to_types\n}\n");
+       instances_to_types_string.push_str("  instances_to_types_map\n}\n");
      }
      if table_stack.len() > 0 {
        for t in table_stack.iter() { 
@@ -753,7 +830,7 @@ impl  MatchActionCodeGenerator{
             &format!("  matches.insert(String::from(\"{}\"), {}_vec);\n",t, t));
 
          table_actions_string.push_str(
-            &format!("  actions.insert(String::from(\"{}\"), {}_vec);\n", t, t));
+            &format!("  table_to_actions.insert(String::from(\"{}\"), {}_vec);\n", t, t));
 
        }
 
@@ -763,21 +840,21 @@ impl  MatchActionCodeGenerator{
      if register_stack.len() > 0 {
        for nn in register_stack.iter() {
          register_string.push_str(
-            &format!("  register_map.insert(\"{}\", {}_map);\n", nn, nn));
+            &format!("  register_map.insert(String::from(\"{}\"), {}_map);\n", nn, nn));
        }
        register_string.push_str("  register_map\n}\n");
      }
      if counter_stack.len() > 0 {
        for cn in counter_stack.iter() {
          counter_string.push_str(
-            &format!("  counter_map.insert(\"{}\", {}_map);\n ", cn, cn));
+            &format!("  counter_map.insert(String::from(\"{}\"), {}_map);\n ", cn, cn));
        }
        counter_string.push_str("  counter_map\n}\n");
      }
      if meter_stack.len() > 0 {
        for mn in meter_stack.iter() {
          meter_string.push_str(
-            &format!("  meter_map.insert(\"{}\", {}_map);\n ", mn, mn));
+            &format!("  meter_map.insert(String::from(\"{}\"), {}_map);\n ", mn, mn));
        }
        meter_string.push_str("  meter_map\n}\n");
 
@@ -791,7 +868,8 @@ impl  MatchActionCodeGenerator{
      action_functions_string = 
                 self.compound_actions_string(table_actions_list, 
                                              actions_to_strings_map , 
-                                             table_actions_types_map);
+                                             table_actions_types_map,
+                                             true);
 
      (format!("{}{}{}{}{}{}{}{}", action_functions_string,
                                   header_type_string,
@@ -834,7 +912,7 @@ impl  MatchActionCodeGenerator{
       "fn add_to_field (pkt_field : &mut i32, value : i32) {\n  *pkt_field += value;\n}\n".to_string()    
     }
     fn generate_count (&self) -> String {
-      "fn count (c : &mut Vec<i32>, value : i32) {\n  c[value] += value; \n}\n".to_string()
+      "fn count (c : &mut StatefulMemory, value : i32) {\n  c[value] += value; \n}\n".to_string()
     }
     fn generate_primitive_actions (&self) -> String {
       format!("{}{}{}{}",

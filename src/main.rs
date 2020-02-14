@@ -3,12 +3,15 @@ extern crate druzhba;
 
 mod prog_to_run;
 mod tests;
+mod match_action_ops;
 use druzhba::pipeline::Pipeline;
 use druzhba::phv::Phv;
 use druzhba::phv_container::PhvContainer;
 use druzhba::processor::Processor;
 use druzhba::drmt_processor::dRMTProcessor;
 use druzhba::scheduler::Scheduler;
+use druzhba::packet::Packet;
+use druzhba::stateful_memory::{StatefulMemory,StatefulMemories};
 use rand::Rng;
 use std::collections::HashMap;
 use std::env;
@@ -206,6 +209,8 @@ fn execute_drmt (args : Vec <String>)
 
 fn execute_p4_drmt (args : Vec <String>) 
 {
+    let schedule =  match_action_ops::generate_schedule();
+    println!("Schedule: {:?}", schedule);
     let p4_input_file : &str = &args[2];
     let num_packet_fields : i32 = 
     match args[3].parse::<i32>() {

@@ -9,3 +9,5 @@ pub mod alu;
 pub mod processor;
 pub mod drmt_processor;
 pub mod scheduler;
+pub mod packet;
+pub mod stateful_memory;
