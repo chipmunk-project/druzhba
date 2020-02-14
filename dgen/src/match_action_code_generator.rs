@@ -274,8 +274,6 @@ impl  MatchActionCodeGenerator{
               }
             }
             else {
-
-
               if !token.parse::<f64>().is_ok() &&
                   curly_brace_stack.len() != 0 &&
                  !parameter_types.contains_key(&token) &&
@@ -284,8 +282,13 @@ impl  MatchActionCodeGenerator{
                  token != "}" && 
                  token != "(" && 
                  token != ")"  {
+                field_declarations.push_str(
+                  &format!("  let mut field_{} : StatefulMemory =  stateful_memories.get_memory(\"{}\");\n  ", 
+                    field_ctr, token));
                 action_functions_body.push_str(
-                  &format!("stateful_memories.get_mut_ref_memory(\"{}\")", token));
+                  &format!("&mut field_{}", field_ctr));
+                header_types_and_fields.push(("".to_string(), token.clone())); 
+                field_ctr+=1;
               }
               // The drop primitive takes in a pkt
               else if is_special_primitive && token == "(" {
@@ -330,8 +333,15 @@ impl  MatchActionCodeGenerator{
       for i in 0..field_ctr {
         let pair : (String, String) = 
           header_types_and_fields[i as usize].clone();
-        action_functions_body.push_str(&format!("  *pkt.get_mut_ref_field(\"{}\", \"{}\") = field_{};\n", 
+        if pair.0 != "" {
+          action_functions_body.push_str(&format!("  *pkt.get_mut_ref_field(\"{}\", \"{}\") = field_{};\n", 
                                        pair.0, pair.1, i));
+        }
+        else {
+          action_functions_body.push_str(&format!("  *stateful_memories.get_mut_ref_memory(\"{}\") = field_{};\n", 
+                                    pair.1, i));
+
+        }
       }
       action_functions_body.push_str("\n}\n");
       (format!("{}{}{}", action_functions_header,
