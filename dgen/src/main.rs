@@ -3,6 +3,7 @@ pub mod alu_generation_utils;
 pub mod rust_code_generator;
 pub mod scheduler;
 pub mod match_action_code_generator;
+pub mod match_action_generation_utils;
 
 use std::collections::HashMap;
 // Important: nightly must be enabled to work

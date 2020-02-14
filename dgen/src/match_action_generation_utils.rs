@@ -1,0 +1,204 @@
+
+use std::fs;
+use std::collections::HashMap;
+
+// Generates code to create hashmap of schedule
+pub fn generate_hashmap_schedule (schedule : HashMap <i32, Vec<String>>) -> String {
+    let mut generate_schedule_string : String = 
+       String::from("pub fn generate_schedule() -> HashMap <i32, Vec<String>> {\n  let schedule : HashMap <i32, Vec<String>> = HashMap::new();\n");
+    for (key, value) in schedule.into_iter() {
+      if value.len() > 0 {
+        generate_schedule_string.push_str(
+         &format!("  schedule.insert({}, {:?});\n", key, value) );
+      }
+    }
+    generate_schedule_string.push_str("  schedule\n}\n");
+    generate_schedule_string
+}
+
+pub fn generate_use_declarations () -> String {
+    let use_hashmap : String = 
+      String::from("use std::collections::HashMap;\n"); 
+    let use_packet : String = 
+      String::from("use druzhba::packet::Packet;\n"); 
+    let use_stateful_memories : String =
+      String::from("use druzhba::stateful_memory::{StatefulMemory, StatefulMemories};\n");
+    format!("{}{}{}", use_hashmap,
+                      use_packet, 
+                      use_stateful_memories)
+
+}
+
+fn generate_drop () -> String {
+  "fn drop(p : &mut Packet) {\n  p.drop();\n}\n".to_string()
+}
+fn generate_modify_field () -> String {
+  "fn modify_field (pkt_field : &mut i32, value : i32) {\n  *pkt_field = value;\n}\n".to_string()
+}
+fn generate_add_to_field () -> String {
+  "fn add_to_field (pkt_field : &mut i32, value : i32) {\n  *pkt_field += value;\n}\n".to_string()    
+}
+fn generate_count () -> String {
+  "fn count (c : &mut StatefulMemory, value : i32) {\n  c[value] += value; \n}\n".to_string()
+}
+pub fn generate_primitive_actions () -> String {
+  format!("{}{}{}{}",
+          generate_drop(),
+          generate_modify_field(),
+          generate_add_to_field(),
+          generate_count())
+}
+// Takes in the included P4 file and modifies it so that
+// the file can be found from the current directory
+pub fn add_new_file (token : String,
+                     complete_p4_files : &mut Vec<String>,
+                     input_file : String) {
+   // Strip the quotes
+   let new_file : String = token[1..token.len() - 1].to_string();
+   let path_vec : Vec <String> = input_file
+                                 .split("/")
+                                 .map (|s| s.to_string())
+                                 .collect();
+   if path_vec.len() == 1 {
+     complete_p4_files.push(new_file);
+   } 
+   else {
+     let mut altered_p4_file : String = String::from("");
+     for j in 0..path_vec.len() - 1 {
+       if path_vec[j] == "" && j == 0 {
+         altered_p4_file.push_str("/"); 
+       }
+       else {
+         altered_p4_file.push_str
+           (&format!("{}/", path_vec[j]));
+       }
+     }
+     complete_p4_files.push(format!("{}{}",
+                                     altered_p4_file,
+                                     new_file).to_string());
+  }
+}
+
+fn separate_by_whitespace ( s : String) -> Vec <String> {
+  s.split_whitespace()
+   .into_iter()
+   .map(|s| s.to_string())
+   .collect()
+}
+
+ // Splits string using a given delimiter and returns
+// a Vec<String>
+fn split_string (current_string : String,
+                 delimiter : String) -> Vec<String> {
+  current_string.split(delimiter.as_str())
+                .map(|s| s.to_string())
+                .collect() 
+  
+}
+// Splits a string using the given delimiter but still
+// includes them in the final vector ensuring that they
+// are in the same place that they were in the original
+// string. For every one of these string items, divide them
+// further in the same way if they contain any other 
+// potential delimiters.
+//
+// Example: 
+//   drop(); => ["drop", "(", ")", ";"]
+fn divide_into_vec (current_string : String,
+                    delimiter : String) -> Vec<String> {
+
+  let mut ret_vec : Vec<String> = Vec::new();
+  let string_vec : Vec<String> = split_string(
+                                     current_string.clone(),
+                                     delimiter.clone());
+  for i in 0..string_vec.len() {
+    let s : String = string_vec[i].clone();
+    let mut s_simplified = simplify_string(s);
+    ret_vec.append(&mut s_simplified);
+    if i < string_vec.len() - 1{
+      ret_vec.push(delimiter.clone());
+    }
+ 
+  }
+  ret_vec
+}
+         
+// Initiates string splitting if the string contains any 
+// important tokens we would like to separate        
+fn simplify_string (current_string : String) -> Vec<String> {
+
+  if current_string.contains ("(") {
+    divide_into_vec(current_string.clone(),
+                         "(".to_string())
+  }
+  else if current_string.contains (")") {
+    divide_into_vec(current_string.clone(),
+                         ")".to_string())
+  }
+  else if current_string.contains ("{") {
+    divide_into_vec(current_string.clone(),
+                         "{".to_string())
+  }
+  else if current_string.contains ("}") {
+    divide_into_vec(current_string.clone(),
+                         "}".to_string())
+  }
+  else if current_string.contains (",") {
+    divide_into_vec(current_string.clone(),
+                         ",".to_string())
+  }
+  else if current_string.contains("/*"){
+    divide_into_vec(current_string.clone(),
+                         "/*".to_string())
+  }
+  else if current_string.contains("*/"){
+    divide_into_vec(current_string.clone(),
+                         "*/".to_string())
+  }
+  else if current_string.contains("//"){
+    divide_into_vec(current_string.clone(),
+                         "//".to_string())
+  }
+  else if current_string.contains(";"){
+    divide_into_vec(current_string.clone(),
+                         ";".to_string())
+  }
+
+  else if current_string == "" {
+    Vec::new()
+  }
+  else {
+    vec![current_string]
+  }
+}
+
+// Takes in a P4 file and performs tokenization.
+// Returns a vector of tokens that are used for Rust code
+// generation
+pub fn lexer (file : String) -> Vec <String> { 
+  let p4_file_contents : String = fs::read_to_string(file)
+                                  .expect("Error: could not read from P4 file");
+  let p4_file_lines : Vec<String> = p4_file_contents
+                                    .split("\n")
+                                    .map(|s| s.to_string())
+                                    .collect(); 
+  let mut tokens : Vec<String> = Vec::new();
+  // Iterate thorugh lines of P4 file
+  for i in 0..p4_file_lines.len() {
+
+    let line : String = p4_file_lines[i].clone();
+    let line_vec : Vec<String> = 
+       separate_by_whitespace(line);
+    for elem in line_vec.iter () {
+      let mut elem_vec : Vec<String> = simplify_string(elem.to_string());
+      if elem_vec.len() > 0 {
+        tokens.append(&mut elem_vec);    
+      }
+      else {
+        tokens.push(elem.to_string()); 
+      }
+    }
+  }
+  tokens
+}
+

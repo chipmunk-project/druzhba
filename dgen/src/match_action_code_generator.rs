@@ -1,5 +1,7 @@
 use std::fs;
 use std::collections::HashMap;
+use match_action_generation_utils;
+
 pub struct MatchActionCodeGenerator {
     pub input_file : String,
     pub output_file : String,
@@ -7,71 +9,6 @@ pub struct MatchActionCodeGenerator {
 
 impl  MatchActionCodeGenerator{
 
-    fn generate_use_declarations (&self) -> String {
-        let use_hashmap : String = 
-          String::from("use std::collections::HashMap;\n"); 
-        let use_packet : String = 
-          String::from("use druzhba::packet::Packet;\n"); 
-        let use_stateful_memories : String =
-          String::from("use druzhba::stateful_memory::{StatefulMemory, StatefulMemories};\n");
-        format!("{}{}{}", use_hashmap,
-                          use_packet, 
-                          use_stateful_memories)
- 
-    }
-
-    // Generates code to create hashmap of schedule
-    fn generate_hashmap_schedule (&mut self, 
-                                  schedule : HashMap <i32, Vec<String>>) -> String {
-        let mut generate_schedule_string : String = 
-           String::from("pub fn generate_schedule() -> HashMap <i32, Vec<String>> {\n  let schedule : HashMap <i32, Vec<String>> = HashMap::new();\n");
-        for (key, value) in schedule.into_iter() {
-          if value.len() > 0 {
-            generate_schedule_string.push_str(
-             &format!("  schedule.insert({}, {:?});\n", key, value) );
-          }
-        }
-        generate_schedule_string.push_str("  schedule\n}\n");
-        generate_schedule_string
-    }
-
-    fn separate_by_whitespace (&self, s : String) -> Vec <String> {
-      s.split_whitespace()
-       .into_iter()
-       .map(|s| s.to_string())
-       .collect()
-    }
-
-    // Takes in the included P4 file and modifies it so that
-    // the file can be found from the current directory
-    fn add_new_file (&self, 
-                     token : String,
-                     complete_p4_files : &mut Vec<String>) {
-       // Strip the quotes
-       let new_file : String = token[1..token.len() - 1].to_string();
-       let path_vec : Vec <String> = self.input_file
-                                     .split("/")
-                                     .map (|s| s.to_string())
-                                     .collect();
-       if path_vec.len() == 1 {
-         complete_p4_files.push(new_file);
-       } 
-       else {
-         let mut altered_p4_file : String = String::from("");
-         for j in 0..path_vec.len() - 1 {
-           if path_vec[j] == "" && j == 0 {
-             altered_p4_file.push_str("/"); 
-           }
-           else {
-             altered_p4_file.push_str
-               (&format!("{}/", path_vec[j]));
-           }
-         }
-         complete_p4_files.push(format!("{}{}",
-                                         altered_p4_file,
-                                         new_file).to_string());
-      }
-    }
 
     // Extracts match information from table reads.
     // Gets the header_type being matched, the field, and
@@ -158,125 +95,7 @@ impl  MatchActionCodeGenerator{
             }
         }
     }
-     // Splits string using a given delimiter and returns
-    // a Vec<String>
-    fn split_string (&self, 
-                     current_string : String,
-                     delimiter : String) -> Vec<String> {
-      current_string.split(delimiter.as_str())
-                    .map(|s| s.to_string())
-                    .collect() 
-      
-    }
-    // Splits a string using the given delimiter but still
-    // includes them in the final vector ensuring that they
-    // are in the same place that they were in the original
-    // string. For every one of these string items, divide them
-    // further in the same way if they contain any other 
-    // potential delimiters.
-    //
-    // Example: 
-    //   drop(); => ["drop", "(", ")", ";"]
-    fn divide_into_vec (&self, 
-                        current_string : String,
-                        delimiter : String) -> Vec<String> {
-  
-      let mut ret_vec : Vec<String> = Vec::new();
-      let string_vec : Vec<String> = self.split_string(
-                                          current_string.clone(),
-                                          delimiter.clone());
-      for i in 0..string_vec.len() {
-        let s : String = string_vec[i].clone();
-        let mut s_simplified = self.simplify_string(s);
-        ret_vec.append(&mut s_simplified);
-        if i < string_vec.len() - 1{
-          ret_vec.push(delimiter.clone());
-        }
-     
-      }
-      ret_vec
-    }
-             
-    // Initiates string splitting if the string contains any 
-    // important tokens we would like to separate        
-    fn simplify_string (&self, 
-                        current_string : String) -> Vec<String> {
 
-      if current_string.contains ("(") {
-        self.divide_into_vec(current_string.clone(),
-                             "(".to_string())
-      }
-      else if current_string.contains (")") {
-        self.divide_into_vec(current_string.clone(),
-                             ")".to_string())
-      }
-      else if current_string.contains ("{") {
-        self.divide_into_vec(current_string.clone(),
-                             "{".to_string())
-      }
-      else if current_string.contains ("}") {
-        self.divide_into_vec(current_string.clone(),
-                             "}".to_string())
-      }
-      else if current_string.contains (",") {
-        self.divide_into_vec(current_string.clone(),
-                             ",".to_string())
-      }
-      else if current_string.contains("/*"){
-        self.divide_into_vec(current_string.clone(),
-                             "/*".to_string())
-      }
-      else if current_string.contains("*/"){
-        self.divide_into_vec(current_string.clone(),
-                             "*/".to_string())
-      }
-      else if current_string.contains("//"){
-        self.divide_into_vec(current_string.clone(),
-                             "//".to_string())
-      }
-      else if current_string.contains(";"){
-        self.divide_into_vec(current_string.clone(),
-                             ";".to_string())
-      }
-
-      else if current_string == "" {
-        Vec::new()
-      }
-      else {
-        vec![current_string]
-      }
-    }
-
-    // Takes in a P4 file and performs tokenization.
-    // Returns a vector of tokens that are used for Rust code
-    // generation
-    fn lexer (&self,
-              file : String) -> Vec <String> { 
-      let p4_file_contents : String = fs::read_to_string(file)
-                                      .expect("Error: could not read from P4 file");
-      let p4_file_lines : Vec<String> = p4_file_contents
-                                        .split("\n")
-                                        .map(|s| s.to_string())
-                                        .collect(); 
-      let mut tokens : Vec<String> = Vec::new();
-      // Iterate thorugh lines of P4 file
-      for i in 0..p4_file_lines.len() {
-
-        let line : String = p4_file_lines[i].clone();
-        let line_vec : Vec<String> = 
-           self.separate_by_whitespace(line);
-        for elem in line_vec.iter () {
-          let mut elem_vec : Vec<String> = self.simplify_string(elem.to_string());
-          if elem_vec.len() > 0 {
-            tokens.append(&mut elem_vec);    
-          }
-          else {
-            tokens.push(elem.to_string()); 
-          }
-        }
-      }
-      tokens
-    }
     // Takes in a list of actions, HashMap of action anems to tokens,
     // and types the parameters take. Takes each action in the list
     // and generates the functions. Then receives a list of new
@@ -286,10 +105,8 @@ impl  MatchActionCodeGenerator{
                                 actions_list : Vec<String>, // Root actions from tables
                                 actions_to_strings_map : HashMap <String, Vec<String>>, // Action name to tokens
                                 argument_types : HashMap<String, Vec<String>>,  // Codes for the arg types (reference or value)
-                                is_table_action : bool)
-                                -> String {
+                                ) -> String {
 
-      
       let mut function_actions_string : String = String::from("");
       for a in actions_list.iter() {
         let tokens : Vec<String> = 
@@ -302,12 +119,11 @@ impl  MatchActionCodeGenerator{
         let (function_string, new_argument_types) : 
             (String , HashMap <String, Vec<String>>) = 
                         self.process_function(tokens, 
-                                              argument_types_for_action,
-                                              is_table_action);
+                                              argument_types_for_action);
         function_actions_string.push_str(&function_string);
 
         let mut new_actions_list : Vec<String>= Vec::new();
-        // BFS on processing functions that were called within the
+        // Processes functions that were called within the
         // original function 
         for k in new_argument_types.keys() {
           new_actions_list.push (k.clone());
@@ -315,8 +131,7 @@ impl  MatchActionCodeGenerator{
         function_actions_string.push_str(
                                  &self.compound_actions_string (new_actions_list,
                                                                 actions_to_strings_map.clone(),
-                                                                new_argument_types.clone(),
-                                                                false));
+                                                                new_argument_types.clone()));
         }                                        
       
       function_actions_string
@@ -326,8 +141,7 @@ impl  MatchActionCodeGenerator{
     // of the transpiled Rust code
     fn process_function (&self,
                         tokens : Vec<String>,
-                        argument_types : Vec<String>,
-                        is_table_action : bool) 
+                        argument_types : Vec<String>) 
                          -> (String, HashMap <String, Vec<String>>){
       let mut curly_brace_stack : Vec<String> = Vec::new();
       let mut action_functions_header : String = String::from("");
@@ -613,7 +427,7 @@ impl  MatchActionCodeGenerator{
         } 
         else if state == "include" {
   
-          self.add_new_file (token.clone(), &mut complete_p4_files);
+          match_action_generation_utils::add_new_file (token.clone(), &mut complete_p4_files, self.input_file.clone());
           state = String::from("none");
         }
         // Enter table section of P4 file
@@ -868,8 +682,7 @@ impl  MatchActionCodeGenerator{
      action_functions_string = 
                 self.compound_actions_string(table_actions_list, 
                                              actions_to_strings_map , 
-                                             table_actions_types_map,
-                                             true);
+                                             table_actions_types_map);
 
      (format!("{}{}{}{}{}{}{}{}", action_functions_string,
                                   header_type_string,
@@ -882,7 +695,6 @@ impl  MatchActionCodeGenerator{
                             )
     ,complete_p4_files)
 
-
     }
     // Opens P4 file and parses actions, matches, and headers.
     // Converts them into Rust code
@@ -893,7 +705,7 @@ impl  MatchActionCodeGenerator{
        let (file_string, additional_p4_files) = self.extract_p4_contents (tokens);
        complete_p4_string.push_str(&file_string);
        for s in additional_p4_files.iter() { 
-         let new_tokens : Vec<String> = self.lexer(s.clone());
+         let new_tokens : Vec<String> = match_action_generation_utils::lexer(s.clone());
          // NOTE: May need to process these new p4_files in future
          let (new_file_string, _p4_files) = self.extract_p4_contents(new_tokens);
 
@@ -902,40 +714,19 @@ impl  MatchActionCodeGenerator{
         complete_p4_string
     }
 
-    fn generate_drop (&self) -> String {
-      "fn drop(p : &mut Packet) {\n  p.drop();\n}\n".to_string()
-    }
-    fn generate_modify_field (&self) -> String {
-      "fn modify_field (pkt_field : &mut i32, value : i32) {\n  *pkt_field = value;\n}\n".to_string()
-    }
-    fn generate_add_to_field (&self) -> String {
-      "fn add_to_field (pkt_field : &mut i32, value : i32) {\n  *pkt_field += value;\n}\n".to_string()    
-    }
-    fn generate_count (&self) -> String {
-      "fn count (c : &mut StatefulMemory, value : i32) {\n  c[value] += value; \n}\n".to_string()
-    }
-    fn generate_primitive_actions (&self) -> String {
-      format!("{}{}{}{}",
-              self.generate_drop(),
-              self.generate_modify_field(),
-              self.generate_add_to_field(),
-              self.generate_count())
-    }
-
     pub fn generate (&mut self, 
                      schedule : HashMap <i32, Vec<String>>) {
-      let tokens : Vec<String> = self.lexer(self.input_file.clone());
+      let tokens : Vec<String> = match_action_generation_utils::lexer(self.input_file.clone());
       let p4_string_data : String = self.parse_p4_file(tokens);
 
 
       let file_string : String = format!("{}{}",
-                                         self.generate_use_declarations(),
-                                         self.generate_hashmap_schedule(schedule));
+                                         match_action_generation_utils::generate_use_declarations(),
+                                         match_action_generation_utils::generate_hashmap_schedule(schedule));
       fs::write(self.output_file.to_string(), 
                 format!("{}{}{}",file_string, 
-                                self.generate_primitive_actions(),
+                                match_action_generation_utils::generate_primitive_actions(),
                                 p4_string_data)).expect("Error: could not write to output Rust file");
 
     }
-
 }
