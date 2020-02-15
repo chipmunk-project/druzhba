@@ -23,7 +23,7 @@ Running dsim using dRMT architecture (using P4):
 
 Example:
 
-    python3 p4_drmt_simulation_execute.py p4_files/stateful.py 2 10 4 1 /path/to/drmt
+    python3 p4_drmt_simulation_execute.py p4_files/stateful.p4 2 10 4 1 /path/to/drmt
   
 NOTE: p4-hlir (https://github.com/jafingerhut/p4-hlir) is needed, which converts .p4 file into DAG.
 Must also have drmt repository (github.com/anirudhSK/drmt/) downloaded 

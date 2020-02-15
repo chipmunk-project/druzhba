@@ -105,6 +105,7 @@ impl  MatchActionCodeGenerator{
                                 actions_list : Vec<String>, // Root actions from tables
                                 actions_to_strings_map : HashMap <String, Vec<String>>, // Action name to tokens
                                 argument_types : HashMap<String, Vec<String>>,  // Codes for the arg types (reference or value)
+                                constants_list : &Vec<String>
                                 ) -> String {
 
       let mut function_actions_string : String = String::from("");
@@ -119,7 +120,9 @@ impl  MatchActionCodeGenerator{
         let (function_string, new_argument_types) : 
             (String , HashMap <String, Vec<String>>) = 
                         self.process_function(tokens, 
-                                              argument_types_for_action);
+                                              argument_types_for_action,
+                                              constants_list);
+
         function_actions_string.push_str(&function_string);
 
         let mut new_actions_list : Vec<String>= Vec::new();
@@ -131,7 +134,8 @@ impl  MatchActionCodeGenerator{
         function_actions_string.push_str(
                                  &self.compound_actions_string (new_actions_list,
                                                                 actions_to_strings_map.clone(),
-                                                                new_argument_types.clone()));
+                                                                new_argument_types.clone(),
+                                                                constants_list));
         }                                        
       
       function_actions_string
@@ -141,7 +145,8 @@ impl  MatchActionCodeGenerator{
     // of the transpiled Rust code
     fn process_function (&self,
                         tokens : Vec<String>,
-                        argument_types : Vec<String>) 
+                        argument_types : Vec<String>,
+                        constants_list : &Vec <String>) 
                          -> (String, HashMap <String, Vec<String>>){
       let mut curly_brace_stack : Vec<String> = Vec::new();
       let mut action_functions_header : String = String::from("");
@@ -178,21 +183,33 @@ impl  MatchActionCodeGenerator{
               !(token == ")" && tokens[i-1] == "(") {
               let arg_type : &str= &argument_types[argument_num];
 
+              // P4 actions don't explicitly tell what types the
+              // parameters are. Need to determines types for 
+              // Rust generation. 
               match arg_type {
-                "reference" => {
+                "reference_field" => {
                   action_functions_header.push_str(" : &mut i32 ");
                   argument_num+=1;
-                  parameter_types.insert(tokens[i-1].clone(), "reference".to_string());
+                  parameter_types.insert(tokens[i-1].clone(), 
+                                         "reference_field".to_string());
+                },
+                "reference_memory" => {
+                  action_functions_header.push_str(" : &mut StatefulMemory ");
+                  argument_num+=1;
+                  parameter_types.insert(tokens[i-1].clone(), 
+                                         "reference_memory".to_string());
                 },
                 "value"     => {
                   action_functions_header.push_str(" : i32 ");
                   argument_num+=1;
-                  parameter_types.insert(tokens[i-1].clone(), "value".to_string());
+                  parameter_types.insert(tokens[i-1].clone(), 
+                                          "value".to_string());
                 },
 
                 "root"      => {
                   action_functions_header.push_str(" : i32 ");
-                  parameter_types.insert(tokens[i-1].clone(), "value".to_string());
+                  parameter_types.insert(tokens[i-1].clone(), 
+                                         "value".to_string());
                 },
                 _           => panic!("Error: Invalid argument type provided "), 
               }
@@ -228,11 +245,11 @@ impl  MatchActionCodeGenerator{
             if token != "add_to_field" &&
                token != "modify_field" &&
                token != "drop"         &&
-               token != "count" {
+               token != "count"  {
               calling_function_name = token.clone();
             }
             else {
-             calling_function_name="none".to_string();
+              calling_function_name = "none".to_string();
             }
             action_functions_body.push_str(&token);
             if token == "drop" {
@@ -270,13 +287,18 @@ impl  MatchActionCodeGenerator{
                                          field_for_action.clone()));
             field_ctr += 1; 
               if calling_function_name != "none" {
-                calling_function_types.push("reference".to_string());
+                calling_function_types.push("reference_field".to_string());
               }
             }
             else {
+              // Checks if this token is a number, a 
+              // parameter, or a constant. Also checks if we
+              // are not in the functon header. If not, then
+              // this token must be a stateful memory
               if !token.parse::<f64>().is_ok() &&
                   curly_brace_stack.len() != 0 &&
                  !parameter_types.contains_key(&token) &&
+                 !constants_list.contains(&token) &&
                  token != "," && 
                  token != "{" && 
                  token != "}" && 
@@ -289,6 +311,9 @@ impl  MatchActionCodeGenerator{
                   &format!("&mut field_{}", field_ctr));
                 header_types_and_fields.push(("".to_string(), token.clone())); 
                 field_ctr+=1;
+                if calling_function_name != "none" {
+                  calling_function_types.push("reference_memory".to_string());
+                }
               }
               // The drop primitive takes in a pkt
               else if is_special_primitive && token == "(" {
@@ -366,7 +391,6 @@ impl  MatchActionCodeGenerator{
             name_vec.push (token.to_string());
           }
           else if token == ":" {
-
             let name : String = name_vec.last().expect("Error: name_vec is empty").clone();
             current_string.push_str(&format!("  {}_map.insert(String::from(\"{}\"), String::from(\"{}\"));\n", 
                                      &name, prev_token, next_token));
@@ -379,9 +403,9 @@ impl  MatchActionCodeGenerator{
     // which contains any new P4 files to parse next that the 
     // current P4 file includes
     fn extract_p4_contents (&self, 
-                           tokens : Vec<String>) -> 
-                           (String, Vec<String>) {
-
+                            tokens : Vec<String>,
+                            constants_list : Vec <String>) -> 
+                            String {
       // These two structures are for caching action data
       let mut actions_list : Vec<String> = Vec::new();
       let mut actions_to_strings_map : HashMap <String, Vec<String>> = 
@@ -404,7 +428,6 @@ impl  MatchActionCodeGenerator{
       let mut action_functions_string : String = String::from("");
       let mut table_matches_string : String = String::from("");
       let mut table_actions_string : String = String::from("");
-      let mut complete_p4_files : Vec <String> = Vec::new();
       let mut tmp_token_buffer : Vec <String> = Vec::new(); 
       let mut instances_to_types_string : String = String::from("");
       for i in 0..tokens.len() {
@@ -435,11 +458,7 @@ impl  MatchActionCodeGenerator{
         if state == "ignore" {
           continue;
         } 
-        else if state == "include" {
-  
-          match_action_generation_utils::add_new_file (token.clone(), &mut complete_p4_files, self.input_file.clone());
-          state = String::from("none");
-        }
+
         // Enter table section of P4 file
         else if state == "table" {
               if table_matches_string.len() == 0 && 
@@ -615,13 +634,9 @@ impl  MatchActionCodeGenerator{
         }
         // We can ignore these for now
         else if (token == "parser" ||
-                 token == "control" ||
-                 token == "#define") &&
+                 token == "control") &&
                  state != "comment" {
           state = String::from("ignore");
-        }
-        else if token == "#include" {
-          state = String::from("include");
         }
         // Important P4 states that we want 
         else if (token == "table" ||
@@ -692,51 +707,65 @@ impl  MatchActionCodeGenerator{
      action_functions_string = 
                 self.compound_actions_string(table_actions_list, 
                                              actions_to_strings_map , 
-                                             table_actions_types_map);
+                                             table_actions_types_map,
+                                             &constants_list);
 
-     (format!("{}{}{}{}{}{}{}{}", action_functions_string,
-                                  header_type_string,
-                                  instances_to_types_string,
-                                  table_matches_string,
-                                  table_actions_string,
-                                  counter_string,
-                                  register_string,
-                                  meter_string
-                            )
-    ,complete_p4_files)
+     format!("{}{}{}{}{}{}{}{}", action_functions_string,
+                                 header_type_string,
+                                 instances_to_types_string,
+                                 table_matches_string,
+                                 table_actions_string,
+                                 counter_string,
+                                 register_string,
+                                 meter_string)
 
     }
     // Opens P4 file and parses actions, matches, and headers.
     // Converts them into Rust code
     fn parse_p4_file (&mut self,
-                      tokens : Vec<String>) -> String {
+                      mut tokens : Vec<String>,
+                      p4_files : Vec<String>,
+                      constants_map : &mut HashMap <String, String>) -> String {
 
        let mut complete_p4_string : String = String::from("");
-       let (file_string, additional_p4_files) = self.extract_p4_contents (tokens);
-       complete_p4_string.push_str(&file_string);
-       for s in additional_p4_files.iter() { 
-         let new_tokens : Vec<String> = match_action_generation_utils::lexer(s.clone());
-         // NOTE: May need to process these new p4_files in future
-         let (new_file_string, _p4_files) = self.extract_p4_contents(new_tokens);
+       for s in p4_files.iter() { 
+         let (mut new_tokens, new_p4_files, new_constants_map) : 
+            (Vec<String>, Vec<String>, HashMap<String, String>)
+             = match_action_generation_utils::lexer(s.clone());
+         tokens.append(&mut new_tokens);
+         constants_map.extend(new_constants_map); 
 
-         complete_p4_string.push_str(&new_file_string);
-        }
-        complete_p4_string
+         // NOTE: May need to process these new p4_files in future
+       }
+       let mut constants_list : Vec<String> = Vec::new();
+       let constants_declaration : String = 
+          match_action_generation_utils::generate_constant_declarations(&constants_map);
+       for s in constants_map.keys() {
+         constants_list.push(s.clone());
+       }
+       let file_string = self.extract_p4_contents(tokens,
+                                                  constants_list);
+       complete_p4_string.push_str(&file_string);
+      
+       format!("{}{}", constants_declaration, complete_p4_string)
     }
 
     pub fn generate (&mut self, 
                      schedule : HashMap <i32, Vec<String>>) {
-      let tokens : Vec<String> = match_action_generation_utils::lexer(self.input_file.clone());
-      let p4_string_data : String = self.parse_p4_file(tokens);
+      let (tokens, p4_files, mut constants_map) : (Vec<String>, Vec<String>, HashMap <String, String>) = 
+        match_action_generation_utils::lexer(self.input_file.clone());
+      let p4_string_data : String = self.parse_p4_file(tokens,
+                                                       p4_files,
+                                                       &mut constants_map);
 
 
-      let file_string : String = format!("{}{}",
-                                         match_action_generation_utils::generate_use_declarations(),
-                                         match_action_generation_utils::generate_hashmap_schedule(schedule));
       fs::write(self.output_file.to_string(), 
-                format!("{}{}{}",file_string, 
-                                match_action_generation_utils::generate_primitive_actions(),
-                                p4_string_data)).expect("Error: could not write to output Rust file");
+                format!("{}{}{}{}", match_action_generation_utils::generate_use_declarations(), 
+                                  p4_string_data,
+                                  match_action_generation_utils::generate_primitive_actions(),
+
+                                  match_action_generation_utils::generate_hashmap_schedule(schedule))
+                                ).expect("Error: could not write to output Rust file");
 
     }
 }

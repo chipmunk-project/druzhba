@@ -5,11 +5,16 @@ use std::collections::HashMap;
 // Generates code to create hashmap of schedule
 pub fn generate_hashmap_schedule (schedule : HashMap <i32, Vec<String>>) -> String {
     let mut generate_schedule_string : String = 
-       String::from("pub fn generate_schedule() -> HashMap <i32, Vec<String>> {\n  let schedule : HashMap <i32, Vec<String>> = HashMap::new();\n");
+       String::from("pub fn generate_schedule() -> HashMap <i32, Vec<String>> {\n  let mut schedule : HashMap <i32, Vec<String>> = HashMap::new();\n");
     for (key, value) in schedule.into_iter() {
       if value.len() > 0 {
+        let mut vec_string : String = String::from("");
+        for v in value.iter() {
+          vec_string.push_str(&format!("\"{}\".to_string(),", v));
+        }
         generate_schedule_string.push_str(
-         &format!("  schedule.insert({}, {:?});\n", key, value) );
+         &format!("  schedule.insert({}, vec![{}]);\n", 
+                                    key, vec_string) );
       }
     }
     generate_schedule_string.push_str("  schedule\n}\n");
@@ -29,6 +34,16 @@ pub fn generate_use_declarations () -> String {
 
 }
 
+pub fn generate_constant_declarations (constants_map : &HashMap <String, String>) -> String {
+  let mut constant_declaration_string : String = String::from("");
+  for v in constants_map.keys() {
+    let value : String = constants_map.get(v)
+        .expect("Error: Could not get constant value from HashMap").clone();
+    constant_declaration_string.push_str(
+      &format!(" const {} : i32 = {};\n", v, value));
+  }
+  constant_declaration_string
+}
 fn generate_drop () -> String {
   "fn drop(p : &mut Packet) {\n  p.drop();\n}\n".to_string()
 }
@@ -65,6 +80,7 @@ pub fn add_new_file (token : String,
    else {
      let mut altered_p4_file : String = String::from("");
      for j in 0..path_vec.len() - 1 {
+       // If absolute path, prepend another /
        if path_vec[j] == "" && j == 0 {
          altered_p4_file.push_str("/"); 
        }
@@ -175,20 +191,40 @@ fn simplify_string (current_string : String) -> Vec<String> {
 // Takes in a P4 file and performs tokenization.
 // Returns a vector of tokens that are used for Rust code
 // generation
-pub fn lexer (file : String) -> Vec <String> { 
-  let p4_file_contents : String = fs::read_to_string(file)
+pub fn lexer (file : String) -> (Vec <String>,
+                                 Vec<String>,
+                                 HashMap <String, String>) { 
+  let p4_file_contents : String = fs::read_to_string(file.clone())
                                   .expect("Error: could not read from P4 file");
   let p4_file_lines : Vec<String> = p4_file_contents
                                     .split("\n")
                                     .map(|s| s.to_string())
                                     .collect(); 
   let mut tokens : Vec<String> = Vec::new();
+  let mut includes_files : Vec<String> = Vec::new();
+  let mut constants_map : HashMap <String, String> = HashMap::new(); 
   // Iterate thorugh lines of P4 file
   for i in 0..p4_file_lines.len() {
+
 
     let line : String = p4_file_lines[i].clone();
     let line_vec : Vec<String> = 
        separate_by_whitespace(line);
+    // Preprocessor interprets define and include macros
+    // NOTE: macro functions are not interpreted
+    if p4_file_lines[i].contains("#include") {
+      add_new_file(line_vec[1].clone(), 
+                   &mut includes_files, 
+                   file.clone());
+      continue;
+    }
+    if p4_file_lines[i].contains("#define"){
+
+      let constant_value : Vec<String> = simplify_string(line_vec[2].clone()).clone();
+      constants_map.insert(line_vec[1].clone(), 
+                           constant_value[0].clone());
+      continue;
+    }
     for elem in line_vec.iter () {
       let mut elem_vec : Vec<String> = simplify_string(elem.to_string());
       if elem_vec.len() > 0 {
@@ -199,6 +235,6 @@ pub fn lexer (file : String) -> Vec <String> {
       }
     }
   }
-  tokens
+  (tokens, includes_files, constants_map)
 }
 

@@ -6,20 +6,25 @@ def run_dgen (args):
     subprocess.run(['cp',
                     'dgen/target/debug/dgen',
                     'dgen_bin'])
-    subprocess.run(['cp',
-                    'dgen/run_p4_graphs.sh',
-                    '.'])
-    subprocess.run(['cp',
+    subprocess.run(['cp', 
                     'dgen/run_drmt.sh',
+                    '.'])
+    subprocess.run(['cp', 
+                    'dgen/run_p4_graphs.sh',
                     '.'])
     subprocess.run(['./dgen_bin',
                     "dRMT", # Architecture
                     args[0], # P4 file
                     args[5], # Path to dRMT repository
+                    'src/match_action_ops.rs'
                     ])
 
     subprocess.run(['rm',
-                    'dgen_bin'])
+                    'dgen_bin', 
+                    'run_drmt.sh'])
+    subprocess.run(['rm',
+                    'dgen_bin', 
+                    'run_p4_graphs.sh'])     
 
 def run_druzhba (args):
     subprocess.run(['cargo',
