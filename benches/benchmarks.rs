@@ -726,4 +726,3 @@ fn bench_rcp_spec  (b : &mut Bencher){
     }
   });
 }
-
