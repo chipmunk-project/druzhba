@@ -11,8 +11,7 @@ impl Scheduler {
   // Runs dRMT scheduler and parses output to get
   // matches/actions at certain cycles
   pub fn exec_drmt_scheduler (&self, path_to_drmt : &str) -> HashMap <i32, Vec<String> > {
-     let output = Command::new("p4-graphs")
-                  .arg("--split-match-action-events")
+     let output = Command::new("./run_p4_graphs.sh")
                   .arg(&self.input_file)
                   .output()
                   .expect("Could not generate DAG");
