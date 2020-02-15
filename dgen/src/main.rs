@@ -19,9 +19,10 @@ fn main() {
     // Make room for optional hole configs
 
     let arch : &str = &args[1];
+    println!("Architecture: {}", arch);
     match arch {
       "dRMT" => drmt_generation (args),
-      "RMT"  => rmt_generation (args),
+      "pisa"  => pisa_generation (args),
       _      => panic!("Error: Architecture not supported."),      
     };
  
@@ -29,44 +30,44 @@ fn main() {
 fn drmt_generation (args : Vec <String>) {
     let p4_file : String = args[2].clone();
     let path_to_drmt : String = args[3].clone();
-/*
+
     let scheduler : scheduler::Scheduler = 
       scheduler::Scheduler { input_file : p4_file.clone() };    
-    let schedule : HashMap <i32, Vec<String>> = scheduler.exec_drmt_scheduler (&path_to_drmt);*/
+    let schedule : HashMap <i32, Vec<String>> = scheduler.exec_drmt_scheduler (&path_to_drmt);
     let mut code_generator : match_action_code_generator::MatchActionCodeGenerator = 
       match_action_code_generator::MatchActionCodeGenerator { 
                            input_file : p4_file.clone(), 
                            output_file : String::from("src/match_action_ops.rs") };
-    code_generator.generate(HashMap::new());
+    code_generator.generate(schedule);
 
     
 }
-fn rmt_generation (args : Vec <String>) {
-   
+fn pisa_generation (args : Vec <String>) {
+/*   
     assert! (args.len() == 9 || 
              args.len() == 10 ||
-             args.len() == 11);
-    let spec_name : String = args[1].clone();
+             args.len() == 11);*/
+    let spec_name : String = args[2].clone();
     let stateful_alu : String = 
-        format!("{}", args[2].clone());
-    let stateless_alu : String = 
         format!("{}", args[3].clone());
+    let stateless_alu : String = 
+        format!("{}", args[4].clone());
     let pipeline_depth : i32 = 
-        match args[4].parse::<i32>() {
+        match args[5].parse::<i32>() {
           Ok (t_pipeline_depth) => t_pipeline_depth,
           Err (_)               => panic!("Failure: Unbale to unwrap pipeline depth"),
         };
     let pipeline_width : i32 = 
-        match args[5].parse::<i32>() {
+        match args[6].parse::<i32>() {
           Ok (t_pipeline_width) => t_pipeline_width,
           Err (_)               => panic!("Failure: Unbale to unwrap pipeline depth"),
         };
     let num_stateful_alus : i32 =  
-        match args[6].parse::<i32>() {
+        match args[7].parse::<i32>() {
           Ok (t_pipeline_width) => t_pipeline_width,
           Err (_)               => panic!("Failure: Unbale to unwrap number of stateful ALUs"),
         };
-    let constant_vec_string : String = args[7].clone();
+    let constant_vec_string : String = args[8].clone();
     let constant_vec : Vec <i32> = constant_vec_string
                                    .split(",")
                                    .map(|n| 
@@ -75,7 +76,7 @@ fn rmt_generation (args : Vec <String>) {
                                           Err (_)  => panic!("Failrure: Unable to parse constant set"),
                                    })
                                     .collect();
-    let file_path : String = args[8].clone();
+    let file_path : String = args[9].clone();
 
     let stateful_alu_split : Vec <String>= stateful_alu.split("/")
                                                        .map (|s| s.to_string())
@@ -100,13 +101,13 @@ fn rmt_generation (args : Vec <String>) {
     let opt_level : i32 = 
         match args.len() {
           // 11 args means hole configs and optimzation level supplied
-          11  => match args[10].parse::<i32>() {
+          12  => match args[11].parse::<i32>() {
             Ok (t_opt_level) => t_opt_level,
             Err (_)          => panic!("Failure: Unable to unwrap optimization level"),
           },
           // 10 args means hole configs supplied but no optimization
           // level so set it to 1 by default
-          10 => 1,
+          11 => 1,
           _  => 0,
 
       };
@@ -124,7 +125,7 @@ fn rmt_generation (args : Vec <String>) {
     }
     else {
 
-      let hole_cfg_file : String = args[9].clone();
+      let hole_cfg_file : String = args[10].clone();
       alu_generation_utils::generate_alus (name, 
                                            stateful_alu, 
                                            stateless_alu, 

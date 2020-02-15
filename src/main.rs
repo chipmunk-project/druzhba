@@ -7,9 +7,7 @@ mod match_action_ops;
 use druzhba::pipeline::Pipeline;
 use druzhba::phv::Phv;
 use druzhba::phv_container::PhvContainer;
-use druzhba::processor::Processor;
 use druzhba::drmt_processor::dRMTProcessor;
-use druzhba::scheduler::Scheduler;
 use druzhba::packet::Packet;
 use druzhba::stateful_memory::{StatefulMemory,StatefulMemories};
 use rand::Rng;
@@ -154,58 +152,7 @@ fn execute_rmt (args : Vec<String>)
   }
 }
 
-// Simulates using dRMT architecture
-fn execute_drmt (args : Vec <String>)
-{
-    let input_file : &str = &args[2];
-    let num_packet_fields : i32 = 
-      match args[3].parse::<i32>() {
 
-        Ok  (t_pkts)    => t_pkts,
-        Err (_)         => panic!("Failure: Unable to unwrap num_packet_fields"),
-      };
-
-    let ticks : i32 = 
-      match args[4].parse::<i32>() {
-
-        Ok  (t_ticks) => t_ticks,
-        Err (_)       => panic!("Failure: Unable to unwrap ticks"),
-      };
-    let num_processors : i32 = 
-      match args[5].parse::<i32>() {
-
-        Ok  (t_num_processors)    => t_num_processors,
-        Err (_)                   => panic!("Failure: Unable to unwrap num_processors"),
-      };
-
-    let num_state_vars : i32 = 
-      match args[6].parse::<i32>() {
-
-        Ok  (t_num_state_vars)   => t_num_state_vars,
-        Err (_)                   => panic!("Failure: Unable to unwrap num_state_vars"),
-      };
-
-    assert! (ticks >= 1);
-    let mut processors : Vec<Processor> = Vec::new();
-    // _i not used
-    for _i in 0..num_processors {
-        processors.push(Processor {
-          riscv_file : input_file.to_string(),
-          phvs : Vec::new(),
-          state : vec![0; num_state_vars as usize]}); 
-    }
-    for t in 0..ticks {
-        let mut phv : Phv <i32> = 
-            generate_random_phv(num_packet_fields);
-        println!("Cycle : {}, processor: {}", t, t % num_processors);
-        println!("Input: {}", phv);
-        processors[(t % num_processors) as usize]
-                    .add_phv(phv);
-
-        processors[(t % num_processors) as usize]
-                    .execute_program();
-    }
-}
 
 fn execute_p4_drmt (args : Vec <String>) 
 {
@@ -311,19 +258,11 @@ fn main() {
   let arch : &str = &args[1];
   println!("Args: {:?}", args);
   match arch {
-    "dRMT" => {
-                assert!(args.len() == 7);
-                execute_drmt(args);
-    },
-    "drmt" => {
-                assert!(args.len() == 7);
-                execute_drmt(args);
-    },
-    "RMT"  => {
+    "PISA"  => {
                 assert!(args.len() == 4 || args.len() == 5);
                 execute_rmt(args);
     },
-    "rmt"  => {
+    "pisa"  => {
                 assert!(args.len() == 4 || args.len() == 5);
                 execute_rmt(args);
     },
