@@ -19,7 +19,6 @@ fn main() {
     // Make room for optional hole configs
 
     let arch : &str = &args[1];
-    println!("Architecture: {}", arch);
     match arch {
       "dRMT" => drmt_generation (args),
       "pisa"  => pisa_generation (args),
@@ -43,10 +42,6 @@ fn drmt_generation (args : Vec <String>) {
     
 }
 fn pisa_generation (args : Vec <String>) {
-/*   
-    assert! (args.len() == 9 || 
-             args.len() == 10 ||
-             args.len() == 11);*/
     let spec_name : String = args[2].clone();
     let stateful_alu : String = 
         format!("{}", args[3].clone());

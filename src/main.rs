@@ -185,70 +185,8 @@ fn execute_p4_drmt (args : Vec <String>)
         Ok  (t_num_state_vars)   => t_num_state_vars,
         Err (_)                   => panic!("Failure: Unable to unwrap num_state_vars"),
       };
-//    let path_to_drmt : &str = &args[7];
     
     assert! (ticks >= 1);
- //   let scheduler : Scheduler = Scheduler { input_file : p4_input_file.to_string() };
-//    let mut cycles_to_matches_and_actions : HashMap <i32, Vec<String> > = 
-//      scheduler.exec_drmt_scheduler(path_to_drmt);
-/*
-    let mut max : i32 = 0;
-     // Get max tick
-    for k in cycles_to_matches_and_actions.keys(){
-      if k > &max {
-        max = *k;
-      }
-    }
-    // TODO: Allow more hw and latency configurations apart
-    // from just large_hw.py and drmt_latencies.py
-    let hw_file : &str = "drmt_specs/large_hw.py";
-    let latencies_file : &str = "drmt_specs/drmt_latencies.py";
-    if Path::new(latencies_file).exists(){
-      let contents : String = fs::read_to_string(&latencies_file)
-        .expect("Something went wrong with reading latencies file");
-      let latencies_vec : Vec<String> = contents
-                                        .split ("\n")
-                                        .map (|s| s.to_string())
-                                        .collect();
-      for line in latencies_vec.iter() {
-        let assignment_line : Vec <String> = line
-                                             .split("=")
-                                             .map(|s| s.to_string())
-                                             .collect();
-        if assignment_line[0].trim() == "dA" {
-          max += assignment_line[1].trim()                                                             .parse::<i32>()  
-                                   .unwrap();
- 
-        }
-      }
-
-    }
-
-    println!("Schedule takes {} ticks", max);
-    let mut processors : Vec <dRMTProcessor> = Vec::new();
-    for i in 0..num_processors {
-      let processor : dRMTProcessor = dRMTProcessor {
-        processor_id : i,
-        schedule : cycles_to_matches_and_actions.clone(),
-        phvs_and_initial_tick : Vec::new(),
-        phv_output_strings : HashMap::new(),
-        state : Vec::new(),
-        current_tick : -1,
-        max_tick : max,
-      };
-      processors.push(processor);
-    }
-      
-    println!("Beginning simulation");
-    for t in 0..ticks {
-      let mut phv : Phv<i32> = 
-        generate_random_phv (num_packet_fields);
-      processors [(t % num_processors) as usize].add_phv (phv, t);
-      for i in 0..processors.len() {
-        processors [i as usize].tick();
-      }
-    }
-*/
 }
 
 #[warn(unused_imports)]
