@@ -6,6 +6,7 @@ def run_dgen_unoptimized (args):
     subprocess.run(['cp',
                     'dgen/target/debug/dgen',
                     'dgen_bin'])
+
     subprocess.run(['./dgen_bin',
                     'pisa',
                     args[0], # Program name

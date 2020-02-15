@@ -6,11 +6,18 @@ def run_dgen (args):
     subprocess.run(['cp',
                     'dgen/target/debug/dgen',
                     'dgen_bin'])
+    subprocess.run(['cp',
+                    'dgen/run_p4_graphs.sh',
+                    '.'])
+    subprocess.run(['cp',
+                    'dgen/run_drmt.sh',
+                    '.'])
     subprocess.run(['./dgen_bin',
                     "dRMT", # Architecture
                     args[0], # P4 file
                     args[5], # Path to dRMT repository
                     ])
+
     subprocess.run(['rm',
                     'dgen_bin'])
 
