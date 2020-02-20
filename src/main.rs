@@ -185,7 +185,7 @@ fn execute_p4_drmt (args : Vec <String>)
         Ok  (t_num_state_vars)   => t_num_state_vars,
         Err (_)                   => panic!("Failure: Unable to unwrap num_state_vars"),
       };
-    
+   
     assert! (ticks >= 1);
 }
 

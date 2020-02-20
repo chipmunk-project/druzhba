@@ -16,6 +16,8 @@ def run_dgen (args):
                     "dRMT", # Architecture
                     args[0], # P4 file
                     args[5], # Path to dRMT repository
+                    args[6], # dRMT hw file (no path)
+                    args[7], # dRMT latencies file (no path)
                     'src/match_action_ops.rs'
                     ])
 
@@ -65,6 +67,15 @@ def main ():
             'path_to_drmt',
             type=str,
             help='Path to dRMT repository')
+    parser.add_argument(
+            'hw_file',
+            type=str,
+            help='Hw file for dRMT scheduler execution')
+
+    parser.add_argument(
+            'latencies_file',
+            type=str,
+            help='Latencies file for dRMT scheduler execution')
 
     # TODO: Add argument for number of cycles the program will run for
     raw_args = parser.parse_args(argv[1:])
@@ -75,6 +86,8 @@ def main ():
     args.append(str(raw_args.num_packet_fields))
     args.append(str(raw_args.num_state_vars))
     args.append(str(raw_args.path_to_drmt))
+    args.append(str(raw_args.hw_file))
+    args.append(str(raw_args.latencies_file))
 
     print('Args: ' , args)
     run_dgen(args)

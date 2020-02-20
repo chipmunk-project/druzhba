@@ -10,7 +10,10 @@ impl Scheduler {
 
   // Runs dRMT scheduler and parses output to get
   // matches/actions at certain cycles
-  pub fn exec_drmt_scheduler (&self, path_to_drmt : &str) -> HashMap <i32, Vec<String> > {
+  pub fn exec_drmt_scheduler (&self, 
+                              path_to_drmt : &str,
+                              hw_file : &str,
+                              latencies_file : &str) -> HashMap <i32, Vec<String> > {
      let output = Command::new("./run_p4_graphs.sh")
                   .arg(&self.input_file)
                   .output()
@@ -49,6 +52,8 @@ impl Scheduler {
      let drmt_scheduler_output = Command::new("./run_drmt.sh")
                                    .arg(format!("{}", py_file))
                                    .arg(path_to_drmt_script)
+                                   .arg(hw_file.to_string())
+                                   .arg(latencies_file.to_string())
                                    .output()
                                    .expect("Could not run DRMT scheduler");
      

@@ -27,12 +27,18 @@ fn main() {
  
 }
 fn drmt_generation (args : Vec <String>) {
+
     let p4_file : String = args[2].clone();
     let path_to_drmt : String = args[3].clone();
-    let file_path : String = args[4].clone();
+    let file_path : String = args[6].clone();
+    let hw_file : String = args[4].clone();
+    let latencies_file : String = args[5].clone();
     let scheduler : scheduler::Scheduler = 
       scheduler::Scheduler { input_file : p4_file.clone() };    
-    let schedule : HashMap <i32, Vec<String>> = scheduler.exec_drmt_scheduler (&path_to_drmt);
+    let schedule : HashMap <i32, Vec<String>> = 
+      scheduler.exec_drmt_scheduler (&path_to_drmt,
+                                     &hw_file,
+                                     &latencies_file);
 
     println!("Writing to {}", file_path);
     let mut code_generator : match_action_code_generator::MatchActionCodeGenerator = 
