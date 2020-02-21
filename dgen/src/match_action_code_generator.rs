@@ -106,8 +106,8 @@ impl  MatchActionCodeGenerator{
                                 actions_to_strings_map : HashMap <String, Vec<String>>, // Action name to tokens
                                 argument_types : HashMap<String, Vec<String>>,  // Codes for the arg types (reference or value)
                                 constants_list : &Vec<String>
-                                ) -> String {
-
+                                ) -> (String, HashMap <String, i32>) {
+      let mut table_actions_to_num_args : HashMap <String, i32> = HashMap::new();
       let mut function_actions_string : String = String::from("");
       for a in actions_list.iter() {
         let tokens : Vec<String> = 
@@ -117,11 +117,12 @@ impl  MatchActionCodeGenerator{
           };
         let argument_types_for_action : Vec<String> = 
           argument_types.get(a).expect("Error: argument_types does not contain table action").clone();
-        let (function_string, new_argument_types) : 
-            (String , HashMap <String, Vec<String>>) = 
+        let (function_string, new_argument_types, num_args) : 
+            (String , HashMap <String, Vec<String>>, i32) = 
                         self.process_function(tokens, 
                                               argument_types_for_action,
                                               constants_list);
+        table_actions_to_num_args.insert(a.clone(), num_args);
 
         function_actions_string.push_str(&function_string);
 
@@ -131,14 +132,18 @@ impl  MatchActionCodeGenerator{
         for k in new_argument_types.keys() {
           new_actions_list.push (k.clone());
         }
-        function_actions_string.push_str(
-                                 &self.compound_actions_string (new_actions_list,
+        
+        let string_and_arg_num_map : (String, HashMap <String, i32>) = 
+                                                                self.compound_actions_string (new_actions_list,
                                                                 actions_to_strings_map.clone(),
                                                                 new_argument_types.clone(),
-                                                                constants_list));
+                                                                constants_list);
+
+        function_actions_string.push_str(&string_and_arg_num_map.0);
+        table_actions_to_num_args.extend(string_and_arg_num_map.1);
         }                                        
       
-      function_actions_string
+      (function_actions_string, table_actions_to_num_args)
     }
     // Takes tokens of an action and a vector containing the 
     // types of the parameters to be taken in. Returns String
@@ -147,11 +152,14 @@ impl  MatchActionCodeGenerator{
                         tokens : Vec<String>,
                         argument_types : Vec<String>,
                         constants_list : &Vec <String>) 
-                         -> (String, HashMap <String, Vec<String>>){
+                         -> (String, HashMap <String, Vec<String>>, i32){
       let mut curly_brace_stack : Vec<String> = Vec::new();
       let mut action_functions_header : String = String::from("");
       let mut action_functions_body : String = String::from("");
+      // Number of parameters for non-table action, index into argument_types
       let mut argument_num : usize = 0;
+      // Number of parameters for table action
+      let mut table_action_args_num : usize = 0;
       let mut new_argument_types : HashMap <String, Vec<String>> = HashMap::new();
       let mut parameter_types : HashMap <String, String> = HashMap::new();
       let mut calling_function_name : String = String::from("none");  
@@ -207,6 +215,7 @@ impl  MatchActionCodeGenerator{
                 },
 
                 "root"      => {
+                  table_action_args_num += 1;
                   action_functions_header.push_str(" : i32 ");
                   parameter_types.insert(tokens[i-1].clone(), 
                                          "value".to_string());
@@ -368,11 +377,22 @@ impl  MatchActionCodeGenerator{
 
         }
       }
+      let mut args_count : i32 = 0;
+      if table_action_args_num > 0 {
+        args_count = table_action_args_num as i32;
+      }
+      else if argument_num > 0 {
+        args_count = argument_num as i32; 
+      }
+      else {
+        args_count = 0;
+      }
       action_functions_body.push_str("\n}\n");
       (format!("{}{}{}", action_functions_header,
                          field_declarations,
                          action_functions_body),
-      new_argument_types)
+      new_argument_types,
+      args_count)
     }
     // Code generation for meters, registers, counters.
     // Each stateful memory is represented as a HashMap
@@ -704,20 +724,22 @@ impl  MatchActionCodeGenerator{
      for ta in table_actions_list.iter() {
        table_actions_types_map.insert(ta.clone(), vec!["root".to_string()]);
      }
-     action_functions_string = 
-                self.compound_actions_string(table_actions_list, 
+     let (action_functions_string, table_actions_to_num_args)  = 
+                self.compound_actions_string(table_actions_list.clone(), 
                                              actions_to_strings_map , 
                                              table_actions_types_map,
                                              &constants_list);
-
-     format!("{}{}{}{}{}{}{}{}", action_functions_string,
-                                 header_type_string,
-                                 instances_to_types_string,
-                                 table_matches_string,
-                                 table_actions_string,
-                                 counter_string,
-                                 register_string,
-                                 meter_string)
+     let caller_function_string : String = 
+        match_action_generation_utils::generate_action_caller(table_actions_list, table_actions_to_num_args);
+     format!("{}{}{}{}{}{}{}{}{}", action_functions_string,
+                                   header_type_string,
+                                   instances_to_types_string,
+                                   table_matches_string,
+                                   table_actions_string,
+                                   counter_string,
+                                   register_string,
+                                   meter_string,
+                                   caller_function_string)
 
     }
     // Opens P4 file and parses actions, matches, and headers.
@@ -749,6 +771,7 @@ impl  MatchActionCodeGenerator{
       
        format!("{}{}", constants_declaration, complete_p4_string)
     }
+
 
     pub fn generate (&mut self, 
                      schedule : HashMap <i32, Vec<String>>) {

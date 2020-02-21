@@ -56,6 +56,46 @@ fn generate_random_phv (num_packet_fields : i32) -> Phv <i32> {
     phv
  
 }
+fn generate_random_packet (header_data : HashMap <String, HashMap <String, i32>>) -> Packet {
+  let mut packet_data_fields : HashMap <String, HashMap <String, i32>> = HashMap::new();
+  let metadata_fields : Vec <String> = 
+                                vec!["ingress_port".to_string(),
+                                     "packet_length".to_string(),
+                                     "egress_spec".to_string(),
+                                     "egress_port".to_string(),
+                                     "egress_instance".to_string(),
+                                     "instance_type".to_string(),
+                                     "parser_status".to_string(),
+                                     "parser_error_location".to_string()];
+                                            
+  // Populate packet with random header_types
+  for (ht, pf_map) in header_data.iter() {
+
+    let chance_to_add : i32 = rand::thread_rng().gen_range(0,4);
+    if chance_to_add == 0 {
+
+    let mut fields : HashMap <String, i32> = HashMap::new();
+      for (pf, length) in pf_map.iter() {
+          fields.insert(pf.clone(), 
+                        rand::thread_rng().gen_range(0,100));  
+      }
+    packet_data_fields.insert(ht.to_string(), fields);
+
+    }
+  }
+  let mut metadata_map : HashMap <String, i32> = HashMap::new();
+  for mf in metadata_fields.iter() {
+    metadata_map.insert(mf.clone(),
+                              rand::thread_rng().gen_range(0,100));
+  }
+  packet_data_fields.insert("standard_metadata".to_string(),
+                            metadata_map);
+  Packet {
+    packet_and_metadata_fields : packet_data_fields,
+    active : true,
+  }
+
+}
 // Initiate RMT pipeline simulation using prog_to_run.rs
 // provided by dgen
 fn execute_rmt (args : Vec<String>)
@@ -156,8 +196,8 @@ fn execute_rmt (args : Vec<String>)
 
 fn execute_p4_drmt (args : Vec <String>) 
 {
-    let schedule =  match_action_ops::generate_schedule();
-    println!("Schedule: {:?}", schedule);
+    let drmt_schedule =  match_action_ops::generate_schedule();
+    println!("Schedule: {:?}", drmt_schedule);
     let p4_input_file : &str = &args[2];
     let num_packet_fields : i32 = 
     match args[3].parse::<i32>() {
@@ -185,7 +225,35 @@ fn execute_p4_drmt (args : Vec <String>)
         Ok  (t_num_state_vars)   => t_num_state_vars,
         Err (_)                   => panic!("Failure: Unable to unwrap num_state_vars"),
       };
-   
+    let mut processors : Vec<dRMTProcessor> = Vec::new();
+    let mut ticks_to_complete : i32 = 0;
+    for (k, _) in drmt_schedule.iter() {
+      if *k > ticks_to_complete {
+        ticks_to_complete = *k;
+      }
+    }
+    for p in 0..num_processors {
+      processors.push(dRMTProcessor { processor_id : p,
+                                      schedule : drmt_schedule.clone(),
+                                      table_name_to_actions : match_action_ops::table_name_to_actions(),
+                                      packets_and_initial_tick  : Vec::new(),
+                                      current_tick : -1,
+                                      packet_output_strings : HashMap::new(),
+                                      tick_duration : 22 //ticks_to_complete 
+      });
+
+    }
+    let header_types : HashMap <String, HashMap<String,i32>> = 
+        match_action_ops::header_types();
+    let instances_to_types : HashMap <String, String> = 
+        match_action_ops::instances_to_types();
+    for t in 0..ticks {
+           processors[(t % num_processors) as usize].add_packet(
+            generate_random_packet(header_types.clone()), t);
+       for p in processors.iter_mut () {
+         p.tick();
+       }
+    }
     assert! (ticks >= 1);
 }
 

@@ -2,6 +2,32 @@
 use std::fs;
 use std::collections::HashMap;
 
+pub fn generate_action_caller (table_actions : Vec<String>,
+                               table_actions_to_num_args : HashMap <String, i32>) -> String
+{
+  let mut function_string = String::from("pub fn call_action (action : &str, args : Vec<i32>, pkt : &mut Packet, memories : &mut StatefulMemories) {\n");
+  function_string.push_str("  match action {\n");
+  // Generates a substring of the match expression
+  let generate_string = | ta : &str, num_args : &i32| -> String {
+    let mut match_string : String = format!("    \"{}\" => {}(", ta, ta);
+    for i in 0..*num_args {
+      match_string.push_str(&format!("args[{}], ",i));
+    }
+
+    match_string.push_str("pkt, memories),\n");
+    match_string
+  };
+  
+  for ta in table_actions.iter() {
+    let num_args : &i32 = table_actions_to_num_args.get(ta)
+                                                  .expect("Error: Could not find table action in generate_action_caller function");
+    function_string.push_str(&generate_string(ta, 
+                                              num_args));
+  }
+  function_string.push_str("    _ => panic!(\"Error: Invalid action provided to call_action function\"),\n  };\n}\n");
+  function_string
+
+}
 // Generates code to create hashmap of schedule
 pub fn generate_hashmap_schedule (schedule : HashMap <i32, Vec<String>>) -> String {
     let mut generate_schedule_string : String = 
@@ -40,7 +66,7 @@ pub fn generate_constant_declarations (constants_map : &HashMap <String, String>
     let value : String = constants_map.get(v)
         .expect("Error: Could not get constant value from HashMap").clone();
     constant_declaration_string.push_str(
-      &format!(" const {} : i32 = {};\n", v, value));
+      &format!("const {} : i32 = {};\n", v, value));
   }
   constant_declaration_string
 }
