@@ -449,7 +449,7 @@ impl  MatchActionCodeGenerator{
       let mut table_matches_string : String = String::from("");
       let mut table_actions_string : String = String::from("");
       let mut tmp_token_buffer : Vec <String> = Vec::new(); 
-      let mut instances_to_types_string : String = String::from("");
+      let mut types_to_instances_string : String = String::from("");
       for i in 0..tokens.len() {
         let token : String= tokens[i].clone();
         // Note: single line comments are not yet being parsed
@@ -568,18 +568,18 @@ impl  MatchActionCodeGenerator{
           if (tokens[i-1] == "header" ||
               tokens[i-1] == "metadata") &&
               tokens[i+1] != ";" {
-            if instances_to_types_string.len() == 0{
-              instances_to_types_string.push_str(
+            if types_to_instances_string.len() == 0{
+              types_to_instances_string.push_str(
                 "// Returns HashMap mapping created instance name to the declared header_type or metadata name\n");
-              instances_to_types_string.push_str(
-                "pub fn instances_to_types () -> HashMap <String, String> { \n");
-              instances_to_types_string.push_str(
-                "  let mut instances_to_types_map : HashMap <String, String> = HashMap::new();\n");
+              types_to_instances_string.push_str(
+                "pub fn types_to_instances () -> HashMap <String, String> { \n");
+              types_to_instances_string.push_str(
+                "  let mut types_to_instances_map : HashMap <String, String> = HashMap::new();\n");
             }
-            instances_to_types_string.push_str(
-                &format!("  instances_to_types_map.insert(String::from(\"{}\"), String::from(\"{}\"));\n",
-                                                    &tokens[i+1],
-                                                    &token));
+            types_to_instances_string.push_str(
+                &format!("  types_to_instances_map.insert(String::from(\"{}\"), String::from(\"{}\"));\n",
+                                                    &token,
+                                                    &tokens[i+1]));
           }
           if token == ";" {
             state = String::from("none");
@@ -680,8 +680,8 @@ impl  MatchActionCodeGenerator{
        }
        header_type_string.push_str("  header_types\n}\n");
      }
-     if instances_to_types_string.len() > 0 {
-       instances_to_types_string.push_str("  instances_to_types_map\n}\n");
+     if types_to_instances_string.len() > 0 {
+       types_to_instances_string.push_str("  types_to_instances_map\n}\n");
      }
      if table_stack.len() > 0 {
        for t in table_stack.iter() { 
@@ -733,7 +733,7 @@ impl  MatchActionCodeGenerator{
         match_action_generation_utils::generate_action_caller(table_actions_list, table_actions_to_num_args);
      format!("{}{}{}{}{}{}{}{}{}", action_functions_string,
                                    header_type_string,
-                                   instances_to_types_string,
+                                   types_to_instances_string,
                                    table_matches_string,
                                    table_actions_string,
                                    counter_string,
@@ -774,7 +774,8 @@ impl  MatchActionCodeGenerator{
 
 
     pub fn generate (&mut self, 
-                     schedule : HashMap <i32, Vec<String>>) {
+                     schedule : HashMap <i32, Vec<String>>,
+                     latencies_file : &str) {
       let (tokens, p4_files, mut constants_map) : (Vec<String>, Vec<String>, HashMap <String, String>) = 
         match_action_generation_utils::lexer(self.input_file.clone());
       let p4_string_data : String = self.parse_p4_file(tokens,
@@ -783,11 +784,12 @@ impl  MatchActionCodeGenerator{
 
 
       fs::write(self.output_file.to_string(), 
-                format!("{}{}{}{}", match_action_generation_utils::generate_use_declarations(), 
+                format!("{}{}{}{}{}", match_action_generation_utils::generate_use_declarations(), 
                                   p4_string_data,
                                   match_action_generation_utils::generate_primitive_actions(),
 
-                                  match_action_generation_utils::generate_hashmap_schedule(schedule))
+                                  match_action_generation_utils::generate_hashmap_schedule(schedule),
+                                  match_action_generation_utils::generate_latencies_functions(latencies_file))
                                 ).expect("Error: could not write to output Rust file");
 
     }

@@ -56,7 +56,8 @@ fn generate_random_phv (num_packet_fields : i32) -> Phv <i32> {
     phv
  
 }
-fn generate_random_packet (header_data : HashMap <String, HashMap <String, i32>>) -> Packet {
+fn generate_random_packet (header_data : HashMap <String, HashMap <String, i32>>,
+                           types_to_instances : HashMap <String, String>) -> Packet {
   let mut packet_data_fields : HashMap <String, HashMap <String, i32>> = HashMap::new();
   let metadata_fields : Vec <String> = 
                                 vec!["ingress_port".to_string(),
@@ -71,15 +72,21 @@ fn generate_random_packet (header_data : HashMap <String, HashMap <String, i32>>
   // Populate packet with random header_types
   for (ht, pf_map) in header_data.iter() {
 
-    let chance_to_add : i32 = rand::thread_rng().gen_range(0,4);
-    if chance_to_add == 0 {
+    let chance_to_add : i32 = rand::thread_rng().gen_range(0,3);
 
-    let mut fields : HashMap <String, i32> = HashMap::new();
-      for (pf, length) in pf_map.iter() {
-          fields.insert(pf.clone(), 
-                        rand::thread_rng().gen_range(0,100));  
-      }
-    packet_data_fields.insert(ht.to_string(), fields);
+    let instances_name : String = types_to_instances.get(ht)
+                                                    .expect("Error: type not detected in types_to_instances")
+                                                    .clone();
+
+    if chance_to_add == 0 &&
+       !instances_name.contains("[") && //TODO: Enable this later
+       !instances_name.contains("]") {
+      let mut fields : HashMap <String, i32> = HashMap::new();
+        for (pf, length) in pf_map.iter() {
+            fields.insert(pf.clone(), 
+                          rand::thread_rng().gen_range(0,100));  
+        }
+      packet_data_fields.insert(instances_name, fields);
 
     }
   }
@@ -226,12 +233,22 @@ fn execute_p4_drmt (args : Vec <String>)
         Err (_)                   => panic!("Failure: Unable to unwrap num_state_vars"),
       };
     let mut processors : Vec<dRMTProcessor> = Vec::new();
-    let mut ticks_to_complete : i32 = 0;
-    for (k, _) in drmt_schedule.iter() {
-      if *k > ticks_to_complete {
-        ticks_to_complete = *k;
-      }
-    }
+    let drmt_schedule_keys : Vec<i32>= 
+      drmt_schedule.iter()
+                   .map(|(k, _)| *k)
+                   .collect();
+    let ticks_to_complete : i32 = 
+      drmt_schedule_keys.iter()
+                        .fold(0, |x, y| {
+        // Get max value in keys
+        if x >= *y {
+          x
+        }
+        else {
+          *y
+        }
+    }) + match_action_ops::get_action_ticks();
+
     for p in 0..num_processors {
       processors.push(dRMTProcessor { processor_id : p,
                                       schedule : drmt_schedule.clone(),
@@ -239,18 +256,19 @@ fn execute_p4_drmt (args : Vec <String>)
                                       packets_and_initial_tick  : Vec::new(),
                                       current_tick : -1,
                                       packet_output_strings : HashMap::new(),
-                                      tick_duration : 22 //ticks_to_complete 
+                                      tick_duration : ticks_to_complete //ticks_to_complete 
       });
 
     }
     let header_types : HashMap <String, HashMap<String,i32>> = 
         match_action_ops::header_types();
-    let instances_to_types : HashMap <String, String> = 
-        match_action_ops::instances_to_types();
+    let types_to_instances : HashMap <String, String> = 
+        match_action_ops::types_to_instances();
     for t in 0..ticks {
            processors[(t % num_processors) as usize].add_packet(
-            generate_random_packet(header_types.clone()), t);
-       for p in processors.iter_mut () {
+           generate_random_packet(header_types.clone(),
+                                  types_to_instances.clone()), t);
+       for p in processors.iter_mut() {
          p.tick();
        }
     }

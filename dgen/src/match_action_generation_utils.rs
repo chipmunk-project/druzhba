@@ -28,6 +28,39 @@ pub fn generate_action_caller (table_actions : Vec<String>,
   function_string
 
 }
+
+pub fn generate_latencies_functions (latencies_file : &str) -> String {
+  let mut getters_string : String = "".to_string();
+  let latencies_file_contents : String = 
+      fs::read_to_string(latencies_file.to_string())
+              .expect("Error: could not read from latencies file");
+  let latencies_lines : Vec<String> = latencies_file_contents
+                                      .split("\n")
+                                      .map(|s| s.to_string())
+                                      .collect(); 
+  for line in latencies_lines.iter() {
+    let line_vec : Vec<String> = separate_by_whitespace(line.to_string());
+    if line_vec.len() != 3 {
+      continue;
+    }
+    // Must be in the form of value assignments. 
+    // TODO: Consider if there are no spaces
+//    assert!(line_vec.len() == 3);
+    getters_string.push_str("pub fn get_");
+    getters_string.push_str(
+      match line_vec[0].as_str() {
+        "dM" => "match_ticks () -> i32 {\n",
+        "dA" => "action_ticks () -> i32 {\n",
+        "dS" => "s () -> i32 {\n", // TODO: What is this?
+        _    => panic!("Error: incorrect latency content"),
+      }
+   );
+    getters_string.push_str(&format!("  {}\n}}\n", line_vec[2]));
+  }
+  getters_string
+  
+
+}
 // Generates code to create hashmap of schedule
 pub fn generate_hashmap_schedule (schedule : HashMap <i32, Vec<String>>) -> String {
     let mut generate_schedule_string : String = 

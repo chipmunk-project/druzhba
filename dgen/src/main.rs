@@ -39,13 +39,22 @@ fn drmt_generation (args : Vec <String>) {
       scheduler.exec_drmt_scheduler (&path_to_drmt,
                                      &hw_file,
                                      &latencies_file);
-
-    println!("Writing to {}", file_path);
     let mut code_generator : match_action_code_generator::MatchActionCodeGenerator = 
       match_action_code_generator::MatchActionCodeGenerator { 
                            input_file : p4_file, 
                            output_file : file_path };
-    code_generator.generate(schedule);
+    let latencies_file_path : String = {
+      if path_to_drmt.chars()
+                     .nth(path_to_drmt.len() - 1)
+                     .unwrap() == '/' {
+        format!("{}{}.py", path_to_drmt, latencies_file)
+      }
+      else {
+        format!("{}/{}.py", path_to_drmt, latencies_file)
+      }
+    };
+    println!("Latencies file path {}", latencies_file_path);
+    code_generator.generate(schedule, &latencies_file_path);
 
     
 }
