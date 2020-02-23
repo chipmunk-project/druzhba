@@ -53,7 +53,6 @@ fn drmt_generation (args : Vec <String>) {
         format!("{}/{}.py", path_to_drmt, latencies_file)
       }
     };
-    println!("Latencies file path {}", latencies_file_path);
     code_generator.generate(schedule, &latencies_file_path);
 
     
