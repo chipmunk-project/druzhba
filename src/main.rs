@@ -4,12 +4,14 @@ extern crate druzhba;
 mod prog_to_run;
 mod tests;
 mod match_action_ops;
+mod drmt_utils;
 use druzhba::pipeline::Pipeline;
 use druzhba::phv::Phv;
 use druzhba::phv_container::PhvContainer;
 use druzhba::drmt_processor::dRMTProcessor;
 use druzhba::packet::Packet;
 use druzhba::stateful_memory::{StatefulMemory,StatefulMemories};
+use druzhba::match_action::MatchAction;
 use rand::Rng;
 use std::collections::HashMap;
 use std::env;
@@ -200,34 +202,35 @@ fn execute_rmt (args : Vec<String>)
 }
 
 
-
+// Simulates dRMT using dgen generated match+action code
 fn execute_p4_drmt (args : Vec <String>) 
 {
     let drmt_schedule =  match_action_ops::generate_schedule();
     println!("Schedule: {:?}", drmt_schedule);
     let p4_input_file : &str = &args[2];
+    let table_entries_file : &str = &args[3];
     let num_packet_fields : i32 = 
-    match args[3].parse::<i32>() {
+    match args[4].parse::<i32>() {
 
         Ok  (t_pkts)    => t_pkts,
         Err (_)         => panic!("Failure: Unable to unwrap num_packet_fields"),
       };
 
     let ticks : i32 = 
-      match args[4].parse::<i32>() {
+      match args[5].parse::<i32>() {
 
         Ok  (t_ticks) => t_ticks,
         Err (_)       => panic!("Failure: Unable to unwrap ticks"),
       };
     let num_processors : i32 = 
-      match args[5].parse::<i32>() {
+      match args[6].parse::<i32>() {
 
         Ok  (t_num_processors)    => t_num_processors,
         Err (_)                   => panic!("Failure: Unable to unwrap num_processors"),
       };
 
     let num_state_vars : i32 = 
-      match args[6].parse::<i32>() {
+      match args[7].parse::<i32>() {
 
         Ok  (t_num_state_vars)   => t_num_state_vars,
         Err (_)                   => panic!("Failure: Unable to unwrap num_state_vars"),
@@ -248,7 +251,9 @@ fn execute_p4_drmt (args : Vec <String>)
           *y
         }
     }) + match_action_ops::get_action_ticks();
-
+    let table_entries_map : HashMap <String, MatchAction> = 
+      drmt_utils::parse_table_entries(table_entries_file);
+    //println!("{:?}", table_entries_map);
     for p in 0..num_processors {
       processors.push(dRMTProcessor { processor_id : p,
                                       schedule : drmt_schedule.clone(),
@@ -291,7 +296,7 @@ fn main() {
                 execute_rmt(args);
     },
     "drmt_p4" => {
-                assert!(args.len() == 7);
+                assert!(args.len() == 8);
                 execute_p4_drmt(args);
 
     },

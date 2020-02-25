@@ -1,13 +1,19 @@
 use crate::packet::Packet;
+use std::collections::HashMap;
 
-struct MatchAction {
-  pub match_table : String,
+use std::fmt;
+
+#[derive(Clone)]
+pub struct MatchAction {
   pub match_header_type : String,
   pub match_field : String,
   pub match_type : String, // lpm, ternary, exact, or range
-//  pub match_range_begin : String,
- // pub match_range_end : String, // -1 if exact match
+  pub match_value : i32,
+  pub range : i32, // For range, match on inputs within [match_type, match_type + range]. 
+  // Should be 0 otherwise
+  pub mask : i32, // Used for defining network prefix of ipv4 or range/ternary
   pub action_name : String,
+  pub action_args : Vec<i32>
 }
 
 impl MatchAction {
@@ -17,11 +23,6 @@ impl MatchAction {
                                       &self.match_field){
       let input_field = incoming_packet.get_field_value(&self.match_header_type,
                                                         &self.match_field);
-      /*
-      if match_range_end == -1 {
-         
-      }*/
-
     }
     // TODO: Complete
     true
@@ -30,3 +31,25 @@ impl MatchAction {
     &self.action_name
   }
 }
+impl fmt::Debug for MatchAction {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+      let mut s : String = "".to_string();
+      s.push_str(&format!(
+        "match_header_type : {}, ", self.match_header_type));  
+      s.push_str(&format!(
+        "match_field : {}, ", self.match_field));  
+      s.push_str(&format!(
+        "match_type : {}, ", self.match_type));  
+      s.push_str(&format!(
+        "range : [{}, {}], ", self.match_value, 
+        self.match_value + self.range));  
+      s.push_str(&format!("mask  {}, ", self.mask));
+
+      s.push_str(&format!("action_name : {}, ", self.action_name));
+
+      s.push_str(&format!("action args : {:?}\n", self.action_args));
+      write!(f, "{}", s)
+    }
+}
+
+

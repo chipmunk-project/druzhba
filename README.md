@@ -19,11 +19,11 @@ Example:
 
 Running dsim using dRMT architecture (using P4):
 
-    python3 p4_drmt_simulation_execute.py <P4 file> <num of packet fielsd> <ticks> <num of processors> <num of state variables> <path to drmt repository> <hw file> <latencies file>
+    python3 p4_drmt_simulation_execute.py <P4 file> <table entries file> <num of packet fielsd> <ticks> <num of processors> <num of state variables> <path to drmt repository> <hw file> <latencies file>
 
 Example:
 
-    python3 p4_drmt_simulation_execute.py p4_files/stateful.p4 2 10 4 1 /path/to/drmt large_hw drmt_latencies
+    python3 p4_drmt_simulation_execute.py p4_files/stateful.p4 table_entries 2 10 4 1 /path/to/drmt large_hw drmt_latencies
   
 NOTE: p4-hlir (https://github.com/jafingerhut/p4-hlir) is needed, which converts .p4 file into DAG.
 Must also have drmt repository (github.com/anirudhSK/drmt/) downloaded 

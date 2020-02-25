@@ -33,10 +33,11 @@ def run_druzhba (args):
                     'run',
                     'drmt_p4',
                     args[0], # P4 file
-                    args[1], # Number of packet fields
-                    args[2], # Number of ticks
-                    args[3], # Number of processors
-                    args[4]]) # Number of state vars
+                    args[1], # table entries file
+                    args[2], # Number of packet fields
+                    args[3], # Number of ticks
+                    args[4], # Number of processors
+                    args[5]]) # Number of state vars
 #                    args[5]]) # Path to dRMT repository
 
 def main ():
@@ -46,6 +47,11 @@ def main ():
             'p4_file',
             type=str,
             help='P4 file')
+    parser.add_argument(
+            'table_entries_file',
+            type=str,
+            help='File containing table entries')
+
     parser.add_argument(
             'num_packet_fields',
             type=int,
@@ -81,6 +87,7 @@ def main ():
     raw_args = parser.parse_args(argv[1:])
     args = []
     args.append(raw_args.p4_file)
+    args.append(raw_args.table_entries_file)
     args.append(str(raw_args.num_packet_fields))
     args.append(str(raw_args.ticks))
     args.append(str(raw_args.num_packet_fields))
