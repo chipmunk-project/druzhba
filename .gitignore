@@ -18,6 +18,5 @@ gurobi.log
 match_action_ops.rs
 src/match_action_ops.rs
 dgen/src/match_action_ops.rs
-p4_files/tofino/intrinsic_metadata.p4
 benchmarks.txt
 *.eps
