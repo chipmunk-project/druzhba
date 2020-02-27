@@ -18,17 +18,32 @@ pub struct MatchAction {
 
 impl MatchAction {
 
-  pub fn is_match (&self, incoming_packet : &mut Packet) -> bool {
+  pub fn is_match (&self, incoming_packet : &Packet) -> bool {
+    let mut match_found : bool = false;
     if incoming_packet.contains_field(&self.match_header_type,
                                       &self.match_field){
       let input_field = incoming_packet.get_field_value(&self.match_header_type,
                                                         &self.match_field);
+      match_found  = match self.match_type.as_str() {
+        "exact" => self.match_value == input_field,
+        "range" => input_field >= self.match_value &&
+                   input_field <= self.match_value + self.range,
+        // TODO: Is the correct implementation for ternary?
+        "ternary" => self.match_value & self.mask ==
+                     input_field & self.mask,
+        "lpm"   => self.match_value & self.mask ==
+                     input_field & self.mask,
+
+        _ => false
+      };
     }
-    // TODO: Complete
-    true
+    match_found
   }
   pub fn get_action (&self) -> &str {
     &self.action_name
+  }
+  pub fn get_match_type (&self) -> &str {
+    &self.match_type
   }
 }
 impl fmt::Debug for MatchAction {

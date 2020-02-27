@@ -251,9 +251,9 @@ fn execute_p4_drmt (args : Vec <String>)
           *y
         }
     }) + match_action_ops::get_action_ticks();
-    let table_entries_map : HashMap <String, MatchAction> = 
+    let table_entries_map : HashMap <String, Vec<MatchAction>> = 
       drmt_utils::parse_table_entries(table_entries_file);
-    //println!("{:?}", table_entries_map);
+    println!("{:?}", table_entries_map);
     for p in 0..num_processors {
       processors.push(dRMTProcessor { processor_id : p,
                                       schedule : drmt_schedule.clone(),
@@ -261,7 +261,8 @@ fn execute_p4_drmt (args : Vec <String>)
                                       packets_and_initial_tick  : Vec::new(),
                                       current_tick : -1,
                                       packet_output_strings : HashMap::new(),
-                                      tick_duration : ticks_to_complete //ticks_to_complete 
+                                      tick_duration : ticks_to_complete,
+                                      entries_to_populate : table_entries_map.clone() 
       });
 
     }

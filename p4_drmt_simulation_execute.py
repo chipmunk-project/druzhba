@@ -15,9 +15,9 @@ def run_dgen (args):
     subprocess.run(['./dgen_bin',
                     "dRMT", # Architecture
                     args[0], # P4 file
-                    args[5], # Path to dRMT repository
-                    args[6], # dRMT hw file (no path)
-                    args[7], # dRMT latencies file (no path)
+                    args[6], # Path to dRMT repository
+                    args[7], # dRMT hw file (no path)
+                    args[8], # dRMT latencies file (no path)
                     'src/match_action_ops.rs'
                     ])
 

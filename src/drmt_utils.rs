@@ -5,7 +5,7 @@ use std::fs;
 use std::i32;
 
 pub fn parse_table_entries (table_entries_file : &str) 
-                        -> HashMap <String, MatchAction>
+                        -> HashMap <String, Vec<MatchAction>>
 {
    
   let table_entry_file_contents : String = 
@@ -17,7 +17,8 @@ pub fn parse_table_entries (table_entries_file : &str)
                                     .collect(); 
   let mut table_name : String = "".to_string();
   let mut curly_brace_stack : Vec<String> = Vec::new();
-  let mut match_action_map : HashMap <String, MatchAction> = HashMap::new();
+  let mut match_action_map : HashMap <String, Vec<MatchAction>> = 
+    HashMap::new();
   let mut fields_map : HashMap <String, String> = HashMap::new();
   let mut parsing_args : bool = false;
   let mut args_string = "".to_string();
@@ -32,6 +33,7 @@ pub fn parse_table_entries (table_entries_file : &str)
     
       let token : String = line_vec[i].clone();
       println!("Elem: {}", token); 
+
       if token == "{" {
         curly_brace_stack.push("{".to_string());
         if parsing_args {
@@ -49,8 +51,16 @@ pub fn parse_table_entries (table_entries_file : &str)
           let match_action : MatchAction = 
             init_match_action(fields_map.clone(),
                               args_string.clone());
-          match_action_map.insert(table_name.clone(),
-                                  match_action);
+          if match_action_map.contains_key(&table_name) {
+            match_action_map.get_mut(&table_name)
+                            .expect("Error: match_action_map does not contain this table name")
+                            .push(match_action);
+          }
+          else {
+            match_action_map.insert(table_name.clone(),
+                                    vec![match_action]);
+          }
+          table_name = "".to_string();
           fields_map.clear();
           args_string = "".to_string();
         }
@@ -63,6 +73,10 @@ pub fn parse_table_entries (table_entries_file : &str)
               line_vec[i-1] == "args" {
         println!("parsing_args true");
         parsing_args = true;
+      }
+      else if token == ":" &&
+              line_vec[i-1] == "table" {
+        table_name = format!("{}", line_vec[i+1]);
       }
       else if token == ":" {
         if line_vec[i-1] == "args" {

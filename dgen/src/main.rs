@@ -33,6 +33,7 @@ fn drmt_generation (args : Vec <String>) {
     let file_path : String = args[6].clone();
     let hw_file : String = args[4].clone();
     let latencies_file : String = args[5].clone();
+    println!("dRMT path: {}, file_path : {}, hw file : {}, latencies file : {}", path_to_drmt, file_path, hw_file, latencies_file);
     let scheduler : scheduler::Scheduler = 
       scheduler::Scheduler { input_file : p4_file.clone() };    
     let schedule : HashMap <i32, Vec<String>> = 

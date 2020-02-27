@@ -1,5 +1,6 @@
 use crate::phv::Phv;
 use crate::packet::Packet;
+use crate::match_action::MatchAction;
 use std::collections::HashMap;
 
 #[derive(Clone)]
@@ -8,9 +9,12 @@ pub struct dRMTProcessor {
     pub schedule : HashMap <i32, Vec<String>>,
     pub table_name_to_actions : HashMap <String, Vec<String>>,
     pub packets_and_initial_tick : Vec<(Packet, i32)>,
+    // Incoming tick to string of packet
     pub packet_output_strings : HashMap<i32, String>,
     pub current_tick : i32, // Should be initialized to -1
     pub tick_duration : i32,
+    // map from table name to match actions
+    pub entries_to_populate : HashMap <String, Vec<MatchAction>>
 }
 
 impl dRMTProcessor {
@@ -42,7 +46,11 @@ impl dRMTProcessor {
           let tasks : &Vec <String> = self.schedule
                                           .get(&(self.current_tick - initial_tick))
                                           .unwrap();
+
           if tasks.len() > 0 {
+            // TODO: Execute this list of actions
+            let action_names : Vec<String> = 
+              self.perform_match_action (&tasks, &packet);
             let new_string : String = format!("{} tick: {} {:?}\n", 
                                               self.packet_output_strings.get(&initial_tick).unwrap(), 
                                               self.current_tick,
@@ -69,5 +77,54 @@ impl dRMTProcessor {
         println!("{}", output);
       }
     
+  }
+  fn perform_match_action (&self, 
+                           tasks : &Vec<String>, 
+                           packet : &Packet ) -> Vec<String> {
+    let mut action_names : Vec<String> = Vec::new();
+    for task in tasks.iter() {
+      if task.contains("MATCH") {
+        // Matches are only executed at the same time as actions
+        continue;
+      }
+      let table_name : String = task[0..task.len() - 7].to_string();
+      // If scheduler runs into populated table match
+      if self.entries_to_populate
+             .contains_key(&table_name) {
+        let match_actions : Vec<MatchAction> = self.entries_to_populate
+                                                   .get(&table_name)
+                                                   .unwrap()
+                                                   .clone();
+        let mut current_ternary_action : (String, i32) = 
+          ("".to_string(), 0);
+        let mut current_lpm_action : (String, i32) = 
+          ("".to_string(), 0);
+        for ma in match_actions.iter(){
+          if ma.is_match(packet) {
+/*
+            if ma.action_name == "ternary"  &&
+               ma.get_prefix() > current_ternary_action.1 {
+              current_ternary_action = (ma.get_action().to_string(),
+                                        ma.get_prefix()); 
+            }*/
+            if ma.action_name == "lpm" &&
+              ma.mask > current_lpm_action.1 {
+              current_lpm_action = (ma.get_action().to_string(),
+                                    ma.mask);
+            }
+            else {
+              action_names.push(ma.get_action()
+                              .to_string());
+              continue; 
+              // TODO: Consider multiple matches on same field
+            } 
+          }
+        }
+        if current_lpm_action.1 > 0 {
+          action_names.push(current_lpm_action.0);
+        }
+      }
+    }
+    action_names 
   }
 }
