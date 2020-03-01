@@ -29,9 +29,14 @@ impl Packet {
   pub fn contains_field (&self,
                          header_type : &str,
                          field : &str) -> bool {
-    self.packet_and_metadata_fields.get(header_type)
-                                   .expect("Error: current header_type does not exist in packet")
-                                   .contains_key(field)
+    if !self.contains_header_type(header_type) {
+      false
+    }
+    else {
+      self.packet_and_metadata_fields.get(header_type)
+                                     .expect("Error: current header_type does not exist in packet")
+                                     .contains_key(field)
+    }
   }
   pub fn get_field_value (&self, 
                           header_type_str : &str, 

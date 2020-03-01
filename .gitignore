@@ -20,3 +20,4 @@ src/match_action_ops.rs
 dgen/src/match_action_ops.rs
 benchmarks.txt
 *.eps
+output_drmt

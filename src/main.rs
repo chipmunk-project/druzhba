@@ -74,7 +74,7 @@ fn generate_random_packet (header_data : HashMap <String, HashMap <String, i32>>
   // Populate packet with random header_types
   for (ht, pf_map) in header_data.iter() {
 
-    let chance_to_add : i32 = rand::thread_rng().gen_range(0,3);
+    let chance_to_add : i32 = rand::thread_rng().gen_range(0,4);
 
     let instances_name : String = types_to_instances.get(ht)
                                                     .expect("Error: type not detected in types_to_instances")
@@ -85,8 +85,13 @@ fn generate_random_packet (header_data : HashMap <String, HashMap <String, i32>>
        !instances_name.contains("]") {
       let mut fields : HashMap <String, i32> = HashMap::new();
         for (pf, length) in pf_map.iter() {
-            fields.insert(pf.clone(), 
-                          rand::thread_rng().gen_range(0,100));  
+          if pf.contains("ttl") || pf.contains("Addr") {
+            fields.insert(pf.clone(), 4812389); 
+          }
+          else {
+            fields.insert(pf.clone(), rand::thread_rng().gen_range(0,100));  
+        
+          }
         }
       packet_data_fields.insert(instances_name, fields);
 
@@ -236,6 +241,8 @@ fn execute_p4_drmt (args : Vec <String>)
         Err (_)                   => panic!("Failure: Unable to unwrap num_state_vars"),
       };
     let mut processors : Vec<dRMTProcessor> = Vec::new();
+
+    assert! (ticks >= 1);
     let drmt_schedule_keys : Vec<i32>= 
       drmt_schedule.iter()
                    .map(|(k, _)| *k)
@@ -257,8 +264,8 @@ fn execute_p4_drmt (args : Vec <String>)
       drmt_utils::init_stateful_memories(match_action_ops::registers(),
                                          match_action_ops::counters(),
                                          match_action_ops::meters());
-    println!("{:?}", table_entries_map);
-//    println!("{:?}", stateful_memories.memories);
+    println!("table entries: \n{:?}", table_entries_map);
+    println!("{:?}", stateful_memories.memories);
     for p in 0..num_processors {
       processors.push(dRMTProcessor { processor_id : p,
                                       schedule : drmt_schedule.clone(),
@@ -276,15 +283,17 @@ fn execute_p4_drmt (args : Vec <String>)
         match_action_ops::header_types();
     let types_to_instances : HashMap <String, String> = 
         match_action_ops::types_to_instances();
+    let mut output_string : String = "".to_string();
     for t in 0..ticks {
            processors[(t % num_processors) as usize].add_packet(
            generate_random_packet(header_types.clone(),
                                   types_to_instances.clone()), t);
        for p in processors.iter_mut() {
-         p.tick(&mut stateful_memories);
+         output_string.push_str(&p.tick(&mut stateful_memories));
        }
     }
-    assert! (ticks >= 1);
+   fs::write("output_drmt".to_string(), output_string); 
+   println!("dRMT output written to output_drmt");
 }
 
 #[warn(unused_imports)]
@@ -311,6 +320,7 @@ fn main() {
   };
 
 }
+
 #[cfg(test)]
 mod test_druzhba;
 mod test_with_chipmunk;
