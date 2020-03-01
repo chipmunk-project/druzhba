@@ -253,7 +253,12 @@ fn execute_p4_drmt (args : Vec <String>)
     }) + match_action_ops::get_action_ticks();
     let table_entries_map : HashMap <String, Vec<MatchAction>> = 
       drmt_utils::parse_table_entries(table_entries_file);
+    let mut stateful_memories : StatefulMemories = 
+      drmt_utils::init_stateful_memories(match_action_ops::registers(),
+                                         match_action_ops::counters(),
+                                         match_action_ops::meters());
     println!("{:?}", table_entries_map);
+//    println!("{:?}", stateful_memories.memories);
     for p in 0..num_processors {
       processors.push(dRMTProcessor { processor_id : p,
                                       schedule : drmt_schedule.clone(),
@@ -262,7 +267,8 @@ fn execute_p4_drmt (args : Vec <String>)
                                       current_tick : -1,
                                       packet_output_strings : HashMap::new(),
                                       tick_duration : ticks_to_complete,
-                                      entries_to_populate : table_entries_map.clone() 
+                                      entries_to_populate : table_entries_map.clone(),
+                                      call_action : match_action_ops::get_call_action_function(),
       });
 
     }
@@ -275,7 +281,7 @@ fn execute_p4_drmt (args : Vec <String>)
            generate_random_packet(header_types.clone(),
                                   types_to_instances.clone()), t);
        for p in processors.iter_mut() {
-         p.tick();
+         p.tick(&mut stateful_memories);
        }
     }
     assert! (ticks >= 1);

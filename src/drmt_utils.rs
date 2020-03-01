@@ -2,8 +2,79 @@
 use druzhba::match_action::MatchAction;
 use std::collections::HashMap;
 use std::fs;
+use druzhba::stateful_memory::{StatefulMemory,StatefulMemories};
 use std::i32;
+fn retrieve_memory_field_string (field : &str, 
+                                 mem_data : &HashMap <String, String>) -> String {
+  match mem_data.contains_key(field){
+    true  =>  mem_data
+                .get(field)
+                .expect("Error: String field not in mem_data")
+                .trim()
+                .to_string(),
+    false => "".to_string(),
+  }
+}
+fn retrieve_memory_field_i32 (field : &str, 
+                              mem_data : &HashMap <String, String>) -> i32 {
+  match mem_data.contains_key(field){
+    true  =>  mem_data
+                .get(field)
+                .expect("Error: i32 field not in mem_data")
+                .trim()
+                .parse::<i32>()
+                .expect ("Error: i32 field could not be parsed"),
 
+    false => 0,
+  }
+}
+fn init_stateful_memory (stateful_memory_type : &str,
+                         mem_data : &HashMap <String, String>) -> StatefulMemory {
+  let stateful_memory_ic : i32 = retrieve_memory_field_i32("instance_count",
+                                               mem_data);
+
+  StatefulMemory {
+    memory : stateful_memory_type.to_string(),
+    memory_type : "".to_string(),   
+    instance_count : retrieve_memory_field_i32("instance_count",
+                                               mem_data),
+    direct_or_static : retrieve_memory_field_string("direct_or_static",
+                                                    mem_data),
+    min_width : stateful_memory_ic,
+    result : retrieve_memory_field_i32("result",
+                                          mem_data),
+    width : retrieve_memory_field_i32("width",
+                                      mem_data),
+    attributes : retrieve_memory_field_string("attributes",
+                                              mem_data),
+    memory_container : vec![0; stateful_memory_ic as usize]
+  }
+
+}
+pub fn init_stateful_memories (registers : HashMap <String, HashMap <String, String>>,
+                               counters : HashMap <String, HashMap <String, String>>,
+                               meters : HashMap <String, HashMap<String, String>>) -> StatefulMemories {
+
+  let mut stateful_memories_map : HashMap <String, StatefulMemory> = HashMap::new();
+  for (reg_name, reg_data) in registers.iter() {
+    stateful_memories_map.insert(reg_name.to_string(),
+                                 init_stateful_memory("register",
+                                 reg_data));
+  }
+  for (cnt_name, cnt_data) in counters.iter() {
+    stateful_memories_map.insert(cnt_name.to_string(),
+                                 init_stateful_memory("counter",
+                                 cnt_data));
+  }
+ for (met_name, met_data) in meters.iter() {
+    stateful_memories_map.insert(met_name.to_string(),
+                          init_stateful_memory("meter",
+                          met_data));
+  }
+  StatefulMemories {
+    memories : stateful_memories_map 
+  }
+}
 pub fn parse_table_entries (table_entries_file : &str) 
                         -> HashMap <String, Vec<MatchAction>>
 {
@@ -32,7 +103,6 @@ pub fn parse_table_entries (table_entries_file : &str)
     for i in 0..line_vec.len() {
     
       let token : String = line_vec[i].clone();
-      println!("Elem: {}", token); 
 
       if token == "{" {
         curly_brace_stack.push("{".to_string());
@@ -44,7 +114,6 @@ pub fn parse_table_entries (table_entries_file : &str)
         curly_brace_stack.pop();
         if parsing_args {
 
-          println!("parsing_args false");
           parsing_args = false;
         }
         if curly_brace_stack.len() == 0 {
@@ -66,7 +135,6 @@ pub fn parse_table_entries (table_entries_file : &str)
         }
       }
       if parsing_args {
-        println!("args_string pushing {}", token);
         args_string.push_str(&token);
       }
       else if token == ":" &&

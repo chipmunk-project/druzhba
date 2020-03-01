@@ -5,7 +5,7 @@ use std::collections::HashMap;
 pub fn generate_action_caller (table_actions : Vec<String>,
                                table_actions_to_num_args : HashMap <String, i32>) -> String
 {
-  let mut function_string = String::from("pub fn call_action (action : &str, args : Vec<i32>, pkt : &mut Packet, memories : &mut StatefulMemories) {\n");
+  let mut function_string = String::from("pub fn get_call_action_function () -> Box <dyn Fn (&str, &Vec<i32>, &mut Packet, &mut StatefulMemories)> {\n   let call_action = | action : &str, args : &Vec<i32>, pkt : &mut Packet, memories : &mut StatefulMemories | {\n");
   function_string.push_str("  match action {\n");
   // Generates a substring of the match expression
   let generate_string = | ta : &str, num_args : &i32| -> String {
@@ -24,7 +24,7 @@ pub fn generate_action_caller (table_actions : Vec<String>,
     function_string.push_str(&generate_string(ta, 
                                               num_args));
   }
-  function_string.push_str("    _ => panic!(\"Error: Invalid action provided to call_action function\"),\n  };\n}\n");
+  function_string.push_str("    _ => panic!(\"Error: Invalid action provided to call_action function\"),\n    };\n  };\n  Box::new(call_action)}\n");
   function_string
 
 }

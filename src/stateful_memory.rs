@@ -1,17 +1,18 @@
 
+use std::fmt;
 use std::ops::{Index, IndexMut};
 use std::collections::HashMap;
 #[derive(Clone)]
 pub struct StatefulMemory {
 
   pub memory : String, // register, meter, counter
-  pub memory_type : String, // Only for meter, counter
+  pub memory_type : String, // Only for meter, counter (bytes, packet)
   pub instance_count : i32,
   pub direct_or_static : String,
   pub min_width : i32, 
   pub result : i32, // Only for meter. TODO: May have to change the type
-  pub width_declaration : String, // Only for register. TODO: consider removing
-  pub attribute_list : String, // Only for register, counter
+  pub width : i32, // Only for register. TODO: consider removing
+  pub attributes : String, // Only for register, counter
   pub memory_container : Vec<i32>,
   
 }

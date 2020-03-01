@@ -404,7 +404,7 @@ impl  MatchActionCodeGenerator{
                                 token : &str, 
                                 next_token : &str) {
           if current_string.len() == 0 {
-            *current_string = format!("fn {}s () -> HashMap <String, HashMap <String, String>> {{\n  let mut {}_map : HashMap <String, HashMap <String,String>> = HashMap::new();\n", state, state);
+            *current_string = format!("pub fn {}s () -> HashMap <String, HashMap <String, String>> {{\n  let mut {}_map : HashMap <String, HashMap <String,String>> = HashMap::new();\n", state, state);
           }
           if prev_token == state {
             current_string.push_str(&format!("  let mut {}_map : HashMap <String, String> = HashMap::new();\n", &token));
@@ -696,6 +696,9 @@ impl  MatchActionCodeGenerator{
        table_matches_string.push_str("  matches\n}\n");
        table_actions_string.push_str("  table_to_actions\n}\n");
      }
+     // Are there any registers? If so ensure they are returned
+     // in the final HashMap. Otherise return an empty HashMap.
+     // Repeat for counters, meters
      if register_stack.len() > 0 {
        for nn in register_stack.iter() {
          register_string.push_str(
@@ -703,6 +706,10 @@ impl  MatchActionCodeGenerator{
        }
        register_string.push_str("  register_map\n}\n");
      }
+     else {
+        register_string.push_str("pub fn registers () -> HashMap <String, HashMap <String, String>> {\n ; "); 
+     }
+
      if counter_stack.len() > 0 {
        for cn in counter_stack.iter() {
          counter_string.push_str(
@@ -710,12 +717,20 @@ impl  MatchActionCodeGenerator{
        }
        counter_string.push_str("  counter_map\n}\n");
      }
+     else {
+       counter_string.push_str("pub fn counters () -> HashMap <String, HashMap <String, String>> {\n  HashMap::new()\n}\n"); 
+
+     }
      if meter_stack.len() > 0 {
        for mn in meter_stack.iter() {
          meter_string.push_str(
             &format!("  meter_map.insert(String::from(\"{}\"), {}_map);\n ", mn, mn));
        }
        meter_string.push_str("  meter_map\n}\n");
+
+     }
+     else {
+       meter_string.push_str("pub fn meters () -> HashMap <String, HashMap <String, String>> {\n  HashMap::new()\n}\n"); 
 
      }
 
