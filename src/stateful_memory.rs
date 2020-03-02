@@ -37,11 +37,14 @@ impl IndexMut<i32> for StatefulMemory {
 impl fmt::Debug for StatefulMemory {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     let mut s : String = "".to_string();
+/*
     s.push_str(&format!("{{stateful_memory: {}, memory_type: {}", self.memory, self.memory_type));
     s.push_str(&format!(", instance_count: {}, direct_or_static: {}", self.instance_count, self.direct_or_static));
     s.push_str(&format!(", min_width: {}, result: {}", self.min_width, self.result));
-    s.push_str(&format!(", width: {}, attributes: {}", self.width, self.attributes));
-    s.push_str(&format!("\tMemory values: {:?} }}\n", self.memory_container)); 
+    s.push_str(&format!(", width: {}, attributes: {}", self.width, self.attributes));*/
+    s.push_str(&format!("{} values: {:?} }}\n", 
+                        self.memory_type, 
+                        self.memory_container)); 
     write!(f,"{}", s)
   }
 }

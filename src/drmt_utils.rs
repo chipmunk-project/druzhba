@@ -116,11 +116,15 @@ pub fn parse_table_entries (table_entries_file : &str)
 
           parsing_args = false;
         }
+        // Synthesize all of the fields of the match+action
+        // entry and initialize
         if curly_brace_stack.len() == 0 {
           let match_action : MatchAction = 
             init_match_action(fields_map.clone(),
-                              args_string.clone());
+                              args_string.trim()
+                                         .to_string());
           if match_action_map.contains_key(&table_name) {
+            // Raise error if specified table is not in .p4 file
             match_action_map.get_mut(&table_name)
                             .expect("Error: match_action_map does not contain this table name")
                             .push(match_action);
@@ -165,13 +169,18 @@ fn init_match_action (fields_map : HashMap <String, String>,
                       -> MatchAction {
   // Convert args to i32 and strip comments and whitespace
   println!("args string: {}", args_string);
-  let args : Vec<i32> = args_string.split(",")
-                                       .map(|s| {
-                                         s.trim()
-                                         .parse::<i32>()
-                                         .expect ("Error: Expected i32 in action args") })
-                                         
-                                       .collect();        
+  // args_string is already stripped of whitespace from the beginning
+  // and end thus if length is 0, there are no args
+  let args : Vec<i32> = 
+    match args_string.len() {
+      0 => Vec::new(), 
+      _ => args_string.split(",")
+             .map(|s| {
+               s.trim()
+               .parse::<i32>()
+               .expect ("Error: Expected i32 in action args") })
+               .collect(),        
+    };
   MatchAction {
       match_header_type : fields_map
                           .get("header_type")

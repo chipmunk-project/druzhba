@@ -42,6 +42,9 @@ impl dRMTProcessor {
 
       let mut initial_tick_of_exit_packet : i32 = -1;
       for (packet, initial_tick) in self.packets_and_initial_tick.iter_mut(){
+        if !packet.active {
+          continue;
+        }
         // Perform current_tick - initial_tick to align with the 
         // schedule that is allocated for each packet.
         // The schedule provides a relative schedule for each 
@@ -111,6 +114,9 @@ impl dRMTProcessor {
                                action_args, 
                                packet,
                                stateful_memories);
+            if !packet.active {
+              break;
+            }
           }
           let new_string : String = format!("{} tick: {} {:?}\n", 
                                             self.packet_output_strings.get(&initial_tick).unwrap(), 
@@ -149,12 +155,18 @@ impl dRMTProcessor {
     let mut string_to_write : String = "".to_string();
 
     string_to_write.push_str(&format!("Packet input: {}\n", input_packet));
-    string_to_write.push_str(&format!("Packet completed on tick {}\n", 
-             self.current_tick));
+    string_to_write.push_str(&format!("Current stateful Memories:\n {:?}\n", stateful_memories));
 
-    string_to_write.push_str(&format!("Stateful Memories:\n {:?}\n", stateful_memories));
-    string_to_write.push_str(&format!("Packet output:\n {}\n==========================================\n", 
-             final_packet));
+    if final_packet.active {
+      string_to_write.push_str(&format!("Packet completed on tick {}\n", 
+               self.current_tick));
+
+      string_to_write.push_str(&format!("Packet output:\n {}\n==========================================\n", 
+               final_packet));
+    }
+    else {
+      string_to_write.push_str("PACKET DROPPED\n==========================================\n");
+    }
     string_to_write
   }
 }

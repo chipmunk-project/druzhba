@@ -113,7 +113,7 @@ fn generate_add_to_field () -> String {
   "fn add_to_field (pkt_field : &mut i32, value : i32) {\n  *pkt_field += value;\n}\n".to_string()    
 }
 fn generate_count () -> String {
-  "fn count (c : &mut StatefulMemory, value : i32) {\n  c[value] += value; \n}\n".to_string()
+  "fn count (c : &mut StatefulMemory, value : i32) {\n  c[value] += 1; \n}\n".to_string()
 }
 pub fn generate_primitive_actions () -> String {
   format!("{}{}{}{}",
@@ -237,6 +237,10 @@ fn simplify_string (current_string : String) -> Vec<String> {
   else if current_string.contains(";"){
     divide_into_vec(current_string.clone(),
                          ";".to_string())
+  }
+  else if current_string.contains(":"){
+    divide_into_vec(current_string.clone(),
+                         ":".to_string())
   }
 
   else if current_string == "" {

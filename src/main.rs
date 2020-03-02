@@ -85,8 +85,23 @@ fn generate_random_packet (header_data : HashMap <String, HashMap <String, i32>>
        !instances_name.contains("]") {
       let mut fields : HashMap <String, i32> = HashMap::new();
         for (pf, length) in pf_map.iter() {
-          if pf.contains("ttl") || pf.contains("Addr") {
-            fields.insert(pf.clone(), 4812389); 
+          // Determines which value this packet field will get.
+          // Used to trigger different actions (for testing
+          // of stateful.p4)
+          let prob_value : i32 = rand::thread_rng().gen_range(0,3);
+          if pf.contains("Addr") {
+            // Trigger hop_ipv4
+            if prob_value == 0 {
+              fields.insert(pf.clone(), 4812389); 
+            }
+            // Trigger drop_pkt
+            else if prob_value == 1 {
+              fields.insert(pf.clone(), 9341242); 
+            }
+            // Trigger act
+            else {
+              fields.insert(pf.clone(), 5123132); 
+            }
           }
           else {
             fields.insert(pf.clone(), rand::thread_rng().gen_range(0,100));  
