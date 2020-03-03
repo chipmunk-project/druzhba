@@ -28,11 +28,10 @@ impl dRMTProcessor {
                     cycle : i32)
     {
 
-      self.packet_output_strings.insert(cycle, format!("Processor {} , tick {}. Packet input:\n{}", 
-                    self.processor_id, 
-                    cycle,
-                    input_packet));
-                    
+      self.packet_output_strings.insert(cycle, format!("Incoming packet on tick {}, processor {}\n{}",
+                                                       cycle,
+                                                       self.processor_id,
+                                                       input_packet));
       let pair : (Packet, i32) = (input_packet, cycle);
       self.packets_and_initial_tick.push(pair);
     }
@@ -74,6 +73,7 @@ impl dRMTProcessor {
                                                    .get(&table_name)
                                                    .unwrap()
                                                    .clone();
+
         let mut current_lpm_action : (String, i32, Vec<i32>) = 
           ("".to_string(), 0, Vec::new());
         for ma in match_actions.iter(){
@@ -105,9 +105,6 @@ impl dRMTProcessor {
       }
     }
 
-    if !action_names_and_args.is_empty() {
-      println!("processor: {}, tick: {}\naction_names_and_args: {:?}", self.processor_id, self.current_tick,action_names_and_args);
-    }
           for (current_action, action_args) in action_names_and_args.iter() {
             // Calls every action
             (self.call_action)(current_action,
@@ -123,7 +120,22 @@ impl dRMTProcessor {
                                             self.current_tick,
                                             tasks);
           self.packet_output_strings.insert(*initial_tick, 
-                                            new_string);
+                                            new_string.clone());
+
+        if !action_names_and_args.is_empty() {
+          println!("processor: {}, tick: {}\naction_names_and_args: {:?}", 
+                                            self.processor_id, 
+                                            self.current_tick,
+                                            action_names_and_args);
+
+          self.packet_output_strings.insert(*initial_tick,
+                                            format!("{}processor: {}, tick: {}\naction_names_and_args: {:?}", 
+                                              new_string,
+                                              self.processor_id, 
+                                              self.current_tick,
+                                              action_names_and_args));
+    }
+
         } 
       }
       if self.current_tick - *initial_tick >= self.tick_duration {
@@ -153,8 +165,8 @@ impl dRMTProcessor {
     };
 
     let mut string_to_write : String = "".to_string();
-
-    string_to_write.push_str(&format!("Packet input: {}\n", input_packet));
+  
+    string_to_write.push_str(&input_packet);
     string_to_write.push_str(&format!("Current stateful Memories:\n {:?}\n", stateful_memories));
 
     if final_packet.active {

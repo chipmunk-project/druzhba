@@ -106,6 +106,10 @@ pub fn generate_constant_declarations (constants_map : &HashMap <String, String>
 fn generate_drop () -> String {
   "fn drop(p : &mut Packet) {\n  p.drop();\n}\n".to_string()
 }
+fn generate_no_op () -> String {
+  "fn no_op() { }\n".to_string()
+}
+
 fn generate_modify_field () -> String {
   "fn modify_field (pkt_field : &mut i32, value : i32) {\n  *pkt_field = value;\n}\n".to_string()
 }
@@ -115,9 +119,11 @@ fn generate_add_to_field () -> String {
 fn generate_count () -> String {
   "fn count (c : &mut StatefulMemory, value : i32) {\n  c[value] += 1; \n}\n".to_string()
 }
+
 pub fn generate_primitive_actions () -> String {
-  format!("{}{}{}{}",
+  format!("{}{}{}{}{}",
           generate_drop(),
+          generate_no_op(),
           generate_modify_field(),
           generate_add_to_field(),
           generate_count())
@@ -274,6 +280,7 @@ pub fn lexer (file : String) -> (Vec <String>,
     let line_vec : Vec<String> = 
        separate_by_whitespace(line);
     // Preprocessor interprets define and include macros
+    // Also removes single line comments
     // NOTE: macro functions are not interpreted
     if p4_file_lines[i].contains("#include") {
       add_new_file(line_vec[1].clone(), 
@@ -289,6 +296,10 @@ pub fn lexer (file : String) -> (Vec <String>,
       continue;
     }
     for elem in line_vec.iter () {
+      // For single line comment
+      if elem.to_string().contains("//") {
+        break;
+      }
       let mut elem_vec : Vec<String> = simplify_string(elem.to_string());
       if elem_vec.len() > 0 {
         tokens.append(&mut elem_vec);    

@@ -15,9 +15,9 @@ def run_dgen (args):
     subprocess.run(['./dgen_bin',
                     "dRMT", # Architecture
                     args[0], # P4 file
-                    args[6], # Path to dRMT repository
-                    args[7], # dRMT hw file (no path)
-                    args[8], # dRMT latencies file (no path)
+                    args[4], # Path to dRMT repository
+                    args[5], # dRMT hw file (no path)
+                    args[6], # dRMT latencies file (no path)
                     'src/match_action_ops.rs'
                     ])
 
@@ -34,11 +34,8 @@ def run_druzhba (args):
                     'drmt_p4',
                     args[0], # P4 file
                     args[1], # table entries file
-                    args[2], # Number of packet fields
-                    args[3], # Number of ticks
-                    args[4], # Number of processors
-                    args[5]]) # Number of state vars
-#                    args[5]]) # Path to dRMT repository
+                    args[2], # Number of ticks
+                    args[3]]) # Number of processors
 
 def main ():
     argv = sys.argv
@@ -52,10 +49,6 @@ def main ():
             type=str,
             help='File containing table entries')
 
-    parser.add_argument(
-            'num_packet_fields',
-            type=int,
-            help='Number of packet fields')
 
     parser.add_argument(
             'ticks',
@@ -65,10 +58,6 @@ def main ():
             'num_processors',
             type=int,
             help='Number of dRMT processors')
-    parser.add_argument(
-            'num_state_vars',
-            type=int,
-            help='Number of state variables for dRMT architecture')
     parser.add_argument(
             'path_to_drmt',
             type=str,
@@ -88,10 +77,9 @@ def main ():
     args = []
     args.append(raw_args.p4_file)
     args.append(raw_args.table_entries_file)
-    args.append(str(raw_args.num_packet_fields))
     args.append(str(raw_args.ticks))
-    args.append(str(raw_args.num_packet_fields))
-    args.append(str(raw_args.num_state_vars))
+
+    args.append(str(raw_args.num_processors))
     args.append(str(raw_args.path_to_drmt))
     args.append(str(raw_args.hw_file))
     args.append(str(raw_args.latencies_file))

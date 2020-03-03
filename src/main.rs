@@ -229,31 +229,17 @@ fn execute_p4_drmt (args : Vec <String>)
     println!("Schedule: {:?}", drmt_schedule);
     let p4_input_file : &str = &args[2];
     let table_entries_file : &str = &args[3];
-    let num_packet_fields : i32 = 
-    match args[4].parse::<i32>() {
-
-        Ok  (t_pkts)    => t_pkts,
-        Err (_)         => panic!("Failure: Unable to unwrap num_packet_fields"),
-      };
-
     let ticks : i32 = 
-      match args[5].parse::<i32>() {
+      match args[4].parse::<i32>() {
 
         Ok  (t_ticks) => t_ticks,
         Err (_)       => panic!("Failure: Unable to unwrap ticks"),
       };
     let num_processors : i32 = 
-      match args[6].parse::<i32>() {
+      match args[5].parse::<i32>() {
 
         Ok  (t_num_processors)    => t_num_processors,
         Err (_)                   => panic!("Failure: Unable to unwrap num_processors"),
-      };
-
-    let num_state_vars : i32 = 
-      match args[7].parse::<i32>() {
-
-        Ok  (t_num_state_vars)   => t_num_state_vars,
-        Err (_)                   => panic!("Failure: Unable to unwrap num_state_vars"),
       };
     let mut processors : Vec<dRMTProcessor> = Vec::new();
 
@@ -300,15 +286,16 @@ fn execute_p4_drmt (args : Vec <String>)
         match_action_ops::types_to_instances();
     let mut output_string : String = "".to_string();
     for t in 0..ticks {
-           processors[(t % num_processors) as usize].add_packet(
+       processors[(t % num_processors) as usize].add_packet(
            generate_random_packet(header_types.clone(),
                                   types_to_instances.clone()), t);
        for p in processors.iter_mut() {
          output_string.push_str(&p.tick(&mut stateful_memories));
        }
     }
-   fs::write("output_drmt".to_string(), output_string); 
+
    println!("dRMT output written to output_drmt");
+   fs::write("output_drmt".to_string(), output_string); 
 }
 
 #[warn(unused_imports)]
@@ -327,7 +314,7 @@ fn main() {
                 execute_rmt(args);
     },
     "drmt_p4" => {
-                assert!(args.len() == 8);
+                assert!(args.len() == 6);
                 execute_p4_drmt(args);
 
     },

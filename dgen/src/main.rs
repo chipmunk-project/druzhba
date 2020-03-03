@@ -43,7 +43,8 @@ fn drmt_generation (args : Vec <String>) {
     let mut code_generator : match_action_code_generator::MatchActionCodeGenerator = 
       match_action_code_generator::MatchActionCodeGenerator { 
                            input_file : p4_file, 
-                           output_file : file_path };
+                           output_file : file_path,
+                           compound_actions_list : Vec::new() };
     let latencies_file_path : String = {
       if path_to_drmt.chars()
                      .nth(path_to_drmt.len() - 1)

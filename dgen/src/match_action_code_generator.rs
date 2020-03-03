@@ -5,6 +5,7 @@ use match_action_generation_utils;
 pub struct MatchActionCodeGenerator {
     pub input_file : String,
     pub output_file : String,
+    pub compound_actions_list : Vec<String>,
 }
 
 impl  MatchActionCodeGenerator{
@@ -67,6 +68,8 @@ impl  MatchActionCodeGenerator{
 
     } 
     // Parse header_type fields
+    // Does not take length, max_length into account. Can be 
+    // done in future work
     fn parse_header_type_fields (&self,
                                  token : String,
                                  next_token : String,
@@ -89,19 +92,48 @@ impl  MatchActionCodeGenerator{
               header_type_string.push_str(&format!("  {}_map.insert(String::from(\"{}\"), {});\n",
                                                    header_type_name,
                                                    tmp_token_buffer[0],
-                                                   token));
+                                                   match token.trim() ==  "*" {
+    true => "64".to_string(), // Set to 64 bits by default if using * as header len
+    _    => token,
+
+    }));
               tmp_token_buffer.clear();
                                           
             }
         }
     }
 
+    fn init_primitive_param_types_map (&self) -> HashMap<String, Vec<String>> {
+      let mut prim_types_map : HashMap <String, Vec<String>> = HashMap::new();
+       prim_types_map.insert("modify_field".to_string(),
+                             vec!["reference".to_string(),
+                                  "value".to_string()]);
+       prim_types_map.insert("add_to_field".to_string(),
+                             vec!["reference".to_string(),
+                                  "value".to_string()]);
+       prim_types_map.insert("no_op".to_string(),
+                             vec![]);
+       prim_types_map.insert("count".to_string(),
+                             vec!["reference".to_string(),
+                                  "value".to_string()]);
+       prim_types_map
+    }
+    fn is_primitive_action (&self,
+                            token : &str) -> bool {
+      let string_token : String = token.to_string();
+      string_token == "modify_field" ||
+      string_token == "drop" ||
+      string_token == "add_to_field" ||
+      string_token == "count" ||
+      string_token == "no_op"
+
+    }
     // Takes in a list of actions, HashMap of action anems to tokens,
     // and types the parameters take. Takes each action in the list
     // and generates the functions. Then receives a list of new
     // non-primitive functions that were called and generates
     // those as well
-    fn compound_actions_string (&self,
+    fn compound_actions_string (&mut self,
                                 actions_list : Vec<String>, // Root actions from tables
                                 actions_to_strings_map : HashMap <String, Vec<String>>, // Action name to tokens
                                 argument_types : HashMap<String, Vec<String>>,  // Codes for the arg types (reference or value)
@@ -110,6 +142,10 @@ impl  MatchActionCodeGenerator{
       let mut table_actions_to_num_args : HashMap <String, i32> = HashMap::new();
       let mut function_actions_string : String = String::from("");
       for a in actions_list.iter() {
+        if self.compound_actions_list.contains(a) {
+          continue;
+        }
+        self.compound_actions_list.push(a.to_string());
         let tokens : Vec<String> = 
           match actions_to_strings_map.get(a) {
             Some (t) => t.clone(),
@@ -132,7 +168,7 @@ impl  MatchActionCodeGenerator{
         for k in new_argument_types.keys() {
           new_actions_list.push (k.clone());
         }
-        
+
         let string_and_arg_num_map : (String, HashMap <String, i32>) = 
                                                                 self.compound_actions_string (new_actions_list,
                                                                 actions_to_strings_map.clone(),
@@ -147,7 +183,9 @@ impl  MatchActionCodeGenerator{
     }
     // Takes tokens of an action and a vector containing the 
     // types of the parameters to be taken in. Returns String
-    // of the transpiled Rust code
+    // of the transpiled Rust code. Returns HashMap of name of 
+    // new function that is being called to the type parameters 
+    // and the and number of parameters
     fn process_function (&self,
                         tokens : Vec<String>,
                         argument_types : Vec<String>,
@@ -165,8 +203,10 @@ impl  MatchActionCodeGenerator{
       let mut calling_function_name : String = String::from("none");  
       let mut calling_function_types : Vec<String> = Vec::new();
       // "special" primitive functions take in pkt as param
-      let mut is_special_primitive : bool = false;
+      let mut primitive : String = "".to_string();
       let mut field_declarations : String = String::from("");
+      let prim_param_types : HashMap <String, Vec<String>> = self.init_primitive_param_types_map();
+      let mut prim_index : usize = 0;
       let mut field_ctr : i32 = 0;
       let mut header_types_and_fields : Vec<(String, String)> = Vec::new();
 
@@ -250,20 +290,19 @@ impl  MatchActionCodeGenerator{
           else if curly_brace_stack.len() != 0 &&
                   (tokens[i-1] == ";" ||
                   tokens[i-1] == "{") {
-    
-            if token != "add_to_field" &&
-               token != "modify_field" &&
-               token != "drop"         &&
-               token != "count"  {
+            // If action that is being called is a primitive
+            // action, no need to process it since it's
+            // already being generated 
+            if !self.is_primitive_action (&token) {
               calling_function_name = token.clone();
+              primitive = "".to_string();
             }
             else {
               calling_function_name = "none".to_string();
+              primitive = token.to_string();
+              prim_index = 0;
             }
             action_functions_body.push_str(&token);
-            if token == "drop" {
-              is_special_primitive = true;
-            }
           }
           // NOTE: currently not processing hex values. Look into
           // implementing this if masks are needed. Used to prevent
@@ -285,17 +324,31 @@ impl  MatchActionCodeGenerator{
               let field_for_action : String = 
                 token[period_index+1..token.len()]
                                   .to_string();
+            if primitive.len() > 0 {
+              let type_vec : Vec<String> = prim_param_types.get(&primitive)
+                                                          .unwrap()
+                                                          .to_vec();
+              if type_vec[prim_index] == "value" {
+                action_functions_body.push_str(
+                  &format!("pkt.get_field_value (\"{}\", \"{}\")",
+                      &header_type_for_action, &field_for_action));
+                prim_index+=1;
 
-           
-            field_declarations.push_str(
-              &format!("  let mut field_{} : i32 = pkt.get_field_value (\"{}\", \"{}\");\n  ",
-                      field_ctr, &header_type_for_action, &field_for_action));
-            action_functions_body.push_str(
-               &format!("&mut field_{}", field_ctr));
-            header_types_and_fields.push((header_type_for_action.clone(),
-                                         field_for_action.clone()));
-            field_ctr += 1; 
-              if calling_function_name != "none" {
+              }
+              else {
+                // Create mutable reference to that field 
+                field_declarations.push_str(
+                  &format!("  let mut field_{} : i32 = pkt.get_field_value (\"{}\", \"{}\");\n  ",
+                          field_ctr, &header_type_for_action, &field_for_action));
+                action_functions_body.push_str(
+                   &format!("&mut field_{}", field_ctr));
+                header_types_and_fields.push((header_type_for_action.clone(),
+                                             field_for_action.clone()));
+                prim_index+=1;
+                field_ctr += 1; 
+                }
+              }
+              else {
                 calling_function_types.push("reference_field".to_string());
               }
             }
@@ -320,12 +373,14 @@ impl  MatchActionCodeGenerator{
                   &format!("&mut field_{}", field_ctr));
                 header_types_and_fields.push(("".to_string(), token.clone())); 
                 field_ctr+=1;
-                if calling_function_name != "none" {
+                prim_index+=1;
+                if primitive.len() == 0 &&
+                   calling_function_name != "none"{
                   calling_function_types.push("reference_memory".to_string());
                 }
               }
               // The drop primitive takes in a pkt
-              else if is_special_primitive && token == "(" {
+              else if primitive == "drop" && token == "(" {
                 action_functions_body.push_str("(pkt");
               }
               // Add pkt, stateful_memories arguments for calling 
@@ -339,6 +394,10 @@ impl  MatchActionCodeGenerator{
                   action_functions_header.push_str(&token);
                 }
                 else {
+                  if token.parse::<f64>().is_ok() &&
+                     primitive.len() > 0 {
+                    prim_index+=1; 
+                  } 
                   action_functions_body.push_str(&token);
                 }
               }
@@ -422,7 +481,7 @@ impl  MatchActionCodeGenerator{
     // be written to a new file and the second is a Vec<String>
     // which contains any new P4 files to parse next that the 
     // current P4 file includes
-    fn extract_p4_contents (&self, 
+    fn extract_p4_contents (&mut self, 
                             tokens : Vec<String>,
                             constants_list : Vec <String>) -> 
                             String {
@@ -472,6 +531,10 @@ impl  MatchActionCodeGenerator{
             if tmp_token_buffer.len() > 0 {
               tmp_token_buffer.clear();
             }
+            state = String::from("none");
+          }
+          if state == "table_actions" {
+    
             state = String::from("none");
           }
         }
@@ -707,7 +770,7 @@ impl  MatchActionCodeGenerator{
        register_string.push_str("  register_map\n}\n");
      }
      else {
-        register_string.push_str("pub fn registers () -> HashMap <String, HashMap <String, String>> {\n ; "); 
+        register_string.push_str("pub fn registers () -> HashMap <String, HashMap <String, String>> {\n  HashMap::new()\n}\n "); 
      }
 
      if counter_stack.len() > 0 {
@@ -739,6 +802,7 @@ impl  MatchActionCodeGenerator{
      for ta in table_actions_list.iter() {
        table_actions_types_map.insert(ta.clone(), vec!["root".to_string()]);
      }
+
      let (action_functions_string, table_actions_to_num_args)  = 
                 self.compound_actions_string(table_actions_list.clone(), 
                                              actions_to_strings_map , 
@@ -806,6 +870,6 @@ impl  MatchActionCodeGenerator{
                                   match_action_generation_utils::generate_hashmap_schedule(schedule),
                                   match_action_generation_utils::generate_latencies_functions(latencies_file))
                                 ).expect("Error: could not write to output Rust file");
-
+      println!("Output written to {}", self.output_file);
     }
 }

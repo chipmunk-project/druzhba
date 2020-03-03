@@ -6,7 +6,7 @@
 #file_name = `basename "$1"`
 if [[ $# -ne 4 ]]
 then
-  echo "Usage: <DAG file> <path/to/drmt> <hw file> <dRMT latencies>"
+    echo "Usage: <DAG file> <path/to/drmt> <hw file> <dRMT latencies>"
 else 
   echo "Arg 1: $1"
   echo "Arg 2: $2"
@@ -19,8 +19,7 @@ else
   # Strip path 
   file_name=${1##*/}
   # Run drmt and strip file extension
-#  echo $2/drmt.py
-#  echo ${file_name%.py}
+  #  echo $2/drmt.py
+  #  echo ${file_name%.py}
   python -u $2/drmt.py ${file_name%.py} $3 $4 10
 fi
-
