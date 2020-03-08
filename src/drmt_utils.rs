@@ -17,6 +17,7 @@ fn retrieve_memory_field_string (field : &str,
 }
 fn retrieve_memory_field_i32 (field : &str, 
                               mem_data : &HashMap <String, String>) -> i32 {
+  println!("Retrieving i32 from field {} in mem_data: \n {:?}", field, mem_data);
   match mem_data.contains_key(field){
     true  =>  mem_data
                 .get(field)
@@ -143,7 +144,6 @@ pub fn parse_table_entries (table_entries_file : &str)
       }
       else if token == ":" &&
               line_vec[i-1] == "args" {
-        println!("parsing_args true");
         parsing_args = true;
       }
       else if token == ":" &&
@@ -168,7 +168,6 @@ fn init_match_action (fields_map : HashMap <String, String>,
                       args_string : String)
                       -> MatchAction {
   // Convert args to i32 and strip comments and whitespace
-  println!("args string: {}", args_string);
   // args_string is already stripped of whitespace from the beginning
   // and end thus if length is 0, there are no args
   let args : Vec<i32> = 

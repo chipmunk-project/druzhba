@@ -34,8 +34,14 @@ impl MatchAction {
         "lpm"   => self.match_value & self.mask ==
                      input_field & self.mask,
 
+        "valid" => true, // Assume the field is correctly parsed
         _ => false
       };
+    }
+    else if self.match_type == "valid" && 
+            incoming_packet
+              .contains_header_type(&self.match_header_type) {
+      match_found = true;
     }
     match_found
   }

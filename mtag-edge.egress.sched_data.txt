@@ -1,0 +1,17 @@
+nodes = \
+{'egress_check_ACTION': {'num_fields': 4, 'type': 'action'},
+ 'egress_check_MATCH': {'key_width': 10, 'type': 'match'},
+ 'egress_meter_ACTION': {'num_fields': 1, 'type': 'action'},
+ 'egress_meter_MATCH': {'key_width': 17, 'type': 'match'},
+ 'meter_policy_ACTION': {'num_fields': 1, 'type': 'action'},
+ 'meter_policy_MATCH': {'key_width': 8, 'type': 'match'}}
+
+edges = \
+{('egress_check_MATCH', 'egress_check_ACTION'): {'delay': 9,
+                                                 'dep_type': 'new_match_to_action'},
+ ('egress_meter_ACTION', 'meter_policy_MATCH'): {'delay': 1,
+                                                 'dep_type': 'rmt_match'},
+ ('egress_meter_MATCH', 'egress_meter_ACTION'): {'delay': 9,
+                                                 'dep_type': 'new_match_to_action'},
+ ('meter_policy_MATCH', 'meter_policy_ACTION'): {'delay': 9,
+                                                 'dep_type': 'new_match_to_action'}}

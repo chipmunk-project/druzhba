@@ -70,17 +70,22 @@ fn generate_random_packet (header_data : HashMap <String, HashMap <String, i32>>
                                      "instance_type".to_string(),
                                      "parser_status".to_string(),
                                      "parser_error_location".to_string()];
-                                            
+                      
+  let mut field_lengths : HashMap <String, i32> = HashMap::new();                      
   // Populate packet with random header_types
+    let chance_to_add : i32 = rand::thread_rng().gen_range(0,4);
   for (ht, pf_map) in header_data.iter() {
 
-    let chance_to_add : i32 = rand::thread_rng().gen_range(0,4);
 
     let instances_name : String = types_to_instances.get(ht)
                                                     .expect("Error: type not detected in types_to_instances")
                                                     .clone();
+    field_lengths.extend(pf_map.clone());
+    if (instances_name == "local_metadata" || instances_name == "mtag") && chance_to_add <=2 {
+      continue; // Testing purposes for mtag-aggregation
+    }
 
-    if chance_to_add == 0 &&
+    if //chance_to_add == 0 &&
        !instances_name.contains("[") && //TODO: Enable this later
        !instances_name.contains("]") {
       let mut fields : HashMap <String, i32> = HashMap::new();
@@ -89,7 +94,7 @@ fn generate_random_packet (header_data : HashMap <String, HashMap <String, i32>>
           // Used to trigger different actions (for testing
           // of stateful.p4)
           let prob_value : i32 = rand::thread_rng().gen_range(0,3);
-          if pf.contains("Addr") {
+          if pf.contains("Addr")  || pf.contains("port_type") || pf.contains("ingress_port") {
             // Trigger hop_ipv4
             if prob_value == 0 {
               fields.insert(pf.clone(), 4812389); 
@@ -114,14 +119,23 @@ fn generate_random_packet (header_data : HashMap <String, HashMap <String, i32>>
   }
   let mut metadata_map : HashMap <String, i32> = HashMap::new();
   for mf in metadata_fields.iter() {
-    metadata_map.insert(mf.clone(),
-                              rand::thread_rng().gen_range(0,100));
+
+    let prob_value : i32 = rand::thread_rng().gen_range(0,2);
+    if mf.contains("ingress_port")  && prob_value == 0{
+      metadata_map.insert(mf.clone(), 10);
+    }
+    else {
+      metadata_map.insert(mf.clone(),
+                                rand::thread_rng().gen_range(0,100));
+    }
   }
   packet_data_fields.insert("standard_metadata".to_string(),
                             metadata_map);
   Packet {
     packet_and_metadata_fields : packet_data_fields,
+    packet_field_lengths : field_lengths,
     active : true,
+    tick_dropped : -1,
   }
 
 }
@@ -284,7 +298,12 @@ fn execute_p4_drmt (args : Vec <String>)
         match_action_ops::header_types();
     let types_to_instances : HashMap <String, String> = 
         match_action_ops::types_to_instances();
-    let mut output_string : String = "".to_string();
+    let mut output_string : String = format!("P4 file: {}\nTable entries file: {}\ndRMT processor: {}\nTicks: {}\nTable entries: {:?}\n************************************\n",
+                                            p4_input_file,
+                                            table_entries_file,
+                                            num_processors,
+                                            ticks,
+                                            table_entries_map);
     for t in 0..ticks {
        processors[(t % num_processors) as usize].add_packet(
            generate_random_packet(header_types.clone(),

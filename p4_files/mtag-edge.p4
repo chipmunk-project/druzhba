@@ -44,6 +44,9 @@ action _strip_mtag() {
     modify_field(local_metadata.was_mtagged, 1);
 }
 
+action drop_pkt() {
+  drop();
+}
 // Always strip the mtag if present on the edge switch
 table strip_mtag {
     reads {
@@ -94,8 +97,9 @@ action add_mTag(up1, up2, down1, down2) {
     modify_field(mtag.ethertype, vlan.ethertype);
 
     // Set VLAN's ethertype to signal mTag
-    modify_field(vlan.ethertype, 0xaaaa);
+//    modify_field(vlan.ethertype, 0xaaaa);
 
+    modify_field(vlan.ethertype, 43690);
     // Add the tag source routing information
     modify_field(mtag.up1, up1);
     modify_field(mtag.up2, up2);
@@ -151,11 +155,11 @@ table egress_check {
 meter per_dest_by_source {
     type : bytes;
     result : local_metadata.color;
-    instance_count : PORT_COUNT * PORT_COUNT;  // Per source/dest pair
+    instance_count : 4096;  // Per source/dest pair
 }
 
 action meter_pkt(meter_idx) {
-    meter(per_dest_by_source, meter_idx, local_metadata.color);
+    execute_meter(per_dest_by_source, meter_idx, local_metadata.color);
 }
 
 // Mark packet color, for uplink ports only
@@ -168,7 +172,7 @@ table egress_meter {
         meter_pkt;
         do_nothing;
     }
-    size : PORT_COUNT * PORT_COUNT;  // Could be smaller
+    size : 4096;  // Could be smaller
 }
 
 // Apply meter policy
@@ -182,7 +186,7 @@ table meter_policy {
         local_metadata.color : exact;
     }
     actions {
-        drop; // Automatically counted by direct counter above
+        drop_pkt; // Automatically counted by direct counter above
         do_nothing;
     }
 }

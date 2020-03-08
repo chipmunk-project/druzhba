@@ -103,6 +103,18 @@ pub fn generate_constant_declarations (constants_map : &HashMap <String, String>
   }
   constant_declaration_string
 }
+fn generate_remove_header () -> String {
+  "fn remove_header (pkt : &mut Packet, header_type : &str) {\n  pkt.remove_header(header_type);\n}\n".to_string()
+}
+fn generate_add_header() -> String {
+  let mut fn_string : String = "fn add_header (pkt : &mut Packet, header_type : &str) {\n  let mut fields : HashMap<String, i32> = header_types().get(header_type).expect(\"Error: header not present in header_types\").clone();\n".to_string();
+  fn_string.push_str("  let mut tmp_fields = fields.clone();\n  for f in tmp_fields.keys(){ fields.insert(f.to_string(), 0); }\n");
+  fn_string.push_str("  pkt.add_header (header_type, fields);\n }\n");
+  fn_string
+}
+fn generate_execute_meter() -> String {
+  "fn execute_meter (pkt : &mut Packet, meter_ref : &mut StatefulMemory, index : i32, field : &mut i32) {\n meter_ref[index] = pkt.total_length();\n  *field = 0; // This field represents color. Set to 0 by default\n}\n".to_string()
+}
 fn generate_drop () -> String {
   "fn drop(p : &mut Packet) {\n  p.drop();\n}\n".to_string()
 }
@@ -121,12 +133,15 @@ fn generate_count () -> String {
 }
 
 pub fn generate_primitive_actions () -> String {
-  format!("{}{}{}{}{}",
+  format!("{}{}{}{}{}{}{}{}",
           generate_drop(),
           generate_no_op(),
           generate_modify_field(),
           generate_add_to_field(),
-          generate_count())
+          generate_count(),
+          generate_add_header(),
+          generate_remove_header(),
+          generate_execute_meter())
 }
 // Takes in the included P4 file and modifies it so that
 // the file can be found from the current directory

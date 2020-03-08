@@ -42,6 +42,10 @@ impl dRMTProcessor {
       let mut initial_tick_of_exit_packet : i32 = -1;
       for (packet, initial_tick) in self.packets_and_initial_tick.iter_mut(){
         if !packet.active {
+          if self.current_tick - *initial_tick >= self.tick_duration {
+            initial_tick_of_exit_packet = *initial_tick;
+          }
+
           continue;
         }
         // Perform current_tick - initial_tick to align with the 
@@ -106,12 +110,14 @@ impl dRMTProcessor {
     }
 
           for (current_action, action_args) in action_names_and_args.iter() {
+            println!("\tCalling {}", current_action);
             // Calls every action
             (self.call_action)(current_action,
                                action_args, 
                                packet,
                                stateful_memories);
             if !packet.active {
+              packet.tick_dropped = self.current_tick;
               break;
             }
           }
@@ -158,6 +164,7 @@ impl dRMTProcessor {
     let (final_packet, tick) = 
         self.packets_and_initial_tick.remove(0);
 
+//    println!("Removing packet: {} that arrived at {}", final_packet, tick);
     let input_packet : String = match self.packet_output_strings.get(&tick){
       Some (s) => s.to_string(),
       _        => panic!("Error: string does not exist in packet_output_strings for given tick"),
@@ -167,18 +174,21 @@ impl dRMTProcessor {
     let mut string_to_write : String = "".to_string();
   
     string_to_write.push_str(&input_packet);
-    string_to_write.push_str(&format!("Current stateful Memories:\n {:?}\n", stateful_memories));
+    string_to_write.push_str(&format!("\nCurrent stateful Memories:\n {:?}\n", stateful_memories));
 
     if final_packet.active {
-      string_to_write.push_str(&format!("Packet completed on tick {}\n", 
+      string_to_write.push_str(&format!("\nPacket completed on tick {}\n", 
                self.current_tick));
+    }
 
       string_to_write.push_str(&format!("Packet output:\n {}\n==========================================\n", 
                final_packet));
-    }
-    else {
-      string_to_write.push_str("PACKET DROPPED\n==========================================\n");
-    }
+
+      if !final_packet.active {
+
+        string_to_write.push_str(&format!("****PACKET DROPPED AT TICK {}****\n==========================================\n", final_packet.tick_dropped));
+      }
+    
     string_to_write
   }
 }

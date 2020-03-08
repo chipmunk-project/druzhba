@@ -113,6 +113,19 @@ impl  MatchActionCodeGenerator{
                                   "value".to_string()]);
        prim_types_map.insert("no_op".to_string(),
                              vec![]);
+       prim_types_map.insert("execute_meter".to_string(),
+                             vec!["reference".to_string(),
+                                  "reference".to_string(),
+                                  "value".to_string(),
+                                  "reference".to_string()]);
+      // TODO: Add support for add_header
+       prim_types_map.insert("remove_header".to_string(),
+                             vec!["reference".to_string(),
+                             "reference".to_string()]);
+       prim_types_map.insert("add_header".to_string(),
+                             vec!["reference".to_string(),
+                             "reference".to_string()]);
+
        prim_types_map.insert("count".to_string(),
                              vec!["reference".to_string(),
                                   "value".to_string()]);
@@ -125,7 +138,10 @@ impl  MatchActionCodeGenerator{
       string_token == "drop" ||
       string_token == "add_to_field" ||
       string_token == "count" ||
-      string_token == "no_op"
+      string_token == "no_op" ||
+      string_token == "execute_meter" ||
+      string_token == "remove_header" ||
+      string_token == "add_header"
 
     }
     // Takes in a list of actions, HashMap of action anems to tokens,
@@ -145,6 +161,7 @@ impl  MatchActionCodeGenerator{
         if self.compound_actions_list.contains(a) {
           continue;
         }
+        println!("Searching for action {} in actions_to_strings_map {:?}", a, actions_to_strings_map);
         self.compound_actions_list.push(a.to_string());
         let tokens : Vec<String> = 
           match actions_to_strings_map.get(a) {
@@ -294,25 +311,42 @@ impl  MatchActionCodeGenerator{
             // action, no need to process it since it's
             // already being generated 
             if !self.is_primitive_action (&token) {
+              println!("Calling non-primitive: {}", token);
               calling_function_name = token.clone();
               primitive = "".to_string();
             }
             else {
               calling_function_name = "none".to_string();
               primitive = token.to_string();
-              prim_index = 0;
             }
+
+            prim_index = 0;
             action_functions_body.push_str(&token);
+          }
+          // The drop primitive takes in a pkt
+          else if (primitive == "drop" || 
+                   primitive == "execute_meter") && 
+                   token == "(" {
+            action_functions_body.push_str("(pkt,");
+          }
+          else if (primitive == "add_header" ||
+                  primitive == "remove_header") &&
+                  tokens[i-1] == "(" {
+            action_functions_body.push_str(&format!("pkt, \"{}\"", token)); 
           }
           // NOTE: currently not processing hex values. Look into
           // implementing this if masks are needed. Used to prevent
           // working with hex values for modify_field action
-          else if token.len() > 2 && 
-                  token[0..2].to_string() == "0x" {
-            continue;
-          }
+/*
+          else if (token.len() > 2 && 
+                  token[0..2].to_string() == "0x") ||
+                  token == "," {
+            action_functions_body.push_str(&token);
+          //  continue;
+          }*/
           // Handle packet or metadata field
           else if token.contains(".") {
+              let mut ref_string : String = "".to_string();
               let period_index : usize = 
                 match token.as_str().find('.') {
                   Some (x) => x,
@@ -324,12 +358,22 @@ impl  MatchActionCodeGenerator{
               let field_for_action : String = 
                 token[period_index+1..token.len()]
                                   .to_string();
-            if primitive.len() > 0 {
-              let type_vec : Vec<String> = prim_param_types.get(&primitive)
-                                                          .unwrap()
-                                                          .to_vec();
-              if type_vec[prim_index] == "value" {
-                action_functions_body.push_str(
+            // Only send immutable references to packet fields 
+            // for certain primitives
+            
+            let type_vec : Vec<String> = 
+              match prim_param_types.contains_key(&primitive) {
+                true => prim_param_types.get(&primitive)
+                                        .unwrap()
+                                        .to_vec(),
+                false => Vec::new(),
+              };
+
+            if primitive.len() > 0 && 
+               type_vec.len() > 0 &&
+               type_vec[prim_index] == "value" {
+
+                ref_string.push_str(
                   &format!("pkt.get_field_value (\"{}\", \"{}\")",
                       &header_type_for_action, &field_for_action));
                 prim_index+=1;
@@ -340,23 +384,24 @@ impl  MatchActionCodeGenerator{
                 field_declarations.push_str(
                   &format!("  let mut field_{} : i32 = pkt.get_field_value (\"{}\", \"{}\");\n  ",
                           field_ctr, &header_type_for_action, &field_for_action));
-                action_functions_body.push_str(
+                ref_string.push_str(
                    &format!("&mut field_{}", field_ctr));
                 header_types_and_fields.push((header_type_for_action.clone(),
                                              field_for_action.clone()));
-                prim_index+=1;
+                prim_index += 1;
                 field_ctr += 1; 
-                }
-              }
-              else {
+
                 calling_function_types.push("reference_field".to_string());
               }
+
+              action_functions_body.push_str(&ref_string);
             }
             else {
               // Checks if this token is a number, a 
               // parameter, or a constant. Also checks if we
               // are not in the functon header. If not, then
               // this token must be a stateful memory
+              // TODO: Check if string
               if !token.parse::<f64>().is_ok() &&
                   curly_brace_stack.len() != 0 &&
                  !parameter_types.contains_key(&token) &&
@@ -379,10 +424,7 @@ impl  MatchActionCodeGenerator{
                   calling_function_types.push("reference_memory".to_string());
                 }
               }
-              // The drop primitive takes in a pkt
-              else if primitive == "drop" && token == "(" {
-                action_functions_body.push_str("(pkt");
-              }
+
               // Add pkt, stateful_memories arguments for calling 
               // compound functions
               else if token == ")" &&
@@ -394,6 +436,7 @@ impl  MatchActionCodeGenerator{
                   action_functions_header.push_str(&token);
                 }
                 else {
+                  // COnstant input to primitive action
                   if token.parse::<f64>().is_ok() &&
                      primitive.len() > 0 {
                     prim_index+=1; 
@@ -759,11 +802,13 @@ impl  MatchActionCodeGenerator{
        table_matches_string.push_str("  matches\n}\n");
        table_actions_string.push_str("  table_to_actions\n}\n");
      }
+     let mut stateful_memory_names = Vec::new();
      // Are there any registers? If so ensure they are returned
      // in the final HashMap. Otherise return an empty HashMap.
      // Repeat for counters, meters
      if register_stack.len() > 0 {
        for nn in register_stack.iter() {
+         stateful_memory_names.push(nn.to_string());
          register_string.push_str(
             &format!("  register_map.insert(String::from(\"{}\"), {}_map);\n", nn, nn));
        }
@@ -775,6 +820,8 @@ impl  MatchActionCodeGenerator{
 
      if counter_stack.len() > 0 {
        for cn in counter_stack.iter() {
+
+         stateful_memory_names.push(cn.to_string());
          counter_string.push_str(
             &format!("  counter_map.insert(String::from(\"{}\"), {}_map);\n ", cn, cn));
        }
@@ -786,6 +833,8 @@ impl  MatchActionCodeGenerator{
      }
      if meter_stack.len() > 0 {
        for mn in meter_stack.iter() {
+
+         stateful_memory_names.push(mn.to_string());
          meter_string.push_str(
             &format!("  meter_map.insert(String::from(\"{}\"), {}_map);\n ", mn, mn));
        }
