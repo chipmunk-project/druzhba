@@ -9,13 +9,25 @@ will be automatically generated in the Druzhba src directory
 which will allow the simulator to run.
 
 
-Running dgen/dsim:
+Running dgen/dsim using the protocol independent switch architecture:
 
-    python3 execute_simulator.py <program name> <stateful ALU> <stateless ALU> <pipeline depth> <pipieline width> <stateful ALUs per stage> <constant set> <hole configurations> <packets> <ticks> <optimization level>
+    python3 pisa_simulation_execute.py <program name> <stateful ALU> <stateless ALU> <pipeline depth> <pipieline width> <stateful ALUs per stage> <constant set> <hole configurations> <packets> <ticks> <optimization level>
 
 Example:
 
-    python3 execute_simulator.py simple example_alus/stateful_alus/raw.alu example_alus/stateless_alus/stateless_alu.alu 2 2 1 "0,1,2,3" hole_configurations/simple_raw_stateless_alu_2_2_hole_cfgs.txt 1 100 1
+    python3 pisa_simulation_execute.py simple example_alus/stateful_alus/raw.alu example_alus/stateless_alus/stateless_alu.alu 2 2 1 "0,1,2,3" hole_configurations/simple_raw_stateless_alu_2_2_hole_cfgs.txt 1 100 1
+
+Running dsim using dRMT architecture (using P4):
+
+    python3 p4_drmt_simulation_execute.py <P4 file> <table entries file> <ticks> <num of processors> <path to drmt repository> <hw file> <latencies file>
+
+Example:
+
+    python3 p4_drmt_simulation_execute.py p4_files/stateful.p4 table_entries/stateful_table_entries 30 4 /path/to/drmt large_hw drmt_latencies
+  
+NOTE: p4-hlir (https://github.com/jafingerhut/p4-hlir) is needed, which converts .p4 file into DAG.
+Must also have drmt repository (github.com/anirudhSK/drmt/) downloaded 
+
 
 Tests will ensure the druhzba pipeline is outputting
 the correct packets relative to the input packets

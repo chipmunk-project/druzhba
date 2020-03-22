@@ -1,0 +1,11 @@
+nodes = \
+{'ipv4_routing_ACTION': {'num_fields': 2, 'type': 'action'},
+ 'ipv4_routing_MATCH': {'key_width': 32, 'type': 'match'},
+ 'table_2_ACTION': {'num_fields': 1, 'type': 'action'},
+ 'table_2_MATCH': {'key_width': 32, 'type': 'match'}}
+
+edges = \
+{('ipv4_routing_MATCH', 'ipv4_routing_ACTION'): {'delay': 9,
+                                                 'dep_type': 'new_match_to_action'},
+ ('table_2_MATCH', 'table_2_ACTION'): {'delay': 9,
+                                       'dep_type': 'new_match_to_action'}}

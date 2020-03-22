@@ -1,0 +1,139 @@
+TableEntry {
+  match {
+    table : strip_mtag
+    header_type : mtag
+    field : *
+    type : valid
+    data {
+      match_value : 9341242
+      range : 0 
+      mask : 0x0000
+    }
+  }
+
+  action {
+    action_name : _strip_mtag
+    args : {  }
+     
+  }
+}
+
+TableEntry {
+  match {
+    table : check_mtag
+    header_type : mtag
+    field : *
+    type : valid
+    data {
+      match_value : 5123132
+      range : 0 
+      mask : 0x0000
+    }
+  }
+  action {
+    action_name : do_nothing
+    args : { }
+  }
+}
+
+TableEntry {
+  match {
+    table : identify_port
+    header_type : standard_metadata
+    field : ingress_port
+    type : exact
+    data {
+      match_value : 4812389
+      range : 0 
+      mask : 0x0000
+    }
+  }
+
+  action {
+    action_name : common_set_port_type
+    args : { 12, 7 }
+     
+  }
+}
+
+TableEntry {
+  match {
+    table : identify_port
+    header_type : standard_metadata
+    field : ingress_port
+    type : exact
+    data {
+      match_value : 9341242
+      range : 0 
+      mask : 0x0000
+    }
+  }
+
+  action {
+    action_name : common_drop_pkt
+    args : { 8, 3, 1 }
+     
+  }
+}
+
+TableEntry {
+  match {
+    table : identify_port
+    header_type : standard_metadata
+    field : ingress_port
+    type : exact
+    data {
+      match_value : 5123132
+      range : 0 
+      mask : 0x0000
+    }
+  }
+
+  action {
+    action_name : do_nothing
+    args : {  }
+     
+  }
+}
+
+TableEntry {
+  match {
+    table : local_switching
+    header_type : vlan
+    field : vid
+    type : exact
+    data {
+      match_value : 5123132
+      range : 0 
+      mask : 0x0000
+    }
+  }
+
+  action {
+    action_name : egress_spec
+    args : { 3 }
+     
+  }
+}
+
+TableEntry {
+  match {
+    table : egress_meter
+    header_type : mtage 
+    field : up1
+    type : exact
+    data {
+      match_value : 4812389
+      range : 0 
+      mask : 0x0000
+    }
+  }
+
+  action {
+    action_name : meter_pkt
+    args : { 4 }
+     
+  }
+}
+
+

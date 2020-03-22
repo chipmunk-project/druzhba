@@ -6,7 +6,9 @@ def run_dgen_unoptimized (args):
     subprocess.run(['cp',
                     'dgen/target/debug/dgen',
                     'dgen_bin'])
+
     subprocess.run(['./dgen_bin',
+                    'pisa',
                     args[0], # Program name
                     args[1], # Stateful ALU
                     args[2], # Stateless ALU
@@ -19,10 +21,12 @@ def run_dgen_unoptimized (args):
     subprocess.run(['rm',
                     'dgen_bin'])
 
+# Gives dsim hole configs
 def run_druzhba_unoptimized (args):
     subprocess.run(['cargo',
                     'run',
-                    args[7],
+                    'pisa',
+                    args[7], 
                     args[8],
                     args[9]])
 def run_dgen_optimized (args):
@@ -30,6 +34,7 @@ def run_dgen_optimized (args):
                     'dgen/target/debug/dgen',
                     'dgen_bin'])
     subprocess.run(['./dgen_bin',
+                    'pisa',
                     args[0], # Program name
                     args[1], # Stateful ALU
                     args[2], # Stateless ALU
@@ -47,6 +52,7 @@ def run_dgen_optimized (args):
 def run_druzhba_optimized (args):
     subprocess.run(['cargo',
                     'run',
+                    'pisa',
                     args[8],
                     args[9]])
 def main ():
@@ -125,5 +131,5 @@ def main ():
         run_druzhba_optimized(args)
 
 
-if __name__== "__main__":
+if __name__== '__main__':
     main()

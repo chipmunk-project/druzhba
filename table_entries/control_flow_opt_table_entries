@@ -1,0 +1,80 @@
+
+TableEntry {
+  match {
+    table : ipv4_routing
+    header_type : ipv4
+    field : dstAddr
+    type : lpm
+    data {
+      match_value : 4812389
+      range : 0 
+      mask : 0xFF00
+    }
+  }
+
+  action {
+    action_name : hop_ipv4
+    args : { 12 }
+     
+  }
+}
+
+
+TableEntry {
+  match {
+    table : ipv4_routing
+    header_type : ipv4
+    field : dstAddr
+    type : lpm
+    data {
+      match_value : 9341242
+      range : 0 
+      mask : 0xFFF0
+    }
+  }
+
+  action {
+    action_name : drop_pkt
+    args : {  }
+     
+  }
+}
+
+TableEntry {
+  match {
+    table : table_2
+    header_type : ipv4
+    field : dstAddr
+    type : lpm
+    data {
+      match_value : 5123132
+      range : 0 
+      mask : 0xF000
+    }
+  }
+
+  action {
+    action_name : act
+    args : {  }
+     
+  }
+}
+TableEntry {
+  match {
+    table : table_3
+    header_type : ipv4
+    field : dstAddr
+    type : lpm
+    data {
+      match_value : 5123132
+      range : 0 
+      mask : 0xF000
+    }
+  }
+
+  action {
+    action_name : lala
+    args : {  }
+     
+  }
+}
